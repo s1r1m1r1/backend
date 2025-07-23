@@ -1,0 +1,12 @@
+name: fullstack_todo
+packages:
+  - backend
+  - frontend
+
+scripts:
+  backend:dev:
+    run: cd backend && dart_frog dev --port=8080
+    description: Start the Dart Frog backend
+  frontend:
+    run: cd frontend && flutter run --target lib/main.dart
+    description: Start the Flutter frontend
