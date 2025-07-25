@@ -9,6 +9,8 @@ import 'package:models/models.dart';
 import 'package:repository/repository.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
+
+import '../../domain/todo_repository.dart';
 part '../../../show_todo/bloc/show_todo_bloc.freezed.dart';
 
 @injectable
@@ -48,13 +50,6 @@ class ShowTodosBloc extends Bloc<ShowTodosEvent, ShowTodosState> {
       _todosDataService.add(event.todo.copyWith(completed: !completed));
       emit(state.copyWith(failure: failure.message));
     }, (_) {});
-  }
-
-  Future<void>? handleTodo([Todo? todo]) {
-    return _navigationService.navigateTo<void>(
-      Routes.maintainTodoView,
-      arguments: MaintainTodoViewArguments(todo: todo),
-    );
   }
 }
 

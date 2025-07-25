@@ -1,5 +1,4 @@
 import 'package:backend/db_client/db_client.dart';
-import 'package:backend/db_client/tables/channel_table.dart';
 import 'package:backend/db_client/tables/todo_table.dart';
 import 'package:drift/drift.dart';
 import '../../exceptions/not_found_exceptions.dart';

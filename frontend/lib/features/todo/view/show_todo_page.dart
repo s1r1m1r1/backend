@@ -1,22 +1,28 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:fullstack_todo/core/di/locator.dart';
-import 'package:fullstack_todo/presentation/show_todos/show_todos_viewmodel.dart';
-import 'package:fullstack_todo/presentation/show_todos/widgets/todo_list_tile.dart';
-import 'package:stacked/stacked.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/di/injectable.dart';
+import 'package:frontend/features/todo/view/bloc/show_todo_bloc.dart';
 
 class ShowTodosPage extends StatelessWidget {
   const ShowTodosPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ViewModelBuilder<ShowTodosViewModel>.reactive(
-      viewModelBuilder: locator.call,
-      onViewModelReady: (model) => model.init(),
-      builder: (BuildContext context, ShowTodosViewModel model, Widget? child) {
+    return BlocProvider(create: (_) => getIt<ShowTodosBloc>(), child: const ShowTodosView());
+  }
+}
+
+class ShowTodosView extends StatelessWidget {
+  const ShowTodosView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ShowTodosBloc, ShowTodosState>(
+      builder: (context, state) {
         return Scaffold(
           appBar: AppBar(title: const Text('Todos')),
-          floatingActionButton: FloatingActionButton(onPressed: model.handleTodo, child: const Icon(Icons.add)),
+          floatingActionButton: FloatingActionButton(onPressed: state.handleTodo, child: const Icon(Icons.add)),
           body: Builder(
             builder: (context) {
               if (model.isBusy) {

@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 
+import 'user_table.dart';
+
 @DataClassName('TodoEntry')
 class TodoTable extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -10,4 +12,6 @@ class TodoTable extends Table {
   DateTimeColumn get updatedAt => dateTime().nullable()();
   // soft delete
   DateTimeColumn get deletedAt => dateTime().nullable()();
+  // foreign key
+  IntColumn get userId => integer().nullable().references(UserTable, #id)();
 }
