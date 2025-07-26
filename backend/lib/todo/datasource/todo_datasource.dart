@@ -59,6 +59,7 @@ class TodoDataSourceImpl implements TodoDataSource {
       stdout.writeln('exception create todo ${e.runtimeType}');
       throw const ServerException('Unexpected error');
     } finally {
+      await _dao.close();
       // await _databaseConnection.close();
     }
   }
