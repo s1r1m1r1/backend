@@ -8,18 +8,13 @@ part 'login_user_dto.freezed.dart';
 part 'login_user_dto.g.dart';
 
 @freezed
-class LoginUserDto with _$LoginUserDto {
+abstract class LoginUserDto with _$LoginUserDto {
   const LoginUserDto._();
-  const factory LoginUserDto({
-    required String email,
-    required String password,
-  }) = _LoginUserDto;
+  const factory LoginUserDto({required String email, required String password}) = _LoginUserDto;
 
   factory LoginUserDto.fromJson(Map<String, dynamic> json) => _$LoginUserDtoFromJson(json);
 
-  static Result<ValidationFailure, LoginUserDto> validated(
-    Map<String, dynamic> json,
-  ) {
+  static Result<ValidationFailure, LoginUserDto> validated(Map<String, dynamic> json) {
     try {
       final errors = <String, List<String>>{};
       final email = json['email'] as String? ?? '';
@@ -30,19 +25,10 @@ class LoginUserDto with _$LoginUserDto {
       if (password.isEmpty) {
         errors['password'] = ['Password is required'];
       }
-      if (errors.isEmpty) return Result.fail(LoginUserDto.fromJson(json));
-      throw BadRequestException(
-        message: 'Validation failed',
-        errors: errors,
-      );
+      if (errors.isEmpty) return Success(LoginUserDto.fromJson(json));
+      throw BadRequestException(message: 'Validation failed', errors: errors);
     } on BadRequestException catch (e) {
-      return Result.fail(
-        ValidationFailure(
-          message: e.message,
-          errors: e.errors,
-          statusCode: e.statusCode,
-        ),
-      );
+      return Fail(ValidationFailure(message: e.message, errors: e.errors, statusCode: e.statusCode));
     }
   }
 }

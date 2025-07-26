@@ -8,7 +8,7 @@ part 'user.g.dart';
 abstract class User with _$User {
   const User._();
   const factory User({
-    required int userId,
+    required String userId,
     required String name,
     required String email,
     @DateTimeConverter() required DateTime createdAt,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:meta/meta.dart';
 
 /// A sealed class representing either a failure [F] or a success [S].
@@ -6,21 +8,46 @@ import 'package:meta/meta.dart';
 /// either succeed with a value or fail with an error.
 @immutable
 sealed class Result<F, S> {
-  const Result._();
-  const factory Result.success(S value) = Success;
-  const factory Result.fail(F value) = Fail;
+  const Result();
+
+  bool get isSuccess => this is Success<F, S>;
+  bool get isFailure => this is Fail<F, S>;
+
+  F? get failure => this is Fail<F, S> ? (this as Fail<F, S>).value : null;
+  S? get success => this is Success<F, S> ? (this as Success<F, S>).value : null;
 }
 
-/// Represents a failed state with a value of type [F].
 final class Fail<F, S> extends Result<F, S> {
-  final F f;
-
-  const Fail(this.f) : super._();
+  final F value;
+  const Fail(this.value);
 }
 
-/// Represents a successful state with a value of type [S].
 final class Success<F, S> extends Result<F, S> {
-  final S s;
+  final S value;
+  const Success(this.value);
+}
 
-  const Success(this.s) : super._();
+extension ResultX<F, S> on Result<F, S> {
+  /// Transforms a `Result<F, S>` into a `FutureOr<Result<F, S2>>`
+  /// by applying `onSuccess` if this result is a `Success`.
+  /// If this result is a `Fail`, it propagates the failure.
+  FutureOr<Result<F, S2>> flatMap<S2>(FutureOr<Result<F, S2>> Function(S value) onSuccess) {
+    if (this is Success<F, S>) {
+      return onSuccess((this as Success<F, S>).value);
+    } else {
+      // Propagate the failure with the original failure type
+      return Fail<F, S2>((this as Fail<F, S>).value);
+    }
+  }
+
+  /// Transforms a `Result<F, S>` into a `FutureOr<T>`
+  /// by applying `onFailure` if this result is a `Fail`,
+  /// or `onSuccess` if this result is a `Success`.
+  FutureOr<T> match<T>(FutureOr<T> Function(F failure) onFailure, FutureOr<T> Function(S success) onSuccess) {
+    if (this is Fail<F, S>) {
+      return onFailure((this as Fail<F, S>).value);
+    } else {
+      return onSuccess((this as Success<F, S>).value);
+    }
+  }
 }

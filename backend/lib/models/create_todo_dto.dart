@@ -23,10 +23,10 @@ abstract class CreateTodoDto with _$CreateTodoDto {
       if (json['description'] == null) {
         errors['description'] = ['Description is required'];
       }
-      if (errors.isEmpty) return Result.success(CreateTodoDto.fromJson(json));
+      if (errors.isEmpty) return Success(CreateTodoDto.fromJson(json));
       throw BadRequestException(message: 'Validation failed', errors: errors);
     } on BadRequestException catch (e) {
-      return Result.fail(ValidationFailure(message: e.message, errors: e.errors, statusCode: e.statusCode));
+      return Fail(ValidationFailure(message: e.message, errors: e.errors, statusCode: e.statusCode));
     }
   }
 }

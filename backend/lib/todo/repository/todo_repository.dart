@@ -20,10 +20,7 @@ abstract class TodoRepository {
 
   Future<Result<Failure, Todo>> createTodo(CreateTodoDto createTodoDto);
 
-  Future<Result<Failure, Todo>> updateTodo({
-    required TodoId id,
-    required UpdateTodoDto updateTodoDto,
-  });
+  Future<Result<Failure, Todo>> updateTodo({required TodoId id, required UpdateTodoDto updateTodoDto});
 
   Future<Result<Failure, void>> deleteTodo(TodoId id);
 }
@@ -38,13 +35,11 @@ class TodoRepositoryImpl implements TodoRepository {
       stdout.writeln('create todo');
       final todo = await _datasource.createTodo(createTodoDto);
       stdout.writeln('create todo ready ${todo.toJson()}');
-      return Result.success(todo);
+      return Success(todo);
     } on Exception catch (e) {
       stdout.writeln('exception create todo ${e.runtimeType}');
       log(e.toString());
-      return Result.fail(
-        ServerFailure(message: e.toString(), statusCode: 100),
-      );
+      return Fail(ServerFailure(message: e.toString(), statusCode: 100));
     }
     ;
   }
@@ -54,17 +49,15 @@ class TodoRepositoryImpl implements TodoRepository {
     try {
       final result = await getTodoById(id);
       switch (result) {
-        case Success<Failure, Todo>():
+        case Success():
           await _datasource.deleteTodoById(id);
           return Success(null);
-        case Fail<Failure, Todo>():
-          return result;
+        case Fail(value: final f):
+          return Fail(ServerFailure(message: 'user not found'));
       }
     } on ServerException catch (e) {
       log(e.message);
-      return Fail(
-        ServerFailure(message: e.message),
-      );
+      return Fail(ServerFailure(message: e.message));
     }
   }
 
@@ -75,17 +68,10 @@ class TodoRepositoryImpl implements TodoRepository {
       return Success(res);
     } on NotFoundException catch (e) {
       // log(e.message);
-      return Fail(
-        ServerFailure(
-          message: e.toString(),
-          statusCode: e.statusCode,
-        ),
-      );
+      return Fail(ServerFailure(message: e.toString(), statusCode: e.statusCode));
     } on ServerException catch (e) {
       log(e.message);
-      return Fail(
-        ServerFailure(message: e.message),
-      );
+      return Fail(ServerFailure(message: e.message));
     }
   }
 
@@ -102,24 +88,14 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<Result<Failure, Todo>> updateTodo({required TodoId id, required UpdateTodoDto updateTodoDto}) async {
     try {
-      final r = await _datasource.updateTodo(
-        id: id,
-        todo: updateTodoDto,
-      );
+      final r = await _datasource.updateTodo(id: id, todo: updateTodoDto);
       return Success(r);
     } on NotFoundException catch (e) {
       log(e.message);
-      return Fail(
-        ServerFailure(
-          message: e.message,
-          statusCode: e.statusCode,
-        ),
-      );
+      return Fail(ServerFailure(message: e.message, statusCode: e.statusCode));
     } on ServerException catch (e) {
       log(e.message);
-      return Fail(
-        ServerFailure(message: e.message),
-      );
+      return Fail(ServerFailure(message: e.message));
     }
   }
 }

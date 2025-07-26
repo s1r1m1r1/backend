@@ -11,58 +11,57 @@ part of 'request_failure.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-RequestFailure _$RequestFailureFromJson(Map<String, dynamic> json) {
-  return $RequestFailure.fromJson(json);
+RequestFailure _$RequestFailureFromJson(
+  Map<String, dynamic> json
+) {
+    return $RequestFailure.fromJson(
+      json
+    );
 }
 
 /// @nodoc
 mixin _$RequestFailure {
-  String get message;
-  int get statusCode;
-  List<String> get errors;
 
-  /// Create a copy of RequestFailure
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $RequestFailureCopyWith<RequestFailure> get copyWith =>
-      _$RequestFailureCopyWithImpl<RequestFailure>(
-          this as RequestFailure, _$identity);
+ String get message; int get statusCode; List<String> get errors;
+/// Create a copy of RequestFailure
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$RequestFailureCopyWith<RequestFailure> get copyWith => _$RequestFailureCopyWithImpl<RequestFailure>(this as RequestFailure, _$identity);
 
   /// Serializes this RequestFailure to a JSON map.
   Map<String, dynamic> toJson();
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is RequestFailure &&
-            (identical(other.message, message) || other.message == message) &&
-            (identical(other.statusCode, statusCode) ||
-                other.statusCode == statusCode) &&
-            const DeepCollectionEquality().equals(other.errors, errors));
-  }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, message, statusCode,
-      const DeepCollectionEquality().hash(errors));
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RequestFailure&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&const DeepCollectionEquality().equals(other.errors, errors));
+}
 
-  @override
-  String toString() {
-    return 'RequestFailure(message: $message, statusCode: $statusCode, errors: $errors)';
-  }
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,message,statusCode,const DeepCollectionEquality().hash(errors));
+
+@override
+String toString() {
+  return 'RequestFailure(message: $message, statusCode: $statusCode, errors: $errors)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $RequestFailureCopyWith<$Res> {
-  factory $RequestFailureCopyWith(
-          RequestFailure value, $Res Function(RequestFailure) _then) =
-      _$RequestFailureCopyWithImpl;
-  @useResult
-  $Res call({String message, int statusCode, List<String> errors});
-}
+abstract mixin class $RequestFailureCopyWith<$Res>  {
+  factory $RequestFailureCopyWith(RequestFailure value, $Res Function(RequestFailure) _then) = _$RequestFailureCopyWithImpl;
+@useResult
+$Res call({
+ String message, int statusCode, List<String> errors
+});
 
+
+
+
+}
 /// @nodoc
 class _$RequestFailureCopyWithImpl<$Res>
     implements $RequestFailureCopyWith<$Res> {
@@ -71,265 +70,207 @@ class _$RequestFailureCopyWithImpl<$Res>
   final RequestFailure _self;
   final $Res Function(RequestFailure) _then;
 
-  /// Create a copy of RequestFailure
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? message = null,
-    Object? statusCode = null,
-    Object? errors = null,
-  }) {
-    return _then(_self.copyWith(
-      message: null == message
-          ? _self.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-      statusCode: null == statusCode
-          ? _self.statusCode
-          : statusCode // ignore: cast_nullable_to_non_nullable
-              as int,
-      errors: null == errors
-          ? _self.errors
-          : errors // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ));
-  }
+/// Create a copy of RequestFailure
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? statusCode = null,Object? errors = null,}) {
+  return _then(_self.copyWith(
+message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
+as int,errors: null == errors ? _self.errors : errors // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
 }
+
+}
+
 
 /// Adds pattern-matching-related methods to [RequestFailure].
 extension RequestFailurePatterns on RequestFailure {
-  /// A variant of `map` that fallback to returning `orElse`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>(
-    TResult Function($RequestFailure value)? $default, {
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case $RequestFailure() when $default != null:
-        return $default(_that);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( $RequestFailure value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case $RequestFailure() when $default != null:
+return $default(_that);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// Callbacks receives the raw object, upcasted.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case final Subclass2 value:
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>(
-    TResult Function($RequestFailure value) $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case $RequestFailure():
-        return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
-    }
-  }
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( $RequestFailure value)  $default,){
+final _that = this;
+switch (_that) {
+case $RequestFailure():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
 
-  /// A variant of `map` that fallback to returning `null`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function($RequestFailure value)? $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case $RequestFailure() when $default != null:
-        return $default(_that);
-      case _:
-        return null;
-    }
-  }
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( $RequestFailure value)?  $default,){
+final _that = this;
+switch (_that) {
+case $RequestFailure() when $default != null:
+return $default(_that);case _:
+  return null;
 
-  /// A variant of `when` that fallback to an `orElse` callback.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String message, int statusCode, List<String> errors)?
-        $default, {
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case $RequestFailure() when $default != null:
-        return $default(_that.message, _that.statusCode, _that.errors);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String message,  int statusCode,  List<String> errors)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case $RequestFailure() when $default != null:
+return $default(_that.message,_that.statusCode,_that.errors);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// As opposed to `map`, this offers destructuring.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case Subclass2(:final field2):
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>(
-    TResult Function(String message, int statusCode, List<String> errors)
-        $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case $RequestFailure():
-        return $default(_that.message, _that.statusCode, _that.errors);
-      case _:
-        throw StateError('Unexpected subclass');
-    }
-  }
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String message,  int statusCode,  List<String> errors)  $default,) {final _that = this;
+switch (_that) {
+case $RequestFailure():
+return $default(_that.message,_that.statusCode,_that.errors);case _:
+  throw StateError('Unexpected subclass');
 
-  /// A variant of `when` that fallback to returning `null`
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String message, int statusCode, List<String> errors)?
-        $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case $RequestFailure() when $default != null:
-        return $default(_that.message, _that.statusCode, _that.errors);
-      case _:
-        return null;
-    }
-  }
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String message,  int statusCode,  List<String> errors)?  $default,) {final _that = this;
+switch (_that) {
+case $RequestFailure() when $default != null:
+return $default(_that.message,_that.statusCode,_that.errors);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
+
 class $RequestFailure extends RequestFailure {
-  const $RequestFailure(
-      {required this.message,
-      required this.statusCode,
-      final List<String> errors = const []})
-      : _errors = errors,
-        super._();
-  factory $RequestFailure.fromJson(Map<String, dynamic> json) =>
-      _$$RequestFailureFromJson(json);
+  const $RequestFailure({required this.message, required this.statusCode, final  List<String> errors = const []}): _errors = errors,super._();
+  factory $RequestFailure.fromJson(Map<String, dynamic> json) => _$$RequestFailureFromJson(json);
 
-  @override
-  final String message;
-  @override
-  final int statusCode;
-  final List<String> _errors;
-  @override
-  @JsonKey()
-  List<String> get errors {
-    if (_errors is EqualUnmodifiableListView) return _errors;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_errors);
-  }
+@override final  String message;
+@override final  int statusCode;
+ final  List<String> _errors;
+@override@JsonKey() List<String> get errors {
+  if (_errors is EqualUnmodifiableListView) return _errors;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_errors);
+}
 
-  /// Create a copy of RequestFailure
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $$RequestFailureCopyWith<$RequestFailure> get copyWith =>
-      _$$RequestFailureCopyWithImpl<$RequestFailure>(this, _$identity);
 
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$RequestFailureToJson(
-      this,
-    );
-  }
+/// Create a copy of RequestFailure
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$$RequestFailureCopyWith<$RequestFailure> get copyWith => _$$RequestFailureCopyWithImpl<$RequestFailure>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is $RequestFailure &&
-            (identical(other.message, message) || other.message == message) &&
-            (identical(other.statusCode, statusCode) ||
-                other.statusCode == statusCode) &&
-            const DeepCollectionEquality().equals(other._errors, _errors));
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$$RequestFailureToJson(this, );
+}
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, message, statusCode,
-      const DeepCollectionEquality().hash(_errors));
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is $RequestFailure&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&const DeepCollectionEquality().equals(other._errors, _errors));
+}
 
-  @override
-  String toString() {
-    return 'RequestFailure(message: $message, statusCode: $statusCode, errors: $errors)';
-  }
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,message,statusCode,const DeepCollectionEquality().hash(_errors));
+
+@override
+String toString() {
+  return 'RequestFailure(message: $message, statusCode: $statusCode, errors: $errors)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $$RequestFailureCopyWith<$Res>
-    implements $RequestFailureCopyWith<$Res> {
-  factory $$RequestFailureCopyWith(
-          $RequestFailure value, $Res Function($RequestFailure) _then) =
-      _$$RequestFailureCopyWithImpl;
-  @override
-  @useResult
-  $Res call({String message, int statusCode, List<String> errors});
-}
+abstract mixin class $$RequestFailureCopyWith<$Res> implements $RequestFailureCopyWith<$Res> {
+  factory $$RequestFailureCopyWith($RequestFailure value, $Res Function($RequestFailure) _then) = _$$RequestFailureCopyWithImpl;
+@override @useResult
+$Res call({
+ String message, int statusCode, List<String> errors
+});
 
+
+
+
+}
 /// @nodoc
 class _$$RequestFailureCopyWithImpl<$Res>
     implements $$RequestFailureCopyWith<$Res> {
@@ -338,30 +279,18 @@ class _$$RequestFailureCopyWithImpl<$Res>
   final $RequestFailure _self;
   final $Res Function($RequestFailure) _then;
 
-  /// Create a copy of RequestFailure
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? message = null,
-    Object? statusCode = null,
-    Object? errors = null,
-  }) {
-    return _then($RequestFailure(
-      message: null == message
-          ? _self.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-      statusCode: null == statusCode
-          ? _self.statusCode
-          : statusCode // ignore: cast_nullable_to_non_nullable
-              as int,
-      errors: null == errors
-          ? _self._errors
-          : errors // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ));
-  }
+/// Create a copy of RequestFailure
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? statusCode = null,Object? errors = null,}) {
+  return _then($RequestFailure(
+message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
+as int,errors: null == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+
 }
 
 // dart format on

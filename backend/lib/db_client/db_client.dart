@@ -9,11 +9,12 @@ import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 import 'package:uuid/uuid.dart';
 
+import 'dao/user_dao.dart';
 import 'tables/user_table.dart';
 
 part 'db_client.g.dart';
 
-@DriftDatabase(tables: [ChannelTable, TodoTable, UserTable], daos: [ChannelDao, TodoDao])
+@DriftDatabase(tables: [ChannelTable, TodoTable, UserTable], daos: [ChannelDao, TodoDao, UserDao])
 class DbClient extends _$DbClient {
   DbClient(super.e);
 

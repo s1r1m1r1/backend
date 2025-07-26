@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:backend/failures/validation_failure.dart';
 import 'package:backend/models/create_todo_dto.dart';
 import 'package:backend/models/todo.dart';
 import 'package:backend/utils/result.dart';
@@ -19,15 +18,10 @@ class TodoController extends HttpController {
   FutureOr<Response> index(Request request) async {
     final res = await _repo.getTodos();
     switch (res) {
-      case Fail<Failure, List<Todo>>(:final f):
-        return Response.json(
-          body: {'message': f.message},
-          statusCode: f.statusCode,
-        );
-      case Success<Failure, List<Todo>>(:final s):
-        return Response.json(
-          body: s.map((e) => e.toJson()).toList(),
-        );
+      case Fail(value: final f):
+        return Response.json(body: {'message': f.message}, statusCode: f.statusCode);
+      case Success(value: final s):
+        return Response.json(body: s.map((e) => e.toJson()).toList());
     }
     ;
   }
@@ -36,21 +30,13 @@ class TodoController extends HttpController {
   FutureOr<Response> show(Request request, String id) async {
     final todoId = mapTodoId(id);
     switch (todoId) {
-      case Fail<Failure, TodoId>(:final f):
-        return Response.json(
-          body: {'message': f.message},
-          statusCode: f.statusCode,
-        );
-      case Success<Failure, TodoId>(:final s):
+      case Fail<Failure, TodoId>(value: final f):
+        return Response.json(body: {'message': f.message}, statusCode: f.statusCode);
+      case Success<Failure, TodoId>(value: final s):
         final res = await _repo.getTodoById(s);
         return switch (res) {
-          Fail<Failure, Todo>(:final f) => Response.json(
-              body: {'message': f.message},
-              statusCode: f.statusCode,
-            ),
-          Success<Failure, Todo>(:final s) => Response.json(
-              body: s.toJson(),
-            ),
+          Fail<Failure, Todo>(value: final f) => Response.json(body: {'message': f.message}, statusCode: f.statusCode),
+          Success<Failure, Todo>(value: final s) => Response.json(body: s.toJson()),
         };
     }
   }
@@ -59,19 +45,13 @@ class TodoController extends HttpController {
   FutureOr<Response> destroy(Request request, String id) async {
     final todoId = mapTodoId(id);
     switch (todoId) {
-      case Fail<Failure, TodoId>(:final f):
-        return Response.json(
-          body: {'message': f.message},
-          statusCode: f.statusCode,
-        );
-      case Success<Failure, TodoId>(:final s):
+      case Fail(value: final f):
+        return Response.json(body: {'message': f.message}, statusCode: f.statusCode);
+      case Success(value: final s):
         final res = await _repo.deleteTodo(s);
         return switch (res) {
-          Fail<Failure, void>(:final f) => Response.json(
-              body: {'message': f.message},
-              statusCode: f.statusCode,
-            ),
-          Success<Failure, void>() => Response.json(body: {'message': 'OK'}),
+          Fail(value: final f) => Response.json(body: {'message': f.message}, statusCode: f.statusCode),
+          Success() => Response.json(body: {'message': 'OK'}),
         };
     }
   }
@@ -80,38 +60,27 @@ class TodoController extends HttpController {
   FutureOr<Response> store(Request request) async {
     stdout.writeln('store 1');
     final parsedBody = await parseJson(request);
-    switch (parsedBody) {
-      case Fail<Failure, Map<String, dynamic>>(:final f):
-        return Response.json(
-          body: {'message': f.message},
-          statusCode: f.statusCode,
-        );
-      case Success<Failure, Map<String, dynamic>>(:final s):
-        final json = s;
+    return parsedBody.fold<FutureOr<Response>>(
+      (left) {
+        return Response.json(body: {'message': left.message}, statusCode: left.statusCode);
+      },
+      (Json json) async {
         final validated = CreateTodoDto.validated(json);
         switch (validated) {
-          case Fail(:final f):
-            return Response.json(
-              body: {'message': f.message},
-              statusCode: f.statusCode,
-            );
-          case Success(:final s):
+          case Fail(value: final f):
+            return Response.json(body: {'message': f.message}, statusCode: f.statusCode);
+          case Success(value: final s):
             final result = await _repo.createTodo(s);
             switch (result) {
-              case Fail<Failure, Todo>(:final f):
-                return Response.json(
-                  body: {'message': f.message},
-                  statusCode: f.statusCode,
-                );
-              case Success<Failure, Todo>(:final s):
+              case Fail(value: final f):
+                return Response.json(body: {'message': f.message}, statusCode: f.statusCode);
+              case Success(value: final s):
                 stdout.writeln('store final ${s.toJson()}');
-                return Response.json(
-                  body: s.toJson(),
-                  statusCode: HttpStatus.created,
-                );
+                return Response.json(body: s.toJson(), statusCode: HttpStatus.created);
             }
         }
-    }
+      },
+    );
   }
 
   @override
@@ -120,55 +89,33 @@ class TodoController extends HttpController {
     final todoIdResult = mapTodoId(id);
     late final TodoId todoId;
     switch (todoIdResult) {
-      case Fail(:final f):
-        return Response.json(
-          body: {'message': f.message},
-          statusCode: f.statusCode,
-        );
-      case Success<Failure, TodoId>():
-        todoId = todoIdResult.s;
+      case Fail(value: final f):
+        return Response.json(body: {'message': f.message}, statusCode: f.statusCode);
+      case Success(value: final s):
+        todoId = s;
     }
     stdout.writeln('update todo 1');
     late final Json json;
-    switch (parsedBody) {
-      case Fail(:final f):
-        return Response.json(
-          body: {'message': f.message},
-          statusCode: f.statusCode,
-        );
-      case Success<Failure, Map<String, dynamic>>(:final s):
-        json = s;
-    }
-
-    final updateTodoDto = UpdateTodoDto.validated(json);
-    switch (updateTodoDto) {
-      case Fail<ValidationFailure, UpdateTodoDto>(:final f):
-        return Response.json(
-          body: {
-            'message': f.message,
-            'errors': f.errors,
-          },
-          statusCode: f.statusCode,
-        );
-      case Success<ValidationFailure, UpdateTodoDto>():
-        stdout.writeln('update todo 2');
-        final res = await _repo.updateTodo(
-          id: todoId,
-          updateTodoDto: updateTodoDto.s,
-        );
-        switch (res) {
-          case Fail<Failure, Todo>(:final f):
-            stdout.writeln('update todo fail 3');
-            return Response.json(
-              body: {'message': f.message},
-              statusCode: f.statusCode,
-            );
-          case Success<Failure, Todo>(:final s):
-            stdout.writeln('update todo 3');
-            return Response.json(
-              body: s.toJson(),
-            );
+    return parsedBody.fold<FutureOr<Response>>(
+      (left) {
+        return Response.json(body: {'message': left.message}, statusCode: left.statusCode);
+      },
+      (Json json) async {
+        final updateTodoDto = UpdateTodoDto.validated(json);
+        switch (updateTodoDto) {
+          case Fail(value: final f):
+            return Response.json(body: {'message': f.message, 'errors': f.errors}, statusCode: f.statusCode);
+          case Success(value: final s):
+            final res = await _repo.updateTodo(id: todoId, updateTodoDto: s);
+            switch (res) {
+              case Fail(value: final f):
+                return Response.json(body: {'message': f.message}, statusCode: f.statusCode);
+              case Success(value: final s):
+                stdout.writeln('update todo 3');
+                return Response.json(body: s.toJson());
+            }
         }
-    }
+      },
+    );
   }
 }

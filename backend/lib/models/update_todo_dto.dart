@@ -26,10 +26,10 @@ abstract class UpdateTodoDto with _$UpdateTodoDto {
       if (json['completed'] == null) {
         errors['completed'] = ['At least one field must be provided'];
       }
-      if (errors.length < 3) return Result.success(UpdateTodoDto.fromJson(json));
+      if (errors.length < 3) return Success(UpdateTodoDto.fromJson(json));
       throw BadRequestException(message: 'Validation failed', errors: errors);
     } on BadRequestException catch (e) {
-      return Result.fail(ValidationFailure(message: e.message, statusCode: e.statusCode, errors: e.errors));
+      return Fail(ValidationFailure(message: e.message, statusCode: e.statusCode, errors: e.errors));
     }
   }
 }
