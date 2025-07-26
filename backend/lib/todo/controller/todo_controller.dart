@@ -95,7 +95,6 @@ class TodoController extends HttpController {
         todoId = s;
     }
     stdout.writeln('update todo 1');
-    late final Json json;
     return parsedBody.fold<FutureOr<Response>>(
       (left) {
         return Response.json(body: {'message': left.message}, statusCode: left.statusCode);

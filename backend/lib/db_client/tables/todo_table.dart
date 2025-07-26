@@ -13,5 +13,5 @@ class TodoTable extends Table {
   // soft delete
   DateTimeColumn get deletedAt => dateTime().nullable()();
   // foreign key
-  IntColumn get userId => integer().nullable().references(UserTable, #id)();
+  TextColumn get userId => text().nullable().references(UserTable, #id)();
 }

@@ -13,23 +13,20 @@ import 'package:drift/drift.dart' show Value;
 
 abstract class TodoDataSource {
   /// Returns a list of all todo items in the data source
-  Future<List<Todo>> getAllTodo();
+  Future<List<Todo>> getAllTodo(String userId);
 
   /// Returns a todo item with the given [id] from the data source
   /// If no todo item with the given [id] exists, returns `null`
-  Future<Todo> getTodoById(TodoId id);
+  Future<Todo> getTodoById(TodoId id, String userId);
 
   /// Creates a new todo item in the data source
-  Future<Todo> createTodo(CreateTodoDto todo);
+  Future<Todo> createTodo(CreateTodoDto todo, String userId);
 
   /// Updates an existing todo item in the data source
-  Future<Todo> updateTodo({
-    required TodoId id,
-    required UpdateTodoDto todo,
-  });
+  Future<Todo> updateTodo({required TodoId id, required UpdateTodoDto todo, required String userId});
 
   /// Deletes a todo item with the given [id] from the data source
-  Future<void> deleteTodoById(TodoId id);
+  Future<void> deleteTodoById(TodoId id, String userId);
 }
 
 class TodoDataSourceImpl implements TodoDataSource {
@@ -37,19 +34,25 @@ class TodoDataSourceImpl implements TodoDataSource {
   final TodoDao _dao;
   // final User _user;
   @override
-  Future<Todo> createTodo(CreateTodoDto createTodo) async {
+  Future<Todo> createTodo(CreateTodoDto createTodo, String userId) async {
     try {
-      stdout.writeln('dotasource 1');
+      // _dao.doWhenOpened();
       final result = await _dao.insertTodo(
         TodoTableCompanion(
-            title: Value(createTodo.title),
-            description: Value.absentIfNull(createTodo.description),
-            completed: Value(false),
-            createdAt: Value(DateTime.now())),
+          title: Value(createTodo.title),
+          description: Value.absentIfNull(createTodo.description),
+          completed: Value(false),
+          createdAt: Value(DateTime.now()),
+          userId: Value(userId),
+        ),
       );
 
-      final todo =
-          Todo(id: result.id, title: result.title, description: result.description, createdAt: result.createdAt);
+      final todo = Todo(
+        id: result.id,
+        title: result.title,
+        description: result.description,
+        createdAt: result.createdAt,
+      );
       stdout.writeln('has result $todo');
       return todo;
     } on Exception catch (e) {
@@ -61,9 +64,9 @@ class TodoDataSourceImpl implements TodoDataSource {
   }
 
   @override
-  Future<void> deleteTodoById(TodoId id) async {
+  Future<void> deleteTodoById(TodoId id, String userId) async {
     try {
-      final deletedRows = await _dao.deleteTodoById(id);
+      final deletedRows = await _dao.deleteTodoById(id, userId);
     } on Exception catch (e) {
       throw ServerException('Unexpected error');
     } finally {
@@ -72,9 +75,9 @@ class TodoDataSourceImpl implements TodoDataSource {
   }
 
   @override
-  Future<List<Todo>> getAllTodo() async {
+  Future<List<Todo>> getAllTodo(String userId) async {
     try {
-      final result = await _dao.getAllTodo();
+      final result = await _dao.getAllTodo(userId);
       return result
           .map((i) => Todo(id: i.id, title: i.title, description: i.description, createdAt: i.createdAt))
           .toList();
@@ -86,10 +89,10 @@ class TodoDataSourceImpl implements TodoDataSource {
   }
 
   @override
-  Future<Todo> getTodoById(TodoId id) async {
+  Future<Todo> getTodoById(TodoId id, String userId) async {
     try {
       // await _databaseConnection.connect();
-      final result = await _dao.getTodoById(id);
+      final result = await _dao.getTodoById(id, userId);
       return Todo(id: result.id, title: result.title, createdAt: result.createdAt);
     } on NotFoundException {
       rethrow;
@@ -101,26 +104,25 @@ class TodoDataSourceImpl implements TodoDataSource {
   }
 
   @override
-  Future<Todo> updateTodo({
-    required TodoId id,
-    required UpdateTodoDto todo,
-  }) async {
+  Future<Todo> updateTodo({required TodoId id, required UpdateTodoDto todo, required String userId}) async {
     try {
       stdout.writeln('datasource update $todo');
       final amount = await _dao.updateTodo(
-          id,
-          TodoTableCompanion(
-              title: Value.absentIfNull(todo.title),
-              description: Value.absentIfNull(todo.description),
-              completed: Value.absentIfNull(todo.completed),
-              updatedAt: Value(DateTime.now())));
+        id,
+        TodoTableCompanion(
+          title: Value.absentIfNull(todo.title),
+          description: Value.absentIfNull(todo.description),
+          completed: Value.absentIfNull(todo.completed),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
       if (amount == 0) {
         stdout.writeln('datasource update not ok todo 1');
         throw const NotFoundException('Todo not found');
       }
 
       stdout.writeln('datasource update ready 1');
-      final updated = await _dao.getTodoById(id);
+      final updated = await _dao.getTodoById(id, userId);
 
       stdout.writeln('datasource update ready $updated');
       stdout.writeln('update ok $updated');

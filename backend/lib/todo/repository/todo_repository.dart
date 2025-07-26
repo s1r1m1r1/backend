@@ -9,6 +9,7 @@ import '../../failures/failure.dart';
 import '../../models/create_todo_dto.dart';
 import '../../models/todo.dart';
 import '../../models/update_todo_dto.dart';
+import '../../models/user.dart';
 import '../../utils/result.dart';
 import '../../utils/typedefs.dart';
 import '../datasource/todo_datasource.dart';
@@ -26,14 +27,15 @@ abstract class TodoRepository {
 }
 
 class TodoRepositoryImpl implements TodoRepository {
-  TodoRepositoryImpl(this._datasource);
+  TodoRepositoryImpl(this._datasource, this.user);
   final TodoDataSource _datasource;
+  final User user;
 
   @override
   Future<Result<Failure, Todo>> createTodo(CreateTodoDto createTodoDto) async {
     try {
       stdout.writeln('create todo');
-      final todo = await _datasource.createTodo(createTodoDto);
+      final todo = await _datasource.createTodo(createTodoDto, user.userId);
       stdout.writeln('create todo ready ${todo.toJson()}');
       return Success(todo);
     } on Exception catch (e) {
@@ -50,7 +52,7 @@ class TodoRepositoryImpl implements TodoRepository {
       final result = await getTodoById(id);
       switch (result) {
         case Success():
-          await _datasource.deleteTodoById(id);
+          await _datasource.deleteTodoById(id, user.userId);
           return Success(null);
         case Fail(value: final f):
           return Fail(ServerFailure(message: 'user not found'));
@@ -64,7 +66,7 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<Result<Failure, Todo>> getTodoById(TodoId id) async {
     try {
-      final res = await _datasource.getTodoById(id);
+      final res = await _datasource.getTodoById(id, user.userId);
       return Success(res);
     } on NotFoundException catch (e) {
       // log(e.message);
@@ -78,7 +80,7 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<Result<Failure, List<Todo>>> getTodos() async {
     try {
-      final res = await _datasource.getAllTodo();
+      final res = await _datasource.getAllTodo(user.userId);
       return Success(res);
     } on ServerException catch (e) {
       return Fail(ServerFailure(message: e.message));
@@ -88,7 +90,7 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<Result<Failure, Todo>> updateTodo({required TodoId id, required UpdateTodoDto updateTodoDto}) async {
     try {
-      final r = await _datasource.updateTodo(id: id, todo: updateTodoDto);
+      final r = await _datasource.updateTodo(id: id, todo: updateTodoDto, userId: user.userId);
       return Success(r);
     } on NotFoundException catch (e) {
       log(e.message);

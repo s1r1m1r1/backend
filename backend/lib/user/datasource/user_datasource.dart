@@ -34,6 +34,7 @@ class UserDataSourceImpl implements UserDataSource {
     } on Exception catch (e) {
       throw ServerException('Unexpected error');
     } finally {
+      // _dao.close();
       // await _databaseConnection.close();
     }
   }

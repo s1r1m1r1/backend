@@ -6,6 +6,7 @@ import 'package:meta/meta.dart';
 ///
 /// This provides a robust and type-safe way to handle operations that can
 /// either succeed with a value or fail with an error.
+@deprecated
 @immutable
 sealed class Result<F, S> {
   const Result();

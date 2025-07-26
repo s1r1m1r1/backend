@@ -15,6 +15,7 @@ final env = DotEnv()..load();
 // final _ds = TodoDataSourceImpl(DbClient.instance.todoDao);
 // final _repo = TodoRepositoryImpl(_ds);
 // final _todoController = TodoController(_repo);
+final _db = DbClient.instance;
 final _userDs = UserDataSourceImpl(DbClient.instance.userDao);
 const _passwordHasher = PasswordHasherService();
 final _userRepo = UserRepositoryImpl(_userDs, _passwordHasher);
@@ -44,6 +45,7 @@ Handler middleware(Handler handler) {
   return handler
       .use(requestLogger())
       .use(provider<JWTService>((_) => _jwtService))
+      .use(provider<DbClient>((_) => _db))
       .use(provider<UserDataSource>((_) => _userDs))
       .use(provider<UserRepository>((_) => _userRepo))
       .use(provider<UserController>((_) => _userController))
