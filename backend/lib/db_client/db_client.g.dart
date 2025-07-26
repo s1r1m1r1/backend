@@ -12,29 +12,47 @@ class $ChannelTableTable extends ChannelTable
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
-      'title', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
   @override
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
-      'description', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _deletedAtMeta =
-      const VerificationMeta('deletedAt');
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-      'deleted_at', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [id, title, description, deletedAt];
   @override
@@ -43,8 +61,10 @@ class $ChannelTableTable extends ChannelTable
   String get actualTableName => $name;
   static const String $name = 'channel_table';
   @override
-  VerificationContext validateIntegrity(Insertable<ChannelEntry> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<ChannelEntry> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -52,21 +72,28 @@ class $ChannelTableTable extends ChannelTable
     }
     if (data.containsKey('title')) {
       context.handle(
-          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
           _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_descriptionMeta);
     }
     if (data.containsKey('deleted_at')) {
-      context.handle(_deletedAtMeta,
-          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
     }
     return context;
   }
@@ -77,14 +104,22 @@ class $ChannelTableTable extends ChannelTable
   ChannelEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ChannelEntry(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      title: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
-      description: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
-      deletedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
     );
   }
 
@@ -99,11 +134,12 @@ class ChannelEntry extends DataClass implements Insertable<ChannelEntry> {
   final String title;
   final String description;
   final DateTime? deletedAt;
-  const ChannelEntry(
-      {required this.id,
-      required this.title,
-      required this.description,
-      this.deletedAt});
+  const ChannelEntry({
+    required this.id,
+    required this.title,
+    required this.description,
+    this.deletedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -127,8 +163,10 @@ class ChannelEntry extends DataClass implements Insertable<ChannelEntry> {
     );
   }
 
-  factory ChannelEntry.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory ChannelEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ChannelEntry(
       id: serializer.fromJson<int>(json['id']),
@@ -148,23 +186,24 @@ class ChannelEntry extends DataClass implements Insertable<ChannelEntry> {
     };
   }
 
-  ChannelEntry copyWith(
-          {int? id,
-          String? title,
-          String? description,
-          Value<DateTime?> deletedAt = const Value.absent()}) =>
-      ChannelEntry(
-        id: id ?? this.id,
-        title: title ?? this.title,
-        description: description ?? this.description,
-        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
-      );
+  ChannelEntry copyWith({
+    int? id,
+    String? title,
+    String? description,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => ChannelEntry(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    description: description ?? this.description,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
   ChannelEntry copyWithCompanion(ChannelTableCompanion data) {
     return ChannelEntry(
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
-      description:
-          data.description.present ? data.description.value : this.description,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
@@ -208,8 +247,8 @@ class ChannelTableCompanion extends UpdateCompanion<ChannelEntry> {
     required String title,
     required String description,
     this.deletedAt = const Value.absent(),
-  })  : title = Value(title),
-        description = Value(description);
+  }) : title = Value(title),
+       description = Value(description);
   static Insertable<ChannelEntry> custom({
     Expression<int>? id,
     Expression<String>? title,
@@ -224,11 +263,12 @@ class ChannelTableCompanion extends UpdateCompanion<ChannelEntry> {
     });
   }
 
-  ChannelTableCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? title,
-      Value<String>? description,
-      Value<DateTime?>? deletedAt}) {
+  ChannelTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? title,
+    Value<String>? description,
+    Value<DateTime?>? deletedAt,
+  }) {
     return ChannelTableCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -276,51 +316,84 @@ class $UserTableTable extends UserTable
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      clientDefault: () => const Uuid().v1());
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: () => const Uuid().v1(),
+  );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
-      'name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _emailMeta = const VerificationMeta('email');
   @override
   late final GeneratedColumn<String> email = GeneratedColumn<String>(
-      'email', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _passwordMeta =
-      const VerificationMeta('password');
+    'email',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _passwordMeta = const VerificationMeta(
+    'password',
+  );
   @override
   late final GeneratedColumn<String> password = GeneratedColumn<String>(
-      'password', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+    'password',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      defaultValue: currentDateAndTime);
-  static const VerificationMeta _deletedAtMeta =
-      const VerificationMeta('deletedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-      'deleted_at', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, name, email, password, createdAt, deletedAt];
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    email,
+    password,
+    createdAt,
+    deletedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'user_table';
   @override
-  VerificationContext validateIntegrity(Insertable<UserEntry> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<UserEntry> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -328,51 +401,73 @@ class $UserTableTable extends UserTable
     }
     if (data.containsKey('name')) {
       context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
     if (data.containsKey('email')) {
       context.handle(
-          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
     } else if (isInserting) {
       context.missing(_emailMeta);
     }
     if (data.containsKey('password')) {
-      context.handle(_passwordMeta,
-          password.isAcceptableOrUnknown(data['password']!, _passwordMeta));
+      context.handle(
+        _passwordMeta,
+        password.isAcceptableOrUnknown(data['password']!, _passwordMeta),
+      );
     } else if (isInserting) {
       context.missing(_passwordMeta);
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('deleted_at')) {
-      context.handle(_deletedAtMeta,
-          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   UserEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return UserEntry(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      email: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}email'])!,
-      password: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}password'])!,
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      deletedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      )!,
+      password: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}password'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
     );
   }
 
@@ -389,13 +484,14 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
   final String password;
   final DateTime createdAt;
   final DateTime? deletedAt;
-  const UserEntry(
-      {required this.id,
-      required this.name,
-      required this.email,
-      required this.password,
-      required this.createdAt,
-      this.deletedAt});
+  const UserEntry({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.password,
+    required this.createdAt,
+    this.deletedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -423,8 +519,10 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
     );
   }
 
-  factory UserEntry.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory UserEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return UserEntry(
       id: serializer.fromJson<String>(json['id']),
@@ -448,21 +546,21 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
     };
   }
 
-  UserEntry copyWith(
-          {String? id,
-          String? name,
-          String? email,
-          String? password,
-          DateTime? createdAt,
-          Value<DateTime?> deletedAt = const Value.absent()}) =>
-      UserEntry(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        email: email ?? this.email,
-        password: password ?? this.password,
-        createdAt: createdAt ?? this.createdAt,
-        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
-      );
+  UserEntry copyWith({
+    String? id,
+    String? name,
+    String? email,
+    String? password,
+    DateTime? createdAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => UserEntry(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    email: email ?? this.email,
+    password: password ?? this.password,
+    createdAt: createdAt ?? this.createdAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
   UserEntry copyWithCompanion(UserTableCompanion data) {
     return UserEntry(
       id: data.id.present ? data.id.value : this.id,
@@ -527,9 +625,9 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     this.createdAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
     this.rowid = const Value.absent(),
-  })  : name = Value(name),
-        email = Value(email),
-        password = Value(password);
+  }) : name = Value(name),
+       email = Value(email),
+       password = Value(password);
   static Insertable<UserEntry> custom({
     Expression<String>? id,
     Expression<String>? name,
@@ -550,14 +648,15 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     });
   }
 
-  UserTableCompanion copyWith(
-      {Value<String>? id,
-      Value<String>? name,
-      Value<String>? email,
-      Value<String>? password,
-      Value<DateTime>? createdAt,
-      Value<DateTime?>? deletedAt,
-      Value<int>? rowid}) {
+  UserTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? email,
+    Value<String>? password,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
     return UserTableCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -620,78 +719,117 @@ class $TodoTableTable extends TodoTable
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
-      'title', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
   @override
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
-      'description', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _completedMeta =
-      const VerificationMeta('completed');
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _completedMeta = const VerificationMeta(
+    'completed',
+  );
   @override
   late final GeneratedColumn<bool> completed = GeneratedColumn<bool>(
-      'completed', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("completed" IN (0, 1))'),
-      defaultValue: const Constant(false));
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+    'completed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("completed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _deletedAtMeta =
-      const VerificationMeta('deletedAt');
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-      'deleted_at', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
   late final GeneratedColumn<int> userId = GeneratedColumn<int>(
-      'user_id', aliasedName, true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES user_table (id)'));
+    'user_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES user_table (id)',
+    ),
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        id,
-        title,
-        description,
-        completed,
-        createdAt,
-        updatedAt,
-        deletedAt,
-        userId
-      ];
+    id,
+    title,
+    description,
+    completed,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    userId,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'todo_table';
   @override
-  VerificationContext validateIntegrity(Insertable<TodoEntry> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<TodoEntry> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -699,39 +837,54 @@ class $TodoTableTable extends TodoTable
     }
     if (data.containsKey('title')) {
       context.handle(
-          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
           _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_descriptionMeta);
     }
     if (data.containsKey('completed')) {
-      context.handle(_completedMeta,
-          completed.isAcceptableOrUnknown(data['completed']!, _completedMeta));
+      context.handle(
+        _completedMeta,
+        completed.isAcceptableOrUnknown(data['completed']!, _completedMeta),
+      );
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     if (data.containsKey('deleted_at')) {
-      context.handle(_deletedAtMeta,
-          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
     }
     if (data.containsKey('user_id')) {
-      context.handle(_userIdMeta,
-          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
     }
     return context;
   }
@@ -742,22 +895,38 @@ class $TodoTableTable extends TodoTable
   TodoEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TodoEntry(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      title: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
-      description: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
-      completed: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at']),
-      deletedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
-      userId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}user_id']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      completed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}completed'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      ),
     );
   }
 
@@ -776,15 +945,16 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
   final DateTime? updatedAt;
   final DateTime? deletedAt;
   final int? userId;
-  const TodoEntry(
-      {required this.id,
-      required this.title,
-      required this.description,
-      required this.completed,
-      required this.createdAt,
-      this.updatedAt,
-      this.deletedAt,
-      this.userId});
+  const TodoEntry({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.completed,
+    required this.createdAt,
+    this.updatedAt,
+    this.deletedAt,
+    this.userId,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -818,13 +988,16 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(deletedAt),
-      userId:
-          userId == null && nullToAbsent ? const Value.absent() : Value(userId),
+      userId: userId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userId),
     );
   }
 
-  factory TodoEntry.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory TodoEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TodoEntry(
       id: serializer.fromJson<int>(json['id']),
@@ -852,31 +1025,32 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
     };
   }
 
-  TodoEntry copyWith(
-          {int? id,
-          String? title,
-          String? description,
-          bool? completed,
-          DateTime? createdAt,
-          Value<DateTime?> updatedAt = const Value.absent(),
-          Value<DateTime?> deletedAt = const Value.absent(),
-          Value<int?> userId = const Value.absent()}) =>
-      TodoEntry(
-        id: id ?? this.id,
-        title: title ?? this.title,
-        description: description ?? this.description,
-        completed: completed ?? this.completed,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
-        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
-        userId: userId.present ? userId.value : this.userId,
-      );
+  TodoEntry copyWith({
+    int? id,
+    String? title,
+    String? description,
+    bool? completed,
+    DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+    Value<DateTime?> deletedAt = const Value.absent(),
+    Value<int?> userId = const Value.absent(),
+  }) => TodoEntry(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    description: description ?? this.description,
+    completed: completed ?? this.completed,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    userId: userId.present ? userId.value : this.userId,
+  );
   TodoEntry copyWithCompanion(TodoTableCompanion data) {
     return TodoEntry(
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
-      description:
-          data.description.present ? data.description.value : this.description,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
       completed: data.completed.present ? data.completed.value : this.completed,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -901,8 +1075,16 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, description, completed, createdAt,
-      updatedAt, deletedAt, userId);
+  int get hashCode => Object.hash(
+    id,
+    title,
+    description,
+    completed,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    userId,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -945,9 +1127,9 @@ class TodoTableCompanion extends UpdateCompanion<TodoEntry> {
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
     this.userId = const Value.absent(),
-  })  : title = Value(title),
-        description = Value(description),
-        createdAt = Value(createdAt);
+  }) : title = Value(title),
+       description = Value(description),
+       createdAt = Value(createdAt);
   static Insertable<TodoEntry> custom({
     Expression<int>? id,
     Expression<String>? title,
@@ -970,15 +1152,16 @@ class TodoTableCompanion extends UpdateCompanion<TodoEntry> {
     });
   }
 
-  TodoTableCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? title,
-      Value<String>? description,
-      Value<bool>? completed,
-      Value<DateTime>? createdAt,
-      Value<DateTime?>? updatedAt,
-      Value<DateTime?>? deletedAt,
-      Value<int?>? userId}) {
+  TodoTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? title,
+    Value<String>? description,
+    Value<bool>? completed,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int?>? userId,
+  }) {
     return TodoTableCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -1045,28 +1228,32 @@ abstract class _$DbClient extends GeneratedDatabase {
   late final $TodoTableTable todoTable = $TodoTableTable(this);
   late final ChannelDao channelDao = ChannelDao(this as DbClient);
   late final TodoDao todoDao = TodoDao(this as DbClient);
+  late final UserDao userDao = UserDao(this as DbClient);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [channelTable, userTable, todoTable];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    channelTable,
+    userTable,
+    todoTable,
+  ];
 }
 
-typedef $$ChannelTableTableCreateCompanionBuilder = ChannelTableCompanion
-    Function({
-  Value<int> id,
-  required String title,
-  required String description,
-  Value<DateTime?> deletedAt,
-});
-typedef $$ChannelTableTableUpdateCompanionBuilder = ChannelTableCompanion
-    Function({
-  Value<int> id,
-  Value<String> title,
-  Value<String> description,
-  Value<DateTime?> deletedAt,
-});
+typedef $$ChannelTableTableCreateCompanionBuilder =
+    ChannelTableCompanion Function({
+      Value<int> id,
+      required String title,
+      required String description,
+      Value<DateTime?> deletedAt,
+    });
+typedef $$ChannelTableTableUpdateCompanionBuilder =
+    ChannelTableCompanion Function({
+      Value<int> id,
+      Value<String> title,
+      Value<String> description,
+      Value<DateTime?> deletedAt,
+    });
 
 class $$ChannelTableTableFilterComposer
     extends Composer<_$DbClient, $ChannelTableTable> {
@@ -1078,16 +1265,24 @@ class $$ChannelTableTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnFilters(column));
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnFilters(column));
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ChannelTableTableOrderingComposer
@@ -1100,16 +1295,24 @@ class $$ChannelTableTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnOrderings(column));
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnOrderings(column));
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ChannelTableTableAnnotationComposer
@@ -1128,29 +1331,35 @@ class $$ChannelTableTableAnnotationComposer
       $composableBuilder(column: $table.title, builder: (column) => column);
 
   GeneratedColumn<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => column);
+    column: $table.description,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 }
 
-class $$ChannelTableTableTableManager extends RootTableManager<
-    _$DbClient,
-    $ChannelTableTable,
-    ChannelEntry,
-    $$ChannelTableTableFilterComposer,
-    $$ChannelTableTableOrderingComposer,
-    $$ChannelTableTableAnnotationComposer,
-    $$ChannelTableTableCreateCompanionBuilder,
-    $$ChannelTableTableUpdateCompanionBuilder,
-    (
-      ChannelEntry,
-      BaseReferences<_$DbClient, $ChannelTableTable, ChannelEntry>
-    ),
-    ChannelEntry,
-    PrefetchHooks Function()> {
+class $$ChannelTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $ChannelTableTable,
+          ChannelEntry,
+          $$ChannelTableTableFilterComposer,
+          $$ChannelTableTableOrderingComposer,
+          $$ChannelTableTableAnnotationComposer,
+          $$ChannelTableTableCreateCompanionBuilder,
+          $$ChannelTableTableUpdateCompanionBuilder,
+          (
+            ChannelEntry,
+            BaseReferences<_$DbClient, $ChannelTableTable, ChannelEntry>,
+          ),
+          ChannelEntry,
+          PrefetchHooks Function()
+        > {
   $$ChannelTableTableTableManager(_$DbClient db, $ChannelTableTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -1159,70 +1368,75 @@ class $$ChannelTableTableTableManager extends RootTableManager<
               $$ChannelTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ChannelTableTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<String> description = const Value.absent(),
-            Value<DateTime?> deletedAt = const Value.absent(),
-          }) =>
-              ChannelTableCompanion(
-            id: id,
-            title: title,
-            description: description,
-            deletedAt: deletedAt,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String title,
-            required String description,
-            Value<DateTime?> deletedAt = const Value.absent(),
-          }) =>
-              ChannelTableCompanion.insert(
-            id: id,
-            title: title,
-            description: description,
-            deletedAt: deletedAt,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => ChannelTableCompanion(
+                id: id,
+                title: title,
+                description: description,
+                deletedAt: deletedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String title,
+                required String description,
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => ChannelTableCompanion.insert(
+                id: id,
+                title: title,
+                description: description,
+                deletedAt: deletedAt,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$ChannelTableTableProcessedTableManager = ProcessedTableManager<
-    _$DbClient,
-    $ChannelTableTable,
-    ChannelEntry,
-    $$ChannelTableTableFilterComposer,
-    $$ChannelTableTableOrderingComposer,
-    $$ChannelTableTableAnnotationComposer,
-    $$ChannelTableTableCreateCompanionBuilder,
-    $$ChannelTableTableUpdateCompanionBuilder,
-    (
+typedef $$ChannelTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $ChannelTableTable,
       ChannelEntry,
-      BaseReferences<_$DbClient, $ChannelTableTable, ChannelEntry>
-    ),
-    ChannelEntry,
-    PrefetchHooks Function()>;
-typedef $$UserTableTableCreateCompanionBuilder = UserTableCompanion Function({
-  Value<String> id,
-  required String name,
-  required String email,
-  required String password,
-  Value<DateTime> createdAt,
-  Value<DateTime?> deletedAt,
-  Value<int> rowid,
-});
-typedef $$UserTableTableUpdateCompanionBuilder = UserTableCompanion Function({
-  Value<String> id,
-  Value<String> name,
-  Value<String> email,
-  Value<String> password,
-  Value<DateTime> createdAt,
-  Value<DateTime?> deletedAt,
-  Value<int> rowid,
-});
+      $$ChannelTableTableFilterComposer,
+      $$ChannelTableTableOrderingComposer,
+      $$ChannelTableTableAnnotationComposer,
+      $$ChannelTableTableCreateCompanionBuilder,
+      $$ChannelTableTableUpdateCompanionBuilder,
+      (
+        ChannelEntry,
+        BaseReferences<_$DbClient, $ChannelTableTable, ChannelEntry>,
+      ),
+      ChannelEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$UserTableTableCreateCompanionBuilder =
+    UserTableCompanion Function({
+      Value<String> id,
+      required String name,
+      required String email,
+      required String password,
+      Value<DateTime> createdAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$UserTableTableUpdateCompanionBuilder =
+    UserTableCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String> email,
+      Value<String> password,
+      Value<DateTime> createdAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
 
 class $$UserTableTableFilterComposer
     extends Composer<_$DbClient, $UserTableTable> {
@@ -1234,22 +1448,34 @@ class $$UserTableTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnFilters(column));
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get email => $composableBuilder(
-      column: $table.email, builder: (column) => ColumnFilters(column));
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get password => $composableBuilder(
-      column: $table.password, builder: (column) => ColumnFilters(column));
+    column: $table.password,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$UserTableTableOrderingComposer
@@ -1262,22 +1488,34 @@ class $$UserTableTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get name => $composableBuilder(
-      column: $table.name, builder: (column) => ColumnOrderings(column));
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get email => $composableBuilder(
-      column: $table.email, builder: (column) => ColumnOrderings(column));
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get password => $composableBuilder(
-      column: $table.password, builder: (column) => ColumnOrderings(column));
+    column: $table.password,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UserTableTableAnnotationComposer
@@ -1308,20 +1546,24 @@ class $$UserTableTableAnnotationComposer
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 }
 
-class $$UserTableTableTableManager extends RootTableManager<
-    _$DbClient,
-    $UserTableTable,
-    UserEntry,
-    $$UserTableTableFilterComposer,
-    $$UserTableTableOrderingComposer,
-    $$UserTableTableAnnotationComposer,
-    $$UserTableTableCreateCompanionBuilder,
-    $$UserTableTableUpdateCompanionBuilder,
-    (UserEntry, BaseReferences<_$DbClient, $UserTableTable, UserEntry>),
-    UserEntry,
-    PrefetchHooks Function()> {
+class $$UserTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $UserTableTable,
+          UserEntry,
+          $$UserTableTableFilterComposer,
+          $$UserTableTableOrderingComposer,
+          $$UserTableTableAnnotationComposer,
+          $$UserTableTableCreateCompanionBuilder,
+          $$UserTableTableUpdateCompanionBuilder,
+          (UserEntry, BaseReferences<_$DbClient, $UserTableTable, UserEntry>),
+          UserEntry,
+          PrefetchHooks Function()
+        > {
   $$UserTableTableTableManager(_$DbClient db, $UserTableTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -1330,81 +1572,86 @@ class $$UserTableTableTableManager extends RootTableManager<
               $$UserTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$UserTableTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            Value<String> name = const Value.absent(),
-            Value<String> email = const Value.absent(),
-            Value<String> password = const Value.absent(),
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime?> deletedAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              UserTableCompanion(
-            id: id,
-            name: name,
-            email: email,
-            password: password,
-            createdAt: createdAt,
-            deletedAt: deletedAt,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            required String name,
-            required String email,
-            required String password,
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime?> deletedAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              UserTableCompanion.insert(
-            id: id,
-            name: name,
-            email: email,
-            password: password,
-            createdAt: createdAt,
-            deletedAt: deletedAt,
-            rowid: rowid,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> email = const Value.absent(),
+                Value<String> password = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserTableCompanion(
+                id: id,
+                name: name,
+                email: email,
+                password: password,
+                createdAt: createdAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                required String name,
+                required String email,
+                required String password,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserTableCompanion.insert(
+                id: id,
+                name: name,
+                email: email,
+                password: password,
+                createdAt: createdAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$UserTableTableProcessedTableManager = ProcessedTableManager<
-    _$DbClient,
-    $UserTableTable,
-    UserEntry,
-    $$UserTableTableFilterComposer,
-    $$UserTableTableOrderingComposer,
-    $$UserTableTableAnnotationComposer,
-    $$UserTableTableCreateCompanionBuilder,
-    $$UserTableTableUpdateCompanionBuilder,
-    (UserEntry, BaseReferences<_$DbClient, $UserTableTable, UserEntry>),
-    UserEntry,
-    PrefetchHooks Function()>;
-typedef $$TodoTableTableCreateCompanionBuilder = TodoTableCompanion Function({
-  Value<int> id,
-  required String title,
-  required String description,
-  Value<bool> completed,
-  required DateTime createdAt,
-  Value<DateTime?> updatedAt,
-  Value<DateTime?> deletedAt,
-  Value<int?> userId,
-});
-typedef $$TodoTableTableUpdateCompanionBuilder = TodoTableCompanion Function({
-  Value<int> id,
-  Value<String> title,
-  Value<String> description,
-  Value<bool> completed,
-  Value<DateTime> createdAt,
-  Value<DateTime?> updatedAt,
-  Value<DateTime?> deletedAt,
-  Value<int?> userId,
-});
+typedef $$UserTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $UserTableTable,
+      UserEntry,
+      $$UserTableTableFilterComposer,
+      $$UserTableTableOrderingComposer,
+      $$UserTableTableAnnotationComposer,
+      $$UserTableTableCreateCompanionBuilder,
+      $$UserTableTableUpdateCompanionBuilder,
+      (UserEntry, BaseReferences<_$DbClient, $UserTableTable, UserEntry>),
+      UserEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$TodoTableTableCreateCompanionBuilder =
+    TodoTableCompanion Function({
+      Value<int> id,
+      required String title,
+      required String description,
+      Value<bool> completed,
+      required DateTime createdAt,
+      Value<DateTime?> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int?> userId,
+    });
+typedef $$TodoTableTableUpdateCompanionBuilder =
+    TodoTableCompanion Function({
+      Value<int> id,
+      Value<String> title,
+      Value<String> description,
+      Value<bool> completed,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int?> userId,
+    });
 
 class $$TodoTableTableFilterComposer
     extends Composer<_$DbClient, $TodoTableTable> {
@@ -1416,25 +1663,39 @@ class $$TodoTableTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnFilters(column));
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnFilters(column));
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<bool> get completed => $composableBuilder(
-      column: $table.completed, builder: (column) => ColumnFilters(column));
+    column: $table.completed,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get deletedAt => $composableBuilder(
-      column: $table.deletedAt, builder: (column) => ColumnFilters(column));
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$TodoTableTableOrderingComposer
@@ -1447,25 +1708,39 @@ class $$TodoTableTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnOrderings(column));
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnOrderings(column));
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<bool> get completed => $composableBuilder(
-      column: $table.completed, builder: (column) => ColumnOrderings(column));
+    column: $table.completed,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
-      column: $table.deletedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$TodoTableTableAnnotationComposer
@@ -1484,7 +1759,9 @@ class $$TodoTableTableAnnotationComposer
       $composableBuilder(column: $table.title, builder: (column) => column);
 
   GeneratedColumn<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => column);
+    column: $table.description,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<bool> get completed =>
       $composableBuilder(column: $table.completed, builder: (column) => column);
@@ -1499,20 +1776,24 @@ class $$TodoTableTableAnnotationComposer
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 }
 
-class $$TodoTableTableTableManager extends RootTableManager<
-    _$DbClient,
-    $TodoTableTable,
-    TodoEntry,
-    $$TodoTableTableFilterComposer,
-    $$TodoTableTableOrderingComposer,
-    $$TodoTableTableAnnotationComposer,
-    $$TodoTableTableCreateCompanionBuilder,
-    $$TodoTableTableUpdateCompanionBuilder,
-    (TodoEntry, BaseReferences<_$DbClient, $TodoTableTable, TodoEntry>),
-    TodoEntry,
-    PrefetchHooks Function()> {
+class $$TodoTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $TodoTableTable,
+          TodoEntry,
+          $$TodoTableTableFilterComposer,
+          $$TodoTableTableOrderingComposer,
+          $$TodoTableTableAnnotationComposer,
+          $$TodoTableTableCreateCompanionBuilder,
+          $$TodoTableTableUpdateCompanionBuilder,
+          (TodoEntry, BaseReferences<_$DbClient, $TodoTableTable, TodoEntry>),
+          TodoEntry,
+          PrefetchHooks Function()
+        > {
   $$TodoTableTableTableManager(_$DbClient db, $TodoTableTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -1521,65 +1802,68 @@ class $$TodoTableTableTableManager extends RootTableManager<
               $$TodoTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$TodoTableTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<String> description = const Value.absent(),
-            Value<bool> completed = const Value.absent(),
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime?> updatedAt = const Value.absent(),
-            Value<DateTime?> deletedAt = const Value.absent(),
-            Value<int?> userId = const Value.absent(),
-          }) =>
-              TodoTableCompanion(
-            id: id,
-            title: title,
-            description: description,
-            completed: completed,
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            deletedAt: deletedAt,
-            userId: userId,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String title,
-            required String description,
-            Value<bool> completed = const Value.absent(),
-            required DateTime createdAt,
-            Value<DateTime?> updatedAt = const Value.absent(),
-            Value<DateTime?> deletedAt = const Value.absent(),
-            Value<int?> userId = const Value.absent(),
-          }) =>
-              TodoTableCompanion.insert(
-            id: id,
-            title: title,
-            description: description,
-            completed: completed,
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            deletedAt: deletedAt,
-            userId: userId,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<bool> completed = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int?> userId = const Value.absent(),
+              }) => TodoTableCompanion(
+                id: id,
+                title: title,
+                description: description,
+                completed: completed,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                userId: userId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String title,
+                required String description,
+                Value<bool> completed = const Value.absent(),
+                required DateTime createdAt,
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int?> userId = const Value.absent(),
+              }) => TodoTableCompanion.insert(
+                id: id,
+                title: title,
+                description: description,
+                completed: completed,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                userId: userId,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$TodoTableTableProcessedTableManager = ProcessedTableManager<
-    _$DbClient,
-    $TodoTableTable,
-    TodoEntry,
-    $$TodoTableTableFilterComposer,
-    $$TodoTableTableOrderingComposer,
-    $$TodoTableTableAnnotationComposer,
-    $$TodoTableTableCreateCompanionBuilder,
-    $$TodoTableTableUpdateCompanionBuilder,
-    (TodoEntry, BaseReferences<_$DbClient, $TodoTableTable, TodoEntry>),
-    TodoEntry,
-    PrefetchHooks Function()>;
+typedef $$TodoTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $TodoTableTable,
+      TodoEntry,
+      $$TodoTableTableFilterComposer,
+      $$TodoTableTableOrderingComposer,
+      $$TodoTableTableAnnotationComposer,
+      $$TodoTableTableCreateCompanionBuilder,
+      $$TodoTableTableUpdateCompanionBuilder,
+      (TodoEntry, BaseReferences<_$DbClient, $TodoTableTable, TodoEntry>),
+      TodoEntry,
+      PrefetchHooks Function()
+    >;
 
 class $DbClientManager {
   final _$DbClient _db;

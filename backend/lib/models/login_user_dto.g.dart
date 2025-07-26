@@ -13,7 +13,4 @@ _LoginUserDto _$LoginUserDtoFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$LoginUserDtoToJson(_LoginUserDto instance) =>
-    <String, dynamic>{
-      'email': instance.email,
-      'password': instance.password,
-    };
+    <String, dynamic>{'email': instance.email, 'password': instance.password};

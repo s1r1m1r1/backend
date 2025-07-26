@@ -14,8 +14,11 @@
     //install extension Russian - Code Spell Checker
     "cSpell.language": "en,ru",
     "cSpell.words": [
+        "checkpw",
         "daos",
-        "googlesignin"
+        "gensalt",
+        "googlesignin",
+        "hashpw"
     ],
     "cSpell.ignorePaths": [
         "vscode-extension", //

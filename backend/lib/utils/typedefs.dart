@@ -12,8 +12,8 @@ Result<Failure, TodoId> mapTodoId(String id) {
   try {
     final todoId = int.tryParse(id);
     if (todoId == null) throw const BadRequestException(message: 'Invalid id');
-    return Result.success(todoId);
+    return Success(todoId);
   } on BadRequestException catch (e) {
-    return Result.fail(RequestFailure(message: e.message, statusCode: e.statusCode));
+    return Fail(RequestFailure(message: e.message, statusCode: e.statusCode));
   }
 }

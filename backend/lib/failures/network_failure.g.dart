@@ -10,7 +10,8 @@ _NetworkFailure _$NetworkFailureFromJson(Map<String, dynamic> json) =>
     _NetworkFailure(
       message: json['message'] as String,
       statusCode: (json['statusCode'] as num).toInt(),
-      errors: (json['errors'] as List<dynamic>?)
+      errors:
+          (json['errors'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],

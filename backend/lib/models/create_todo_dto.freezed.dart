@@ -14,52 +14,47 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$CreateTodoDto {
-  String get title;
-  String? get description;
-  bool? get completed;
 
-  /// Create a copy of CreateTodoDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $CreateTodoDtoCopyWith<CreateTodoDto> get copyWith =>
-      _$CreateTodoDtoCopyWithImpl<CreateTodoDto>(
-          this as CreateTodoDto, _$identity);
+ String get title; String? get description; bool? get completed;
+/// Create a copy of CreateTodoDto
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CreateTodoDtoCopyWith<CreateTodoDto> get copyWith => _$CreateTodoDtoCopyWithImpl<CreateTodoDto>(this as CreateTodoDto, _$identity);
 
   /// Serializes this CreateTodoDto to a JSON map.
   Map<String, dynamic> toJson();
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is CreateTodoDto &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
-            (identical(other.completed, completed) ||
-                other.completed == completed));
-  }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, title, description, completed);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateTodoDto&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.completed, completed) || other.completed == completed));
+}
 
-  @override
-  String toString() {
-    return 'CreateTodoDto(title: $title, description: $description, completed: $completed)';
-  }
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,description,completed);
+
+@override
+String toString() {
+  return 'CreateTodoDto(title: $title, description: $description, completed: $completed)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $CreateTodoDtoCopyWith<$Res> {
-  factory $CreateTodoDtoCopyWith(
-          CreateTodoDto value, $Res Function(CreateTodoDto) _then) =
-      _$CreateTodoDtoCopyWithImpl;
-  @useResult
-  $Res call({String title, String? description, bool? completed});
-}
+abstract mixin class $CreateTodoDtoCopyWith<$Res>  {
+  factory $CreateTodoDtoCopyWith(CreateTodoDto value, $Res Function(CreateTodoDto) _then) = _$CreateTodoDtoCopyWithImpl;
+@useResult
+$Res call({
+ String title, String? description, bool? completed
+});
 
+
+
+
+}
 /// @nodoc
 class _$CreateTodoDtoCopyWithImpl<$Res>
     implements $CreateTodoDtoCopyWith<$Res> {
@@ -68,255 +63,201 @@ class _$CreateTodoDtoCopyWithImpl<$Res>
   final CreateTodoDto _self;
   final $Res Function(CreateTodoDto) _then;
 
-  /// Create a copy of CreateTodoDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? title = null,
-    Object? description = freezed,
-    Object? completed = freezed,
-  }) {
-    return _then(_self.copyWith(
-      title: null == title
-          ? _self.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: freezed == description
-          ? _self.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-      completed: freezed == completed
-          ? _self.completed
-          : completed // ignore: cast_nullable_to_non_nullable
-              as bool?,
-    ));
-  }
+/// Create a copy of CreateTodoDto
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? description = freezed,Object? completed = freezed,}) {
+  return _then(_self.copyWith(
+title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,completed: freezed == completed ? _self.completed : completed // ignore: cast_nullable_to_non_nullable
+as bool?,
+  ));
 }
+
+}
+
 
 /// Adds pattern-matching-related methods to [CreateTodoDto].
 extension CreateTodoDtoPatterns on CreateTodoDto {
-  /// A variant of `map` that fallback to returning `orElse`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>(
-    TResult Function(_CreateTodoDto value)? $default, {
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case _CreateTodoDto() when $default != null:
-        return $default(_that);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CreateTodoDto value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CreateTodoDto() when $default != null:
+return $default(_that);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// Callbacks receives the raw object, upcasted.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case final Subclass2 value:
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>(
-    TResult Function(_CreateTodoDto value) $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _CreateTodoDto():
-        return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
-    }
-  }
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CreateTodoDto value)  $default,){
+final _that = this;
+switch (_that) {
+case _CreateTodoDto():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
 
-  /// A variant of `map` that fallback to returning `null`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_CreateTodoDto value)? $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _CreateTodoDto() when $default != null:
-        return $default(_that);
-      case _:
-        return null;
-    }
-  }
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CreateTodoDto value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CreateTodoDto() when $default != null:
+return $default(_that);case _:
+  return null;
 
-  /// A variant of `when` that fallback to an `orElse` callback.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String title, String? description, bool? completed)?
-        $default, {
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case _CreateTodoDto() when $default != null:
-        return $default(_that.title, _that.description, _that.completed);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String? description,  bool? completed)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CreateTodoDto() when $default != null:
+return $default(_that.title,_that.description,_that.completed);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// As opposed to `map`, this offers destructuring.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case Subclass2(:final field2):
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>(
-    TResult Function(String title, String? description, bool? completed)
-        $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _CreateTodoDto():
-        return $default(_that.title, _that.description, _that.completed);
-      case _:
-        throw StateError('Unexpected subclass');
-    }
-  }
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String? description,  bool? completed)  $default,) {final _that = this;
+switch (_that) {
+case _CreateTodoDto():
+return $default(_that.title,_that.description,_that.completed);case _:
+  throw StateError('Unexpected subclass');
 
-  /// A variant of `when` that fallback to returning `null`
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String title, String? description, bool? completed)?
-        $default,
-  ) {
-    final _that = this;
-    switch (_that) {
-      case _CreateTodoDto() when $default != null:
-        return $default(_that.title, _that.description, _that.completed);
-      case _:
-        return null;
-    }
-  }
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String? description,  bool? completed)?  $default,) {final _that = this;
+switch (_that) {
+case _CreateTodoDto() when $default != null:
+return $default(_that.title,_that.description,_that.completed);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
+
 class _CreateTodoDto extends CreateTodoDto {
-  const _CreateTodoDto({required this.title, this.description, this.completed})
-      : super._();
-  factory _CreateTodoDto.fromJson(Map<String, dynamic> json) =>
-      _$CreateTodoDtoFromJson(json);
+  const _CreateTodoDto({required this.title, this.description, this.completed}): super._();
+  factory _CreateTodoDto.fromJson(Map<String, dynamic> json) => _$CreateTodoDtoFromJson(json);
 
-  @override
-  final String title;
-  @override
-  final String? description;
-  @override
-  final bool? completed;
+@override final  String title;
+@override final  String? description;
+@override final  bool? completed;
 
-  /// Create a copy of CreateTodoDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$CreateTodoDtoCopyWith<_CreateTodoDto> get copyWith =>
-      __$CreateTodoDtoCopyWithImpl<_CreateTodoDto>(this, _$identity);
+/// Create a copy of CreateTodoDto
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CreateTodoDtoCopyWith<_CreateTodoDto> get copyWith => __$CreateTodoDtoCopyWithImpl<_CreateTodoDto>(this, _$identity);
 
-  @override
-  Map<String, dynamic> toJson() {
-    return _$CreateTodoDtoToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$CreateTodoDtoToJson(this, );
+}
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _CreateTodoDto &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
-            (identical(other.completed, completed) ||
-                other.completed == completed));
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateTodoDto&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.completed, completed) || other.completed == completed));
+}
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, title, description, completed);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,description,completed);
 
-  @override
-  String toString() {
-    return 'CreateTodoDto(title: $title, description: $description, completed: $completed)';
-  }
+@override
+String toString() {
+  return 'CreateTodoDto(title: $title, description: $description, completed: $completed)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class _$CreateTodoDtoCopyWith<$Res>
-    implements $CreateTodoDtoCopyWith<$Res> {
-  factory _$CreateTodoDtoCopyWith(
-          _CreateTodoDto value, $Res Function(_CreateTodoDto) _then) =
-      __$CreateTodoDtoCopyWithImpl;
-  @override
-  @useResult
-  $Res call({String title, String? description, bool? completed});
-}
+abstract mixin class _$CreateTodoDtoCopyWith<$Res> implements $CreateTodoDtoCopyWith<$Res> {
+  factory _$CreateTodoDtoCopyWith(_CreateTodoDto value, $Res Function(_CreateTodoDto) _then) = __$CreateTodoDtoCopyWithImpl;
+@override @useResult
+$Res call({
+ String title, String? description, bool? completed
+});
 
+
+
+
+}
 /// @nodoc
 class __$CreateTodoDtoCopyWithImpl<$Res>
     implements _$CreateTodoDtoCopyWith<$Res> {
@@ -325,30 +266,18 @@ class __$CreateTodoDtoCopyWithImpl<$Res>
   final _CreateTodoDto _self;
   final $Res Function(_CreateTodoDto) _then;
 
-  /// Create a copy of CreateTodoDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? title = null,
-    Object? description = freezed,
-    Object? completed = freezed,
-  }) {
-    return _then(_CreateTodoDto(
-      title: null == title
-          ? _self.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: freezed == description
-          ? _self.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-      completed: freezed == completed
-          ? _self.completed
-          : completed // ignore: cast_nullable_to_non_nullable
-              as bool?,
-    ));
-  }
+/// Create a copy of CreateTodoDto
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? description = freezed,Object? completed = freezed,}) {
+  return _then(_CreateTodoDto(
+title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String?,completed: freezed == completed ? _self.completed : completed // ignore: cast_nullable_to_non_nullable
+as bool?,
+  ));
+}
+
+
 }
 
 // dart format on
