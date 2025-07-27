@@ -1,7 +1,7 @@
-import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:either_dart/either.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../exceptions/new_api_exceptions.dart';
 import '../failures/validation_failure.dart';
 
 part 'login_user_dto.freezed.dart';

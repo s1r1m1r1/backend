@@ -1,10 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:backend/failures/server_failure.dart';
 import 'package:either_dart/either.dart';
 
+import '../../exceptions/new_api_exceptions.dart';
 import '../../failures/failure.dart';
 import '../../models/create_todo_dto.dart';
 import '../../models/todo.dart';
@@ -55,7 +55,7 @@ class TodoRepositoryImpl implements TodoRepository {
         case Left():
           return Left(ServerFailure(message: 'user not found'));
       }
-    } on ServerException catch (e) {
+    } on ApiException catch (e) {
       log(e.message);
       return Left(ServerFailure(message: e.message));
     }
@@ -69,7 +69,7 @@ class TodoRepositoryImpl implements TodoRepository {
     } on ApiException catch (e) {
       // log(e.message);
       return Left(ServerFailure(message: e.toString(), statusCode: e.statusCode));
-    } on ServerException catch (e) {
+    } on ApiException catch (e) {
       log(e.message);
       return Left(ServerFailure(message: e.message));
     }
@@ -80,7 +80,7 @@ class TodoRepositoryImpl implements TodoRepository {
     try {
       final res = await _datasource.getAllTodo(user.userId);
       return res;
-    } on ServerException catch (e) {
+    } on ApiException catch (e) {
       rethrow;
     } on Object catch (e, stackTrace) {
       Error.throwWithStackTrace(ApiException.internalServerError(), stackTrace);
@@ -94,7 +94,7 @@ class TodoRepositoryImpl implements TodoRepository {
       return Right(r);
     } on ApiException catch (e) {
       return Left(ServerFailure(message: e.message ?? '', statusCode: e.statusCode));
-    } on ServerException catch (e) {
+    } on ApiException catch (e) {
       log(e.message);
       return Left(ServerFailure(message: e.message));
     }

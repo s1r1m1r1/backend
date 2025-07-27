@@ -42,6 +42,12 @@ class RegistrationInterceptor extends Interceptor {
   }
 
   @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    debugPrint('Response  body: ${response.data} ${response.statusCode}');
+    super.onResponse(response, handler);
+  }
+
+  @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // Handle token refresh logic here if needed (e.g., 401 Unauthorized)
     if (err.response?.statusCode == 401) {

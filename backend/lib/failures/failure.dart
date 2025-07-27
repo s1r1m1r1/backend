@@ -1,4 +1,4 @@
 abstract class Failure {
-  String get message;
+  String? get message;
   int get statusCode;
 }

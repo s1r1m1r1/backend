@@ -1,7 +1,7 @@
+import 'package:backend/exceptions/new_api_exceptions.dart';
 import 'package:either_dart/either.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../exceptions/api_exceptions.dart';
 import '../failures/validation_failure.dart';
 
 part 'create_todo_dto.freezed.dart';

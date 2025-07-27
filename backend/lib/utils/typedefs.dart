@@ -1,7 +1,7 @@
-import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:backend/failures/failure.dart';
 import 'package:either_dart/either.dart';
 
+import '../exceptions/new_api_exceptions.dart';
 import '../failures/request_failure.dart';
 
 /// id todo
