@@ -57,7 +57,7 @@ class ApiService {
     final response = await http.post(
       Uri.parse('$_baseUrl/users/signup'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({'username': username, 'email': email, 'password': password}),
+      body: json.encode({'name': username, 'email': email, 'password': password}),
     );
     if (response.statusCode == 201) {
       return json.decode(response.body); // Assuming it returns some user data
