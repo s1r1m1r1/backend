@@ -1,8 +1,8 @@
+import 'package:either_dart/either.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../exceptions/bad_request_exceptions.dart';
 import '../failures/validation_failure.dart';
-import '../utils/result.dart';
 
 part 'update_todo_dto.freezed.dart';
 part 'update_todo_dto.g.dart';
@@ -14,7 +14,7 @@ abstract class UpdateTodoDto with _$UpdateTodoDto {
 
   factory UpdateTodoDto.fromJson(Map<String, dynamic> json) => _$UpdateTodoDtoFromJson(json);
 
-  static Result<ValidationFailure, UpdateTodoDto> validated(Map<String, dynamic> json) {
+  static Either<ValidationFailure, UpdateTodoDto> validated(Map<String, dynamic> json) {
     try {
       final errors = <String, List<String>>{};
       if (json['title'] == null || json['title'] == '') {
@@ -26,10 +26,10 @@ abstract class UpdateTodoDto with _$UpdateTodoDto {
       if (json['completed'] == null) {
         errors['completed'] = ['At least one field must be provided'];
       }
-      if (errors.length < 3) return Success(UpdateTodoDto.fromJson(json));
+      if (errors.length < 3) return Right(UpdateTodoDto.fromJson(json));
       throw BadRequestException(message: 'Validation failed', errors: errors);
     } on BadRequestException catch (e) {
-      return Fail(ValidationFailure(message: e.message, statusCode: e.statusCode, errors: e.errors));
+      return Left(ValidationFailure(message: e.message, statusCode: e.statusCode, errors: e.errors));
     }
   }
 }

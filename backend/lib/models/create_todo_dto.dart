@@ -1,8 +1,8 @@
+import 'package:either_dart/either.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../exceptions/bad_request_exceptions.dart';
 import '../failures/validation_failure.dart';
-import '../utils/result.dart';
 
 part 'create_todo_dto.freezed.dart';
 part 'create_todo_dto.g.dart';
@@ -14,7 +14,7 @@ abstract class CreateTodoDto with _$CreateTodoDto {
 
   factory CreateTodoDto.fromJson(Map<String, dynamic> json) => _$CreateTodoDtoFromJson(json);
 
-  static Result<ValidationFailure, CreateTodoDto> validated(Map<String, dynamic> json) {
+  static Either<ValidationFailure, CreateTodoDto> validated(Map<String, dynamic> json) {
     try {
       final errors = <String, List<String>>{};
       if (json['title'] == null) {
@@ -23,10 +23,10 @@ abstract class CreateTodoDto with _$CreateTodoDto {
       if (json['description'] == null) {
         errors['description'] = ['Description is required'];
       }
-      if (errors.isEmpty) return Success(CreateTodoDto.fromJson(json));
+      if (errors.isEmpty) return Right(CreateTodoDto.fromJson(json));
       throw BadRequestException(message: 'Validation failed', errors: errors);
     } on BadRequestException catch (e) {
-      return Fail(ValidationFailure(message: e.message, errors: e.errors, statusCode: e.statusCode));
+      return Left(ValidationFailure(message: e.message, errors: e.errors, statusCode: e.statusCode));
     }
   }
 }

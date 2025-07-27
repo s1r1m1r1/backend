@@ -2,23 +2,16 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:backend/models/user.dart';
-import 'package:backend/utils/result.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 import '../../controller/http_controller.dart';
-import '../../failures/validation_failure.dart';
 import '../../models/create_user_dto.dart';
 import '../../models/login_user_dto.dart';
 import '../../services/jwt_service.dart';
 import '../../utils/typedefs.dart';
 import '../repository/user_repository.dart';
 
-/// {@template user_controller}
-/// This is the controller for the user resource
-/// Use this class to handle requests to the user resource
-/// {@endtemplate}
 class UserController extends HttpController {
-  /// {@macro user_controller}
   UserController(this._repo, this._jwtService);
 
   final UserRepository _repo;
@@ -72,16 +65,17 @@ class UserController extends HttpController {
       (Json json) async {
         stdout.writeln('login parsedBody right');
         final loginUserDto = LoginUserDto.validated(json);
-        switch (loginUserDto) {
-          case Fail(value: final f):
+        return loginUserDto.fold<FutureOr<Response>>(
+          (left) {
             stdout.writeln('login loginUserDto fail');
             return Response.json(
-              body: {"status": f.statusCode, 'message': f.message, 'errors': f.errors},
-              statusCode: f.statusCode,
+              body: {"status": left.statusCode, 'message': left.message, 'errors': left.errors},
+              statusCode: left.statusCode,
             );
-          case Success<ValidationFailure, LoginUserDto>(value: final s):
-            stdout.writeln('login loginUserDto success $s');
-            final res = await _repo.loginUser(s);
+          },
+          (LoginUserDto dto) async {
+            stdout.writeln('login loginUserDto success');
+            final res = await _repo.loginUser(dto);
             return res.fold<Response>(
               (left) {
                 stdout.writeln('login loginUser fail');
@@ -92,7 +86,8 @@ class UserController extends HttpController {
                 return _signAndSendToken(user);
               },
             );
-        }
+          },
+        );
       },
     );
   }
