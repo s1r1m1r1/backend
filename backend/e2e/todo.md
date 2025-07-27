@@ -7,7 +7,7 @@ curl -s -L -X GET 'http://localhost:8080/todos'
 
 
 curl -s -L -X GET 'http://localhost:8080/todos' -H 'Authorization: Bearer <token>'
-curl -s -L -X GET 'http://localhost:8080/todos' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4ZDdkZWU1MC02YTRhLTExZjAtOThmNi01NzIyMjYyMDNjNzAiLCJuYW1lIjoidGVzdG5hbWUiLCJlbWFpbCI6InNhaWxlc0BnbWFpbC5jb20iLCJjcmVhdGVkQXQiOiIyMDI1LTA3LTI2VDIwOjAxOjI4LjAwMCIsImlhdCI6MTc1MzU1Mjg5M30.JiUBd2Sb8dtCKjsuEJq0k6gH94waZhk5hte-ADmvJUg'
+curl -s -L -X GET 'http://localhost:8080/todos' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4ZDdkZWU1MC02YTRhLTExZjAtOThmNi01NzIyMjYyMDNjNzAiLCJuYW1lIjoidGVzdG5hbWUiLCJlbWFpbCI6InNhaWxlc0BnbWFpbC5jb20iLCJjcmVhdGVkQXQiOiIyMDI1LTA3LTI2VDIwOjAxOjI4LjAwMCIsImlhdCI6MTc1MzU2ODg0NH0.U90XOSf40oogJ_D37xO-87rqcw7_fkNhRlBXGBWpwVw'
 
 [
   {

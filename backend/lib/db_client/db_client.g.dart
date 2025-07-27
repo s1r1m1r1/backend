@@ -1220,15 +1220,485 @@ class TodoTableCompanion extends UpdateCompanion<TodoEntry> {
   }
 }
 
+class $RefreshTokenTableTable extends RefreshTokenTable
+    with TableInfo<$RefreshTokenTableTable, RefreshTokenEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RefreshTokenTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES user_table (id)',
+    ),
+  );
+  static const VerificationMeta _hashedTokenMeta = const VerificationMeta(
+    'hashedToken',
+  );
+  @override
+  late final GeneratedColumn<String> hashedToken = GeneratedColumn<String>(
+    'hashed_token',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _expiresAtMeta = const VerificationMeta(
+    'expiresAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> expiresAt = GeneratedColumn<DateTime>(
+    'expires_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _revokedAtMeta = const VerificationMeta(
+    'revokedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> revokedAt = GeneratedColumn<DateTime>(
+    'revoked_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deviceInfoMeta = const VerificationMeta(
+    'deviceInfo',
+  );
+  @override
+  late final GeneratedColumn<String> deviceInfo = GeneratedColumn<String>(
+    'device_info',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    userId,
+    hashedToken,
+    expiresAt,
+    createdAt,
+    revokedAt,
+    deviceInfo,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'refresh_token_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RefreshTokenEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('hashed_token')) {
+      context.handle(
+        _hashedTokenMeta,
+        hashedToken.isAcceptableOrUnknown(
+          data['hashed_token']!,
+          _hashedTokenMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_hashedTokenMeta);
+    }
+    if (data.containsKey('expires_at')) {
+      context.handle(
+        _expiresAtMeta,
+        expiresAt.isAcceptableOrUnknown(data['expires_at']!, _expiresAtMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('revoked_at')) {
+      context.handle(
+        _revokedAtMeta,
+        revokedAt.isAcceptableOrUnknown(data['revoked_at']!, _revokedAtMeta),
+      );
+    }
+    if (data.containsKey('device_info')) {
+      context.handle(
+        _deviceInfoMeta,
+        deviceInfo.isAcceptableOrUnknown(data['device_info']!, _deviceInfoMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RefreshTokenEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RefreshTokenEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
+      hashedToken: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}hashed_token'],
+      )!,
+      expiresAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}expires_at'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      revokedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}revoked_at'],
+      ),
+      deviceInfo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_info'],
+      ),
+    );
+  }
+
+  @override
+  $RefreshTokenTableTable createAlias(String alias) {
+    return $RefreshTokenTableTable(attachedDatabase, alias);
+  }
+}
+
+class RefreshTokenEntry extends DataClass
+    implements Insertable<RefreshTokenEntry> {
+  final int id;
+  final String userId;
+  final String hashedToken;
+  final DateTime? expiresAt;
+  final DateTime createdAt;
+  final DateTime? revokedAt;
+  final String? deviceInfo;
+  const RefreshTokenEntry({
+    required this.id,
+    required this.userId,
+    required this.hashedToken,
+    this.expiresAt,
+    required this.createdAt,
+    this.revokedAt,
+    this.deviceInfo,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['user_id'] = Variable<String>(userId);
+    map['hashed_token'] = Variable<String>(hashedToken);
+    if (!nullToAbsent || expiresAt != null) {
+      map['expires_at'] = Variable<DateTime>(expiresAt);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || revokedAt != null) {
+      map['revoked_at'] = Variable<DateTime>(revokedAt);
+    }
+    if (!nullToAbsent || deviceInfo != null) {
+      map['device_info'] = Variable<String>(deviceInfo);
+    }
+    return map;
+  }
+
+  RefreshTokenTableCompanion toCompanion(bool nullToAbsent) {
+    return RefreshTokenTableCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      hashedToken: Value(hashedToken),
+      expiresAt: expiresAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expiresAt),
+      createdAt: Value(createdAt),
+      revokedAt: revokedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(revokedAt),
+      deviceInfo: deviceInfo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deviceInfo),
+    );
+  }
+
+  factory RefreshTokenEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RefreshTokenEntry(
+      id: serializer.fromJson<int>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      hashedToken: serializer.fromJson<String>(json['hashedToken']),
+      expiresAt: serializer.fromJson<DateTime?>(json['expiresAt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      revokedAt: serializer.fromJson<DateTime?>(json['revokedAt']),
+      deviceInfo: serializer.fromJson<String?>(json['deviceInfo']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'userId': serializer.toJson<String>(userId),
+      'hashedToken': serializer.toJson<String>(hashedToken),
+      'expiresAt': serializer.toJson<DateTime?>(expiresAt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'revokedAt': serializer.toJson<DateTime?>(revokedAt),
+      'deviceInfo': serializer.toJson<String?>(deviceInfo),
+    };
+  }
+
+  RefreshTokenEntry copyWith({
+    int? id,
+    String? userId,
+    String? hashedToken,
+    Value<DateTime?> expiresAt = const Value.absent(),
+    DateTime? createdAt,
+    Value<DateTime?> revokedAt = const Value.absent(),
+    Value<String?> deviceInfo = const Value.absent(),
+  }) => RefreshTokenEntry(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    hashedToken: hashedToken ?? this.hashedToken,
+    expiresAt: expiresAt.present ? expiresAt.value : this.expiresAt,
+    createdAt: createdAt ?? this.createdAt,
+    revokedAt: revokedAt.present ? revokedAt.value : this.revokedAt,
+    deviceInfo: deviceInfo.present ? deviceInfo.value : this.deviceInfo,
+  );
+  RefreshTokenEntry copyWithCompanion(RefreshTokenTableCompanion data) {
+    return RefreshTokenEntry(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      hashedToken: data.hashedToken.present
+          ? data.hashedToken.value
+          : this.hashedToken,
+      expiresAt: data.expiresAt.present ? data.expiresAt.value : this.expiresAt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      revokedAt: data.revokedAt.present ? data.revokedAt.value : this.revokedAt,
+      deviceInfo: data.deviceInfo.present
+          ? data.deviceInfo.value
+          : this.deviceInfo,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RefreshTokenEntry(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('hashedToken: $hashedToken, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('revokedAt: $revokedAt, ')
+          ..write('deviceInfo: $deviceInfo')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    userId,
+    hashedToken,
+    expiresAt,
+    createdAt,
+    revokedAt,
+    deviceInfo,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RefreshTokenEntry &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.hashedToken == this.hashedToken &&
+          other.expiresAt == this.expiresAt &&
+          other.createdAt == this.createdAt &&
+          other.revokedAt == this.revokedAt &&
+          other.deviceInfo == this.deviceInfo);
+}
+
+class RefreshTokenTableCompanion extends UpdateCompanion<RefreshTokenEntry> {
+  final Value<int> id;
+  final Value<String> userId;
+  final Value<String> hashedToken;
+  final Value<DateTime?> expiresAt;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> revokedAt;
+  final Value<String?> deviceInfo;
+  const RefreshTokenTableCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.hashedToken = const Value.absent(),
+    this.expiresAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.revokedAt = const Value.absent(),
+    this.deviceInfo = const Value.absent(),
+  });
+  RefreshTokenTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String userId,
+    required String hashedToken,
+    this.expiresAt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.revokedAt = const Value.absent(),
+    this.deviceInfo = const Value.absent(),
+  }) : userId = Value(userId),
+       hashedToken = Value(hashedToken);
+  static Insertable<RefreshTokenEntry> custom({
+    Expression<int>? id,
+    Expression<String>? userId,
+    Expression<String>? hashedToken,
+    Expression<DateTime>? expiresAt,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? revokedAt,
+    Expression<String>? deviceInfo,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (hashedToken != null) 'hashed_token': hashedToken,
+      if (expiresAt != null) 'expires_at': expiresAt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (revokedAt != null) 'revoked_at': revokedAt,
+      if (deviceInfo != null) 'device_info': deviceInfo,
+    });
+  }
+
+  RefreshTokenTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? userId,
+    Value<String>? hashedToken,
+    Value<DateTime?>? expiresAt,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? revokedAt,
+    Value<String?>? deviceInfo,
+  }) {
+    return RefreshTokenTableCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      hashedToken: hashedToken ?? this.hashedToken,
+      expiresAt: expiresAt ?? this.expiresAt,
+      createdAt: createdAt ?? this.createdAt,
+      revokedAt: revokedAt ?? this.revokedAt,
+      deviceInfo: deviceInfo ?? this.deviceInfo,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (hashedToken.present) {
+      map['hashed_token'] = Variable<String>(hashedToken.value);
+    }
+    if (expiresAt.present) {
+      map['expires_at'] = Variable<DateTime>(expiresAt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (revokedAt.present) {
+      map['revoked_at'] = Variable<DateTime>(revokedAt.value);
+    }
+    if (deviceInfo.present) {
+      map['device_info'] = Variable<String>(deviceInfo.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RefreshTokenTableCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('hashedToken: $hashedToken, ')
+          ..write('expiresAt: $expiresAt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('revokedAt: $revokedAt, ')
+          ..write('deviceInfo: $deviceInfo')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DbClient extends GeneratedDatabase {
   _$DbClient(QueryExecutor e) : super(e);
   $DbClientManager get managers => $DbClientManager(this);
   late final $ChannelTableTable channelTable = $ChannelTableTable(this);
   late final $UserTableTable userTable = $UserTableTable(this);
   late final $TodoTableTable todoTable = $TodoTableTable(this);
+  late final $RefreshTokenTableTable refreshTokenTable =
+      $RefreshTokenTableTable(this);
   late final ChannelDao channelDao = ChannelDao(this as DbClient);
   late final TodoDao todoDao = TodoDao(this as DbClient);
   late final UserDao userDao = UserDao(this as DbClient);
+  late final RefreshTokenDao refreshTokenDao = RefreshTokenDao(
+    this as DbClient,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1237,6 +1707,7 @@ abstract class _$DbClient extends GeneratedDatabase {
     channelTable,
     userTable,
     todoTable,
+    refreshTokenTable,
   ];
 }
 
@@ -1459,6 +1930,29 @@ final class $$UserTableTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$RefreshTokenTableTable, List<RefreshTokenEntry>>
+  _refreshTokenTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
+    db.refreshTokenTable,
+    aliasName: $_aliasNameGenerator(
+      db.userTable.id,
+      db.refreshTokenTable.userId,
+    ),
+  );
+
+  $$RefreshTokenTableTableProcessedTableManager get refreshTokenTableRefs {
+    final manager = $$RefreshTokenTableTableTableManager(
+      $_db,
+      $_db.refreshTokenTable,
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _refreshTokenTableRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$UserTableTableFilterComposer
@@ -1516,6 +2010,31 @@ class $$UserTableTableFilterComposer
           }) => $$TodoTableTableFilterComposer(
             $db: $db,
             $table: $db.todoTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> refreshTokenTableRefs(
+    Expression<bool> Function($$RefreshTokenTableTableFilterComposer f) f,
+  ) {
+    final $$RefreshTokenTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.refreshTokenTable,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RefreshTokenTableTableFilterComposer(
+            $db: $db,
+            $table: $db.refreshTokenTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -1617,6 +2136,32 @@ class $$UserTableTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> refreshTokenTableRefs<T extends Object>(
+    Expression<T> Function($$RefreshTokenTableTableAnnotationComposer a) f,
+  ) {
+    final $$RefreshTokenTableTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.refreshTokenTable,
+          getReferencedColumn: (t) => t.userId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$RefreshTokenTableTableAnnotationComposer(
+                $db: $db,
+                $table: $db.refreshTokenTable,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$UserTableTableTableManager
@@ -1632,7 +2177,10 @@ class $$UserTableTableTableManager
           $$UserTableTableUpdateCompanionBuilder,
           (UserEntry, $$UserTableTableReferences),
           UserEntry,
-          PrefetchHooks Function({bool todoTableRefs})
+          PrefetchHooks Function({
+            bool todoTableRefs,
+            bool refreshTokenTableRefs,
+          })
         > {
   $$UserTableTableTableManager(_$DbClient db, $UserTableTable table)
     : super(
@@ -1689,36 +2237,63 @@ class $$UserTableTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({todoTableRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (todoTableRefs) db.todoTable],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (todoTableRefs)
-                    await $_getPrefetchedData<
-                      UserEntry,
-                      $UserTableTable,
-                      TodoEntry
-                    >(
-                      currentTable: table,
-                      referencedTable: $$UserTableTableReferences
-                          ._todoTableRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$UserTableTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).todoTableRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.userId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({todoTableRefs = false, refreshTokenTableRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (todoTableRefs) db.todoTable,
+                    if (refreshTokenTableRefs) db.refreshTokenTable,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (todoTableRefs)
+                        await $_getPrefetchedData<
+                          UserEntry,
+                          $UserTableTable,
+                          TodoEntry
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UserTableTableReferences
+                              ._todoTableRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UserTableTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).todoTableRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.userId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (refreshTokenTableRefs)
+                        await $_getPrefetchedData<
+                          UserEntry,
+                          $UserTableTable,
+                          RefreshTokenEntry
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UserTableTableReferences
+                              ._refreshTokenTableRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UserTableTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).refreshTokenTableRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.userId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -1735,7 +2310,7 @@ typedef $$UserTableTableProcessedTableManager =
       $$UserTableTableUpdateCompanionBuilder,
       (UserEntry, $$UserTableTableReferences),
       UserEntry,
-      PrefetchHooks Function({bool todoTableRefs})
+      PrefetchHooks Function({bool todoTableRefs, bool refreshTokenTableRefs})
     >;
 typedef $$TodoTableTableCreateCompanionBuilder =
     TodoTableCompanion Function({
@@ -2107,6 +2682,373 @@ typedef $$TodoTableTableProcessedTableManager =
       TodoEntry,
       PrefetchHooks Function({bool userId})
     >;
+typedef $$RefreshTokenTableTableCreateCompanionBuilder =
+    RefreshTokenTableCompanion Function({
+      Value<int> id,
+      required String userId,
+      required String hashedToken,
+      Value<DateTime?> expiresAt,
+      Value<DateTime> createdAt,
+      Value<DateTime?> revokedAt,
+      Value<String?> deviceInfo,
+    });
+typedef $$RefreshTokenTableTableUpdateCompanionBuilder =
+    RefreshTokenTableCompanion Function({
+      Value<int> id,
+      Value<String> userId,
+      Value<String> hashedToken,
+      Value<DateTime?> expiresAt,
+      Value<DateTime> createdAt,
+      Value<DateTime?> revokedAt,
+      Value<String?> deviceInfo,
+    });
+
+final class $$RefreshTokenTableTableReferences
+    extends
+        BaseReferences<_$DbClient, $RefreshTokenTableTable, RefreshTokenEntry> {
+  $$RefreshTokenTableTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $UserTableTable _userIdTable(_$DbClient db) =>
+      db.userTable.createAlias(
+        $_aliasNameGenerator(db.refreshTokenTable.userId, db.userTable.id),
+      );
+
+  $$UserTableTableProcessedTableManager get userId {
+    final $_column = $_itemColumn<String>('user_id')!;
+
+    final manager = $$UserTableTableTableManager(
+      $_db,
+      $_db.userTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RefreshTokenTableTableFilterComposer
+    extends Composer<_$DbClient, $RefreshTokenTableTable> {
+  $$RefreshTokenTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hashedToken => $composableBuilder(
+    column: $table.hashedToken,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get expiresAt => $composableBuilder(
+    column: $table.expiresAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get revokedAt => $composableBuilder(
+    column: $table.revokedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceInfo => $composableBuilder(
+    column: $table.deviceInfo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UserTableTableFilterComposer get userId {
+    final $$UserTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableFilterComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RefreshTokenTableTableOrderingComposer
+    extends Composer<_$DbClient, $RefreshTokenTableTable> {
+  $$RefreshTokenTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hashedToken => $composableBuilder(
+    column: $table.hashedToken,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get expiresAt => $composableBuilder(
+    column: $table.expiresAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get revokedAt => $composableBuilder(
+    column: $table.revokedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceInfo => $composableBuilder(
+    column: $table.deviceInfo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UserTableTableOrderingComposer get userId {
+    final $$UserTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RefreshTokenTableTableAnnotationComposer
+    extends Composer<_$DbClient, $RefreshTokenTableTable> {
+  $$RefreshTokenTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get hashedToken => $composableBuilder(
+    column: $table.hashedToken,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get expiresAt =>
+      $composableBuilder(column: $table.expiresAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get revokedAt =>
+      $composableBuilder(column: $table.revokedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceInfo => $composableBuilder(
+    column: $table.deviceInfo,
+    builder: (column) => column,
+  );
+
+  $$UserTableTableAnnotationComposer get userId {
+    final $$UserTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RefreshTokenTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $RefreshTokenTableTable,
+          RefreshTokenEntry,
+          $$RefreshTokenTableTableFilterComposer,
+          $$RefreshTokenTableTableOrderingComposer,
+          $$RefreshTokenTableTableAnnotationComposer,
+          $$RefreshTokenTableTableCreateCompanionBuilder,
+          $$RefreshTokenTableTableUpdateCompanionBuilder,
+          (RefreshTokenEntry, $$RefreshTokenTableTableReferences),
+          RefreshTokenEntry,
+          PrefetchHooks Function({bool userId})
+        > {
+  $$RefreshTokenTableTableTableManager(
+    _$DbClient db,
+    $RefreshTokenTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RefreshTokenTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RefreshTokenTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RefreshTokenTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<String> hashedToken = const Value.absent(),
+                Value<DateTime?> expiresAt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> revokedAt = const Value.absent(),
+                Value<String?> deviceInfo = const Value.absent(),
+              }) => RefreshTokenTableCompanion(
+                id: id,
+                userId: userId,
+                hashedToken: hashedToken,
+                expiresAt: expiresAt,
+                createdAt: createdAt,
+                revokedAt: revokedAt,
+                deviceInfo: deviceInfo,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String userId,
+                required String hashedToken,
+                Value<DateTime?> expiresAt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> revokedAt = const Value.absent(),
+                Value<String?> deviceInfo = const Value.absent(),
+              }) => RefreshTokenTableCompanion.insert(
+                id: id,
+                userId: userId,
+                hashedToken: hashedToken,
+                expiresAt: expiresAt,
+                createdAt: createdAt,
+                revokedAt: revokedAt,
+                deviceInfo: deviceInfo,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$RefreshTokenTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({userId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (userId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.userId,
+                                referencedTable:
+                                    $$RefreshTokenTableTableReferences
+                                        ._userIdTable(db),
+                                referencedColumn:
+                                    $$RefreshTokenTableTableReferences
+                                        ._userIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RefreshTokenTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $RefreshTokenTableTable,
+      RefreshTokenEntry,
+      $$RefreshTokenTableTableFilterComposer,
+      $$RefreshTokenTableTableOrderingComposer,
+      $$RefreshTokenTableTableAnnotationComposer,
+      $$RefreshTokenTableTableCreateCompanionBuilder,
+      $$RefreshTokenTableTableUpdateCompanionBuilder,
+      (RefreshTokenEntry, $$RefreshTokenTableTableReferences),
+      RefreshTokenEntry,
+      PrefetchHooks Function({bool userId})
+    >;
 
 class $DbClientManager {
   final _$DbClient _db;
@@ -2117,4 +3059,6 @@ class $DbClientManager {
       $$UserTableTableTableManager(_db, _db.userTable);
   $$TodoTableTableTableManager get todoTable =>
       $$TodoTableTableTableManager(_db, _db.todoTable);
+  $$RefreshTokenTableTableTableManager get refreshTokenTable =>
+      $$RefreshTokenTableTableTableManager(_db, _db.refreshTokenTable);
 }
