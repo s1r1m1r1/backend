@@ -1,4 +1,4 @@
-import 'dart:async' show FutureOr;
+import 'dart:async';
 
 import 'package:backend/request_handler/not_allowed_request_handler.dart';
 import 'package:backend/user/controller/user_controller.dart';
@@ -9,6 +9,5 @@ FutureOr<Response> onRequest(RequestContext context) {
   if (context.request.method != HttpMethod.post) {
     return notAllowedRequestHandler(context);
   }
-
   return userController.store(context.request);
 }

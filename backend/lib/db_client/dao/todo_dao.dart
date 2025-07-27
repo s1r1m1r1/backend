@@ -12,31 +12,30 @@ class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
   // of this object.
   TodoDao(super.db);
 
-  insert() {}
-
   Future<TodoEntry> insertTodo(TodoTableCompanion companion) async {
-    return into(todoTable).insertReturning(
-      companion,
-    );
+    return into(todoTable).insertReturning(companion);
   }
 
   Future<int> updateTodo(TodoId id, TodoTableCompanion companion) async {
-    return (update(todoTable)..where((t) => t.id.equals(id))).write(
-      companion,
-    );
+    return (update(
+      todoTable,
+    )..where((t) => t.id.equals(id) & t.userId.equalsNullable(companion.userId.value))).write(companion);
   }
 
-  Future<int> deleteTodoById(TodoId id) async {
-    return (delete(todoTable)..where((t) => t.id.equals(id))).go();
+  Future<int> deleteTodoById(TodoId id, String userId) async {
+    return (delete(todoTable)..where((t) => t.id.equals(id) & t.userId.equals(userId))).go();
   }
 
-  Future<List<TodoEntry>> getAllTodo() async {
-    return (select(todoTable)..orderBy([(t) => OrderingTerm.desc(t.createdAt)])).get();
+  Future<List<TodoEntry>> getAllTodo(String userId) async {
+    return (select(todoTable)
+          ..where((t) => t.userId.equals(userId))
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+        .get();
   }
 
-  Future<TodoEntry> getTodoById(TodoId id) async {
+  Future<TodoEntry> getTodoById(TodoId id, String userId) async {
     try {
-      final result = await (select(todoTable)..where((t) => t.id.equals(id))).getSingle();
+      final result = await (select(todoTable)..where((t) => t.id.equals(id) & t.userId.equals(userId))).getSingle();
       return result;
     } catch (e) {
       throw NotFoundException('Todo not found');

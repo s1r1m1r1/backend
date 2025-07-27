@@ -15,13 +15,13 @@ abstract class UserDataSource {
 }
 
 class UserDataSourceImpl implements UserDataSource {
-  UserDataSourceImpl(this._dao);
+  UserDataSourceImpl(this._userDao);
 
-  final UserDao _dao;
+  final UserDao _userDao;
   Future<User> createUser(CreateUserDto user) async {
     try {
       // await _databaseConnection.connect();
-      final entry = await _dao.insert(
+      final entry = await _userDao.insert(
         UserTableCompanion(
           name: Value(user.name),
           email: Value(user.email),
@@ -34,6 +34,7 @@ class UserDataSourceImpl implements UserDataSource {
     } on Exception catch (e) {
       throw ServerException('Unexpected error');
     } finally {
+      // _dao.close();
       // await _databaseConnection.close();
     }
   }
@@ -42,7 +43,7 @@ class UserDataSourceImpl implements UserDataSource {
   Future<User> getUserByEmail(String email) async {
     try {
       // await _databaseConnection.connect();
-      final entry = await _dao.getUserByEmail(email);
+      final entry = await _userDao.getUserByEmail(email);
       return User(
         userId: entry.id,
         name: entry.name,
@@ -61,7 +62,7 @@ class UserDataSourceImpl implements UserDataSource {
   Future<User> getUserById(String userId) async {
     try {
       // await _databaseConnection.connect();
-      final entry = await _dao.getUserById(userId);
+      final entry = await _userDao.getUserById(userId);
       return User(userId: entry.id, name: entry.name, email: entry.email, createdAt: entry.createdAt);
     } on Exception catch (e) {
       throw ServerException('Unexpected error');

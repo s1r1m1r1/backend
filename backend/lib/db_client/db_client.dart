@@ -7,10 +7,10 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
-import 'package:uuid/uuid.dart';
 
 import 'dao/user_dao.dart';
 import 'tables/user_table.dart';
+import 'package:uuid/uuid.dart';
 
 part 'db_client.g.dart';
 
@@ -18,19 +18,12 @@ part 'db_client.g.dart';
 class DbClient extends _$DbClient {
   DbClient(super.e);
 
-  // Singleton instance for the database
-  static DbClient? _instance;
-  static DbClient get instance {
-    _instance ??= DbClient(_openConnection());
-    return _instance!;
-  }
-
   @override
   int get schemaVersion => 1; // Used for migrations
 
   // You can also write raw SQL queries if needed:
   // Future<List<User>> rawUsers() => customSelect('SELECT * FROM users').map((row) => User.fromData(row.data, this)).get();
-  static QueryExecutor _openConnection() {
+  static QueryExecutor openConnection() {
     return LazyDatabase(() async {
       final appEnv = Platform.environment['APP_ENV'];
       final dbPath = appEnv == 'production'

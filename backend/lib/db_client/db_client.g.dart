@@ -799,11 +799,11 @@ class $TodoTableTable extends TodoTable
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
-  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
     'user_id',
     aliasedName,
     true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES user_table (id)',
@@ -924,7 +924,7 @@ class $TodoTableTable extends TodoTable
         data['${effectivePrefix}deleted_at'],
       ),
       userId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}user_id'],
       ),
     );
@@ -944,7 +944,7 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
   final DateTime createdAt;
   final DateTime? updatedAt;
   final DateTime? deletedAt;
-  final int? userId;
+  final String? userId;
   const TodoEntry({
     required this.id,
     required this.title,
@@ -970,7 +970,7 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
     if (!nullToAbsent || userId != null) {
-      map['user_id'] = Variable<int>(userId);
+      map['user_id'] = Variable<String>(userId);
     }
     return map;
   }
@@ -1007,7 +1007,7 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
-      userId: serializer.fromJson<int?>(json['userId']),
+      userId: serializer.fromJson<String?>(json['userId']),
     );
   }
   @override
@@ -1021,7 +1021,7 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
-      'userId': serializer.toJson<int?>(userId),
+      'userId': serializer.toJson<String?>(userId),
     };
   }
 
@@ -1033,7 +1033,7 @@ class TodoEntry extends DataClass implements Insertable<TodoEntry> {
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
     Value<DateTime?> deletedAt = const Value.absent(),
-    Value<int?> userId = const Value.absent(),
+    Value<String?> userId = const Value.absent(),
   }) => TodoEntry(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -1107,7 +1107,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoEntry> {
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   final Value<DateTime?> deletedAt;
-  final Value<int?> userId;
+  final Value<String?> userId;
   const TodoTableCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -1138,7 +1138,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoEntry> {
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
-    Expression<int>? userId,
+    Expression<String>? userId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1160,7 +1160,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoEntry> {
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
     Value<DateTime?>? deletedAt,
-    Value<int?>? userId,
+    Value<String?>? userId,
   }) {
     return TodoTableCompanion(
       id: id ?? this.id,
@@ -1199,7 +1199,7 @@ class TodoTableCompanion extends UpdateCompanion<TodoEntry> {
       map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
     if (userId.present) {
-      map['user_id'] = Variable<int>(userId.value);
+      map['user_id'] = Variable<String>(userId.value);
     }
     return map;
   }
@@ -1438,6 +1438,29 @@ typedef $$UserTableTableUpdateCompanionBuilder =
       Value<int> rowid,
     });
 
+final class $$UserTableTableReferences
+    extends BaseReferences<_$DbClient, $UserTableTable, UserEntry> {
+  $$UserTableTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TodoTableTable, List<TodoEntry>>
+  _todoTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
+    db.todoTable,
+    aliasName: $_aliasNameGenerator(db.userTable.id, db.todoTable.userId),
+  );
+
+  $$TodoTableTableProcessedTableManager get todoTableRefs {
+    final manager = $$TodoTableTableTableManager(
+      $_db,
+      $_db.todoTable,
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_todoTableRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
 class $$UserTableTableFilterComposer
     extends Composer<_$DbClient, $UserTableTable> {
   $$UserTableTableFilterComposer({
@@ -1476,6 +1499,31 @@ class $$UserTableTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> todoTableRefs(
+    Expression<bool> Function($$TodoTableTableFilterComposer f) f,
+  ) {
+    final $$TodoTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.todoTable,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TodoTableTableFilterComposer(
+            $db: $db,
+            $table: $db.todoTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$UserTableTableOrderingComposer
@@ -1544,6 +1592,31 @@ class $$UserTableTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  Expression<T> todoTableRefs<T extends Object>(
+    Expression<T> Function($$TodoTableTableAnnotationComposer a) f,
+  ) {
+    final $$TodoTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.todoTable,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TodoTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.todoTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$UserTableTableTableManager
@@ -1557,9 +1630,9 @@ class $$UserTableTableTableManager
           $$UserTableTableAnnotationComposer,
           $$UserTableTableCreateCompanionBuilder,
           $$UserTableTableUpdateCompanionBuilder,
-          (UserEntry, BaseReferences<_$DbClient, $UserTableTable, UserEntry>),
+          (UserEntry, $$UserTableTableReferences),
           UserEntry,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool todoTableRefs})
         > {
   $$UserTableTableTableManager(_$DbClient db, $UserTableTable table)
     : super(
@@ -1609,9 +1682,43 @@ class $$UserTableTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$UserTableTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({todoTableRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (todoTableRefs) db.todoTable],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (todoTableRefs)
+                    await $_getPrefetchedData<
+                      UserEntry,
+                      $UserTableTable,
+                      TodoEntry
+                    >(
+                      currentTable: table,
+                      referencedTable: $$UserTableTableReferences
+                          ._todoTableRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$UserTableTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).todoTableRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.userId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -1626,9 +1733,9 @@ typedef $$UserTableTableProcessedTableManager =
       $$UserTableTableAnnotationComposer,
       $$UserTableTableCreateCompanionBuilder,
       $$UserTableTableUpdateCompanionBuilder,
-      (UserEntry, BaseReferences<_$DbClient, $UserTableTable, UserEntry>),
+      (UserEntry, $$UserTableTableReferences),
       UserEntry,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool todoTableRefs})
     >;
 typedef $$TodoTableTableCreateCompanionBuilder =
     TodoTableCompanion Function({
@@ -1639,7 +1746,7 @@ typedef $$TodoTableTableCreateCompanionBuilder =
       required DateTime createdAt,
       Value<DateTime?> updatedAt,
       Value<DateTime?> deletedAt,
-      Value<int?> userId,
+      Value<String?> userId,
     });
 typedef $$TodoTableTableUpdateCompanionBuilder =
     TodoTableCompanion Function({
@@ -1650,8 +1757,30 @@ typedef $$TodoTableTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
       Value<DateTime?> deletedAt,
-      Value<int?> userId,
+      Value<String?> userId,
     });
+
+final class $$TodoTableTableReferences
+    extends BaseReferences<_$DbClient, $TodoTableTable, TodoEntry> {
+  $$TodoTableTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $UserTableTable _userIdTable(_$DbClient db) => db.userTable
+      .createAlias($_aliasNameGenerator(db.todoTable.userId, db.userTable.id));
+
+  $$UserTableTableProcessedTableManager? get userId {
+    final $_column = $_itemColumn<String>('user_id');
+    if ($_column == null) return null;
+    final manager = $$UserTableTableTableManager(
+      $_db,
+      $_db.userTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
 
 class $$TodoTableTableFilterComposer
     extends Composer<_$DbClient, $TodoTableTable> {
@@ -1696,6 +1825,29 @@ class $$TodoTableTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$UserTableTableFilterComposer get userId {
+    final $$UserTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableFilterComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TodoTableTableOrderingComposer
@@ -1741,6 +1893,29 @@ class $$TodoTableTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$UserTableTableOrderingComposer get userId {
+    final $$UserTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TodoTableTableAnnotationComposer
@@ -1774,6 +1949,29 @@ class $$TodoTableTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  $$UserTableTableAnnotationComposer get userId {
+    final $$UserTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TodoTableTableTableManager
@@ -1787,9 +1985,9 @@ class $$TodoTableTableTableManager
           $$TodoTableTableAnnotationComposer,
           $$TodoTableTableCreateCompanionBuilder,
           $$TodoTableTableUpdateCompanionBuilder,
-          (TodoEntry, BaseReferences<_$DbClient, $TodoTableTable, TodoEntry>),
+          (TodoEntry, $$TodoTableTableReferences),
           TodoEntry,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool userId})
         > {
   $$TodoTableTableTableManager(_$DbClient db, $TodoTableTable table)
     : super(
@@ -1811,7 +2009,7 @@ class $$TodoTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
-                Value<int?> userId = const Value.absent(),
+                Value<String?> userId = const Value.absent(),
               }) => TodoTableCompanion(
                 id: id,
                 title: title,
@@ -1831,7 +2029,7 @@ class $$TodoTableTableTableManager
                 required DateTime createdAt,
                 Value<DateTime?> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
-                Value<int?> userId = const Value.absent(),
+                Value<String?> userId = const Value.absent(),
               }) => TodoTableCompanion.insert(
                 id: id,
                 title: title,
@@ -1843,9 +2041,54 @@ class $$TodoTableTableTableManager
                 userId: userId,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TodoTableTableReferences(db, table, e),
+                ),
+              )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({userId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (userId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.userId,
+                                referencedTable: $$TodoTableTableReferences
+                                    ._userIdTable(db),
+                                referencedColumn: $$TodoTableTableReferences
+                                    ._userIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
         ),
       );
 }
@@ -1860,9 +2103,9 @@ typedef $$TodoTableTableProcessedTableManager =
       $$TodoTableTableAnnotationComposer,
       $$TodoTableTableCreateCompanionBuilder,
       $$TodoTableTableUpdateCompanionBuilder,
-      (TodoEntry, BaseReferences<_$DbClient, $TodoTableTable, TodoEntry>),
+      (TodoEntry, $$TodoTableTableReferences),
       TodoEntry,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool userId})
     >;
 
 class $DbClientManager {

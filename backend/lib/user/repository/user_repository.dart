@@ -7,12 +7,11 @@ import '../../models/create_user_dto.dart';
 import '../../models/login_user_dto.dart';
 import '../../models/user.dart';
 import '../../services/password_hash_service.dart';
-import '../../utils/result.dart';
 import '../datasource/user_datasource.dart';
 import 'package:either_dart/either.dart';
 
 abstract class UserRepository {
-  Future<Either<Failure, User>> getUserById(int userId);
+  Future<Either<Failure, User>> getUserById(String userId);
 
   Future<Either<Failure, User>> createUser(CreateUserDto createUserDto);
 
@@ -29,9 +28,9 @@ class UserRepositoryImpl extends UserRepository {
   final PasswordHasherService passwordHasherService;
 
   @override
-  Future<Either<Failure, User>> getUserById(int userId) async {
+  Future<Either<Failure, User>> getUserById(String userId) async {
     try {
-      final result = await _datasource.getUserById(userId.toString());
+      final result = await _datasource.getUserById(userId);
       return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: 'user with this id did not found'));

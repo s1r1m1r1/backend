@@ -26,32 +26,32 @@ class UserController extends HttpController {
 
   @override
   FutureOr<Response> store(Request request) async {
+    stdout.writeln('store store ');
     final parsedBody = await parseJson(request);
-    stdout.writeln('store parsedBody start');
     return parsedBody.fold<FutureOr<Response>>(
       (left) {
         stdout.writeln('store parsedBody left');
         return Response.json(body: {'message': left.message}, statusCode: left.statusCode);
       },
       (Json json) {
-        stdout.writeln('store parsedBody right');
+        stdout.writeln('store parsedBody json');
         final createTodoDto = CreateUserDto.validated(json);
         return createTodoDto.fold(
           (left) {
-            stdout.writeln('store createTodoDto left ${left.message}');
+            stdout.writeln('store createTodoDto left');
             return Response.json(body: {'message': left.errors}, statusCode: left.statusCode);
           },
-          (result) async {
+          (CreateUserDto u) async {
             stdout.writeln('store createTodoDto right');
-            final res = await _repo.createUser(result);
-            return res.fold<Response>(
+            final res = await _repo.createUser(u);
+            return res.fold(
               (left) {
-                stdout.writeln('store createUser left');
+                stdout.writeln('store res left');
                 return Response.json(body: {'message': left.message}, statusCode: left.statusCode);
               },
-              (User right) {
-                stdout.writeln('store createUser right');
-                return _signAndSendToken(right, HttpStatus.created);
+              (User user) {
+                stdout.writeln('store res right');
+                return _signAndSendToken(user, HttpStatus.created);
               },
             );
           },
