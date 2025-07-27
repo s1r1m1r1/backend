@@ -1,7 +1,6 @@
 import 'dart:io' show HttpHeaders;
 
 import 'package:backend/db_client/db_client.dart';
-import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:backend/services/jwt_service.dart';
 import 'package:backend/todo/controller/todo_controller.dart';
 import 'package:backend/todo/datasource/todo_datasource.dart';
@@ -9,6 +8,7 @@ import 'package:backend/todo/repository/todo_repository.dart';
 import 'package:backend/user/repository/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 
+import '../exceptions/new_api_exceptions.dart';
 import '../models/user.dart';
 
 Handler authorizationMiddleware(Handler handler) {

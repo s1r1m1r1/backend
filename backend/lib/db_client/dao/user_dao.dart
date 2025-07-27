@@ -1,7 +1,8 @@
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/db_client/tables/user_table.dart';
-import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:drift/drift.dart';
+
+import '../../exceptions/new_api_exceptions.dart';
 
 part 'user_dao.g.dart';
 

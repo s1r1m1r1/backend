@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import '../../exceptions/api_exceptions.dart';
-import '../../exceptions/server_exceptions.dart';
+import '../../exceptions/new_api_exceptions.dart';
 import '../../failures/failure.dart';
 import '../../failures/server_failure.dart';
 import '../../models/create_user_dto.dart';
@@ -14,7 +13,7 @@ import 'package:either_dart/either.dart';
 abstract class UserRepository {
   Future<Either<Failure, User>> getUserById(String userId);
 
-  Future<Either<Failure, User>> createUser(CreateUserDto createUserDto);
+  Future<User> createUser(CreateUserDto createUserDto);
 
   Future<Either<Failure, User>> loginUser(LoginUserDto loginUserDto);
 
@@ -33,26 +32,22 @@ class UserRepositoryImpl extends UserRepository {
     try {
       final result = await _datasource.getUserById(userId);
       return Right(result);
-    } on ServerException catch (e) {
+    } on ApiException catch (e) {
       return Left(ServerFailure(message: 'user with this id did not found'));
     }
   }
 
   @override
-  Future<Either<Failure, User>> createUser(CreateUserDto createUserDto) async {
-    try {
-      final userExists = await getUserByEmail(createUserDto.email);
-      if (userExists.isRight) {
-        throw ServerException(message: 'Email already in use');
-      }
-      // dto is already validated in the controller
-      // we will hash the password here
-      final hashedPassword = passwordHasherService.hashPassword(createUserDto.password);
-      final user = await _datasource.createUser(createUserDto.copyWith(password: hashedPassword));
-      return Right(user);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+  Future<User> createUser(CreateUserDto createUserDto) async {
+    final userExists = await getUserByEmail(createUserDto.email);
+    if (userExists.isRight) {
+      throw ApiException.conflict(message: 'Email already in use');
     }
+    // dto is already validated in the controller
+    // we will hash the password here
+    final hashedPassword = passwordHasherService.hashPassword(createUserDto.password);
+    final user = await _datasource.createUser(createUserDto.copyWith(password: hashedPassword));
+    return user;
   }
 
   @override
@@ -60,7 +55,7 @@ class UserRepositoryImpl extends UserRepository {
     try {
       final result = await _datasource.getUserByEmail(email);
       return Right(result);
-    } on ServerException {
+    } on ApiException {
       return Left(ServerFailure(message: 'user with this email did not found'));
     }
   }
@@ -74,7 +69,7 @@ class UserRepositoryImpl extends UserRepository {
       switch (userExists) {
         case Left(value: var f):
           stdout.writeln('loginUser exception not userExits');
-          throw ServerException(message: f.message);
+          throw ApiException.notFound(message: f.message ?? '');
 
         case Right(value: var s):
           final user = s;
@@ -91,12 +86,12 @@ class UserRepositoryImpl extends UserRepository {
           );
           if (!isPasswordCorrect) {
             stdout.writeln('loginUser Fail check passw incorrect');
-            throw ServerException(message: 'password is incorrect');
+            throw ApiException.forbidden(message: 'password is incorrect');
           }
           stdout.writeln('loginUser Success  passw ');
           return Right(user);
       }
-    } on ServerException catch (e) {
+    } on ApiException catch (e) {
       stdout.writeln('exception login user ${e.runtimeType}');
       return Left(ServerFailure(message: e.message, statusCode: HttpStatus.unauthorized));
     }

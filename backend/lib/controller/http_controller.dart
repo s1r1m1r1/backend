@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:backend/utils/typedefs.dart';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:either_dart/either.dart';
 
-import '../failures/failure.dart';
+import '../exceptions/new_api_exceptions.dart';
 import '../failures/validation_failure.dart';
 import '../request_handler/unimplemented_handler.dart';
 
@@ -23,21 +21,41 @@ abstract class HttpController {
 
   // Parses the request body into a json map
   /// Returns a [ValidationFailure] if the body is invalid
-  Future<Either<Failure, Json>> parseJson(Request request) async {
+  Future<Json> parseJson(Request request) async {
     try {
       final body = await request.body();
       if (body.isEmpty) {
-        throw ApiException.badRequest(message: 'JSON body is empty');
+        throw ApiException.badRequest(message: 'Request body is empty');
       }
-      late final Map<String, dynamic> json;
+
       try {
-        json = jsonDecode(body) as Map<String, dynamic>;
-        return Right(json);
-      } catch (e) {
-        throw ApiException.badRequest(message: 'JSON is not Map');
+        final Json json = jsonDecode(body) as Json;
+        return json;
+      } on FormatException catch (e) {
+        throw ApiException.badRequest(
+          message: 'Request body is not valid JSON.',
+          errors: [e.message], // Include the decoding error message
+          stackTrace: StackTrace.current,
+        );
+      } on TypeError catch (e) {
+        throw ApiException.badRequest(
+          message: 'JSON body must be a top-level JSON object (Map).',
+          errors: [e.toString()], // Include the type error
+          stackTrace: StackTrace.current,
+        );
       }
     } on ApiException catch (e) {
-      return Left(ValidationFailure(message: e.message, statusCode: e.statusCode));
+      // Catch existing ApiExceptions thrown above and re-throw them directly.
+      // This ensures that the specific ApiException (e.g., 'JSON body is empty')
+      // and its associated status code and message are propagated.
+      rethrow;
+    } on Object catch (e, stackTrace) {
+      // Catch any other unexpected errors during body reading or initial parsing
+      // This is for truly unexpected internal server issues
+      throw ApiException.internalServerError(
+        message: 'Internal server error during JSON parsing.',
+        stackTrace: stackTrace,
+      );
     }
   }
 }

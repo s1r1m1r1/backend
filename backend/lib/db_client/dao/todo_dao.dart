@@ -1,6 +1,6 @@
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/db_client/tables/todo_table.dart';
-import 'package:backend/exceptions/api_exceptions.dart';
+import 'package:backend/exceptions/new_api_exceptions.dart';
 import 'package:drift/drift.dart';
 import '../../utils/typedefs.dart';
 

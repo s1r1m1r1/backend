@@ -55,56 +55,53 @@ class TodoController extends HttpController {
   @override
   FutureOr<Response> store(Request request) async {
     stdout.writeln('store 1');
-    final parsedBody = await parseJson(request);
-    return parsedBody.fold<FutureOr<Response>>(
-      (left) {
-        return Response.json(body: {'message': left.message}, statusCode: left.statusCode);
-      },
-      (Json json) async {
-        final validated = CreateTodoDto.validated(json);
-        return validated.fold<FutureOr<Response>>(
-          (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
-          (CreateTodoDto dto) async {
-            final result = await _repo.createTodo(dto);
-            return result.fold(
-              (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
-              (right) => Response.json(body: right.toJson()),
-            );
-          },
-        );
-      },
-    );
+    try {
+      final json = await parseJson(request);
+      final validated = CreateTodoDto.validated(json);
+      return validated.fold<FutureOr<Response>>(
+        (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
+        (CreateTodoDto dto) async {
+          final result = await _repo.createTodo(dto);
+          return result.fold(
+            (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
+            (right) => Response.json(body: right.toJson()),
+          );
+        },
+      );
+    } catch (e) {
+      stdout.writeln('store error');
+      return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
+    }
   }
 
   @override
   FutureOr<Response> update(Request request, String id) async {
-    final parsedBody = await parseJson(request);
-    final todoIdResult = mapTodoId(id);
-    late final TodoId todoId;
-    switch (todoIdResult) {
-      case Left(value: final f):
-        return Response.json(body: {'message': f.message}, statusCode: f.statusCode);
-      case Right(value: final s):
-        todoId = s;
+    try {
+      final parsedBody = await parseJson(request);
+      final todoIdResult = mapTodoId(id);
+      late final TodoId todoId;
+      switch (todoIdResult) {
+        case Left(value: final f):
+          return Response.json(body: {'message': f.message}, statusCode: f.statusCode);
+        case Right(value: final s):
+          todoId = s;
+      }
+      stdout.writeln('update todo 1');
+
+      final updateTodoDto = UpdateTodoDto.validated(parsedBody);
+      return updateTodoDto.fold<FutureOr<Response>>(
+        (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
+        (UpdateTodoDto dto) async {
+          final res = await _repo.updateTodo(id: todoId, updateTodoDto: dto);
+          return res.fold<Response>(
+            (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
+            (right) => Response.json(body: right.toJson()),
+          );
+        },
+      );
+    } catch (e, stackTrace) {
+      stdout.writeln('TodoController UNKNOWN ERROR ${stackTrace}');
+      return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
     }
-    stdout.writeln('update todo 1');
-    return parsedBody.fold<FutureOr<Response>>(
-      (left) {
-        return Response.json(body: {'message': left.message}, statusCode: left.statusCode);
-      },
-      (Json json) async {
-        final updateTodoDto = UpdateTodoDto.validated(json);
-        return updateTodoDto.fold<FutureOr<Response>>(
-          (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
-          (UpdateTodoDto dto) async {
-            final res = await _repo.updateTodo(id: todoId, updateTodoDto: dto);
-            return res.fold<Response>(
-              (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
-              (right) => Response.json(body: right.toJson()),
-            );
-          },
-        );
-      },
-    );
   }
 }
