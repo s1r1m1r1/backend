@@ -1,7 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../exceptions/bad_request_exceptions.dart';
+import '../exceptions/api_exceptions.dart';
 import '../failures/validation_failure.dart';
 
 part 'create_todo_dto.freezed.dart';
@@ -16,16 +16,16 @@ abstract class CreateTodoDto with _$CreateTodoDto {
 
   static Either<ValidationFailure, CreateTodoDto> validated(Map<String, dynamic> json) {
     try {
-      final errors = <String, List<String>>{};
+      final errors = <String>[];
       if (json['title'] == null) {
-        errors['title'] = ['Title is required'];
+        errors.add('Title is required');
       }
       if (json['description'] == null) {
-        errors['description'] = ['Description is required'];
+        errors.add('Description is required');
       }
       if (errors.isEmpty) return Right(CreateTodoDto.fromJson(json));
-      throw BadRequestException(message: 'Validation failed', errors: errors);
-    } on BadRequestException catch (e) {
+      throw ApiException.badRequest(message: 'Validation failed', errors: errors);
+    } on ApiException catch (e) {
       return Left(ValidationFailure(message: e.message, errors: e.errors, statusCode: e.statusCode));
     }
   }

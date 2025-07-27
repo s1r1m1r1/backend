@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:backend/db_client/dao/todo_dao.dart';
 import 'package:backend/db_client/db_client.dart';
-import 'package:backend/exceptions/not_found_exceptions.dart';
+import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:backend/exceptions/server_exceptions.dart';
 import 'package:backend/models/create_todo_dto.dart';
 import 'package:backend/models/todo.dart';
@@ -57,7 +57,7 @@ class TodoDataSourceImpl implements TodoDataSource {
       return todo;
     } on Exception catch (e) {
       stdout.writeln('exception create todo ${e.runtimeType}');
-      throw const ServerException('Unexpected error');
+      throw ServerException(message: 'Unexpected error');
     } finally {
       // await _databaseConnection.close();
     }
@@ -68,7 +68,7 @@ class TodoDataSourceImpl implements TodoDataSource {
     try {
       final deletedRows = await _dao.deleteTodoById(id, userId);
     } on Exception catch (e) {
-      throw ServerException('Unexpected error');
+      throw ServerException(message: 'Unexpected error');
     } finally {
       // await _databaseConnection.close();
     }
@@ -82,7 +82,7 @@ class TodoDataSourceImpl implements TodoDataSource {
           .map((i) => Todo(id: i.id, title: i.title, description: i.description, createdAt: i.createdAt))
           .toList();
     } on Exception catch (e) {
-      throw ServerException('Unexpected error');
+      throw ServerException(message: 'Unexpected error');
     } finally {
       // await _databaseConnection.close();
     }
@@ -94,10 +94,10 @@ class TodoDataSourceImpl implements TodoDataSource {
       // await _databaseConnection.connect();
       final result = await _dao.getTodoById(id, userId);
       return Todo(id: result.id, title: result.title, createdAt: result.createdAt);
-    } on NotFoundException {
+    } on ApiException {
       rethrow;
     } on Exception catch (e) {
-      throw ServerException('Unexpected error');
+      throw ServerException(message: 'Unexpected error');
     } finally {
       // await _databaseConnection.close();
     }
@@ -118,7 +118,7 @@ class TodoDataSourceImpl implements TodoDataSource {
       );
       if (amount == 0) {
         stdout.writeln('datasource update not ok todo 1');
-        throw const NotFoundException('Todo not found');
+        throw ApiException.notFound(message: 'Todo not found');
       }
 
       stdout.writeln('datasource update ready 1');
@@ -129,7 +129,7 @@ class TodoDataSourceImpl implements TodoDataSource {
       return Todo(id: updated.id, title: updated.title, description: updated.description, createdAt: updated.createdAt);
     } on Exception catch (e) {
       stdout.writeln('update err $e ');
-      throw ServerException('Unexpected error');
+      throw ServerException(message: 'Unexpected error');
     } finally {
       // await _databaseConnection.close();
     }

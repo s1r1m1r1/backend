@@ -9,7 +9,6 @@ abstract class User with _$User {
   const User._();
   const factory User({
     required String userId,
-    required String name,
     required String email,
     @DateTimeConverter() required DateTime createdAt,
     @Default('') @JsonKey(includeToJson: false) String password,

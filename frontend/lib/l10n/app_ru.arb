@@ -1,0 +1,9 @@
+{
+  "@@locale": "ru",
+ "connectionStatusConnecting": "подключение...",
+  "connectionStatusServerNotAvailable": "сервер недоступен",
+  "connectionStatusWaitingToRetry": "ожидание повторной попытки",
+  "connectionStatusConnected": "подключено",
+  "connectionStatusFailed": "ошибка",
+  "connectionStatusNoInternet": "нет интернета"
+}

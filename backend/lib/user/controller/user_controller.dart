@@ -31,7 +31,6 @@ class UserController extends HttpController {
         final createTodoDto = CreateUserDto.validated(json);
         return createTodoDto.fold(
           (left) {
-            stdout.writeln('store createTodoDto left');
             return Response.json(body: {'message': left.errors}, statusCode: left.statusCode);
           },
           (CreateUserDto u) async {

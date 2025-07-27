@@ -1,7 +1,7 @@
 // lib/screens/todo_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/bloc/todo/todo_bloc.dart';
+import 'package:frontend/features/todo/view/todo/todo_bloc.dart';
 import 'package:frontend/models/todo.dart';
 
 class TodoListScreen extends StatelessWidget {

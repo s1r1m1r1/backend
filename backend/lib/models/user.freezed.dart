@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- String get userId; String get name; String get email;@DateTimeConverter() DateTime get createdAt;@JsonKey(includeToJson: false) String get password;
+ String get userId; String get email;@DateTimeConverter() DateTime get createdAt;@JsonKey(includeToJson: false) String get password;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.password, password) || other.password == password));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,name,email,createdAt,password);
+int get hashCode => Object.hash(runtimeType,userId,email,createdAt,password);
 
 @override
 String toString() {
-  return 'User(userId: $userId, name: $name, email: $email, createdAt: $createdAt, password: $password)';
+  return 'User(userId: $userId, email: $email, createdAt: $createdAt, password: $password)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- String userId, String name, String email,@DateTimeConverter() DateTime createdAt,@JsonKey(includeToJson: false) String password
+ String userId, String email,@DateTimeConverter() DateTime createdAt,@JsonKey(includeToJson: false) String password
 });
 
 
@@ -65,10 +65,9 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? name = null,Object? email = null,Object? createdAt = null,Object? password = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? email = null,Object? createdAt = null,Object? password = null,}) {
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
@@ -157,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String name,  String email, @DateTimeConverter()  DateTime createdAt, @JsonKey(includeToJson: false)  String password)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String email, @DateTimeConverter()  DateTime createdAt, @JsonKey(includeToJson: false)  String password)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.userId,_that.name,_that.email,_that.createdAt,_that.password);case _:
+return $default(_that.userId,_that.email,_that.createdAt,_that.password);case _:
   return orElse();
 
 }
@@ -178,10 +177,10 @@ return $default(_that.userId,_that.name,_that.email,_that.createdAt,_that.passwo
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String name,  String email, @DateTimeConverter()  DateTime createdAt, @JsonKey(includeToJson: false)  String password)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String email, @DateTimeConverter()  DateTime createdAt, @JsonKey(includeToJson: false)  String password)  $default,) {final _that = this;
 switch (_that) {
 case _User():
-return $default(_that.userId,_that.name,_that.email,_that.createdAt,_that.password);case _:
+return $default(_that.userId,_that.email,_that.createdAt,_that.password);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +197,10 @@ return $default(_that.userId,_that.name,_that.email,_that.createdAt,_that.passwo
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String name,  String email, @DateTimeConverter()  DateTime createdAt, @JsonKey(includeToJson: false)  String password)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String email, @DateTimeConverter()  DateTime createdAt, @JsonKey(includeToJson: false)  String password)?  $default,) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.userId,_that.name,_that.email,_that.createdAt,_that.password);case _:
+return $default(_that.userId,_that.email,_that.createdAt,_that.password);case _:
   return null;
 
 }
@@ -213,11 +212,10 @@ return $default(_that.userId,_that.name,_that.email,_that.createdAt,_that.passwo
 @JsonSerializable()
 
 class _User extends User {
-  const _User({required this.userId, required this.name, required this.email, @DateTimeConverter() required this.createdAt, @JsonKey(includeToJson: false) this.password = ''}): super._();
+  const _User({required this.userId, required this.email, @DateTimeConverter() required this.createdAt, @JsonKey(includeToJson: false) this.password = ''}): super._();
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  String userId;
-@override final  String name;
 @override final  String email;
 @override@DateTimeConverter() final  DateTime createdAt;
 @override@JsonKey(includeToJson: false) final  String password;
@@ -235,16 +233,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.password, password) || other.password == password));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,name,email,createdAt,password);
+int get hashCode => Object.hash(runtimeType,userId,email,createdAt,password);
 
 @override
 String toString() {
-  return 'User(userId: $userId, name: $name, email: $email, createdAt: $createdAt, password: $password)';
+  return 'User(userId: $userId, email: $email, createdAt: $createdAt, password: $password)';
 }
 
 
@@ -255,7 +253,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, String name, String email,@DateTimeConverter() DateTime createdAt,@JsonKey(includeToJson: false) String password
+ String userId, String email,@DateTimeConverter() DateTime createdAt,@JsonKey(includeToJson: false) String password
 });
 
 
@@ -272,10 +270,9 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? name = null,Object? email = null,Object? createdAt = null,Object? password = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? email = null,Object? createdAt = null,Object? password = null,}) {
   return _then(_User(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable

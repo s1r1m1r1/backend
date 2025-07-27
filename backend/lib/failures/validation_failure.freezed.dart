@@ -22,7 +22,7 @@ ValidationFailure _$ValidationFailureFromJson(
 /// @nodoc
 mixin _$ValidationFailure {
 
- String get message; int get statusCode; Map<String, List<String>> get errors;
+ String? get message; int get statusCode; List<String>? get errors;
 /// Create a copy of ValidationFailure
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -55,7 +55,7 @@ abstract mixin class $ValidationFailureCopyWith<$Res>  {
   factory $ValidationFailureCopyWith(ValidationFailure value, $Res Function(ValidationFailure) _then) = _$ValidationFailureCopyWithImpl;
 @useResult
 $Res call({
- String message, int statusCode, Map<String, List<String>> errors
+ String? message, int statusCode, List<String>? errors
 });
 
 
@@ -72,12 +72,12 @@ class _$ValidationFailureCopyWithImpl<$Res>
 
 /// Create a copy of ValidationFailure
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? statusCode = null,Object? errors = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? message = freezed,Object? statusCode = null,Object? errors = freezed,}) {
   return _then(_self.copyWith(
-message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,errors: null == errors ? _self.errors : errors // ignore: cast_nullable_to_non_nullable
-as Map<String, List<String>>,
+message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
+as int,errors: freezed == errors ? _self.errors : errors // ignore: cast_nullable_to_non_nullable
+as List<String>?,
   ));
 }
 
@@ -162,7 +162,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String message,  int statusCode,  Map<String, List<String>> errors)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? message,  int statusCode,  List<String>? errors)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case $ValidationFailure() when $default != null:
 return $default(_that.message,_that.statusCode,_that.errors);case _:
@@ -183,7 +183,7 @@ return $default(_that.message,_that.statusCode,_that.errors);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String message,  int statusCode,  Map<String, List<String>> errors)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? message,  int statusCode,  List<String>? errors)  $default,) {final _that = this;
 switch (_that) {
 case $ValidationFailure():
 return $default(_that.message,_that.statusCode,_that.errors);case _:
@@ -203,7 +203,7 @@ return $default(_that.message,_that.statusCode,_that.errors);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String message,  int statusCode,  Map<String, List<String>> errors)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? message,  int statusCode,  List<String>? errors)?  $default,) {final _that = this;
 switch (_that) {
 case $ValidationFailure() when $default != null:
 return $default(_that.message,_that.statusCode,_that.errors);case _:
@@ -218,16 +218,18 @@ return $default(_that.message,_that.statusCode,_that.errors);case _:
 @JsonSerializable()
 
 class $ValidationFailure extends ValidationFailure {
-  const $ValidationFailure({required this.message, this.statusCode = HttpStatus.badRequest, final  Map<String, List<String>> errors = const {}}): _errors = errors,super._();
+  const $ValidationFailure({this.message, required this.statusCode, final  List<String>? errors}): _errors = errors,super._();
   factory $ValidationFailure.fromJson(Map<String, dynamic> json) => _$$ValidationFailureFromJson(json);
 
-@override final  String message;
-@override@JsonKey() final  int statusCode;
- final  Map<String, List<String>> _errors;
-@override@JsonKey() Map<String, List<String>> get errors {
-  if (_errors is EqualUnmodifiableMapView) return _errors;
+@override final  String? message;
+@override final  int statusCode;
+ final  List<String>? _errors;
+@override List<String>? get errors {
+  final value = _errors;
+  if (value == null) return null;
+  if (_errors is EqualUnmodifiableListView) return _errors;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_errors);
+  return EqualUnmodifiableListView(value);
 }
 
 
@@ -264,7 +266,7 @@ abstract mixin class $$ValidationFailureCopyWith<$Res> implements $ValidationFai
   factory $$ValidationFailureCopyWith($ValidationFailure value, $Res Function($ValidationFailure) _then) = _$$ValidationFailureCopyWithImpl;
 @override @useResult
 $Res call({
- String message, int statusCode, Map<String, List<String>> errors
+ String? message, int statusCode, List<String>? errors
 });
 
 
@@ -281,12 +283,12 @@ class _$$ValidationFailureCopyWithImpl<$Res>
 
 /// Create a copy of ValidationFailure
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? statusCode = null,Object? errors = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = freezed,Object? statusCode = null,Object? errors = freezed,}) {
   return _then($ValidationFailure(
-message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,errors: null == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
-as Map<String, List<String>>,
+message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
+as int,errors: freezed == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
+as List<String>?,
   ));
 }
 
