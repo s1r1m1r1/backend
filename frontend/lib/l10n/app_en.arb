@@ -1,0 +1,10 @@
+{
+  "@@locale": "en",
+  "connectionStatusConnecting": "connecting...",
+  "connectionStatusServerNotAvailable": "server not available",
+  "connectionStatusWaitingToRetry": "waiting to retry",
+  "connectionStatusConnected": "connected",
+  "connectionStatusFailed": "failed",
+  "connectionStatusNoInternet": "no internet"
+
+}

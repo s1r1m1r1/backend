@@ -1,7 +1,7 @@
+import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:either_dart/either.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../exceptions/bad_request_exceptions.dart';
 import '../failures/validation_failure.dart';
 
 part 'login_user_dto.freezed.dart';
@@ -16,18 +16,18 @@ abstract class LoginUserDto with _$LoginUserDto {
 
   static Either<ValidationFailure, LoginUserDto> validated(Map<String, dynamic> json) {
     try {
-      final errors = <String, List<String>>{};
+      final errors = <String>[];
       final email = json['email'] as String? ?? '';
       final password = json['password'] as String? ?? '';
       if (email.isEmpty) {
-        errors['email'] = ['Email is required'];
+        errors.add('Email is required');
       }
       if (password.isEmpty) {
-        errors['password'] = ['Password is required'];
+        errors.add('Password is required');
       }
       if (errors.isEmpty) return Right(LoginUserDto.fromJson(json));
-      throw BadRequestException(message: 'Validation failed', errors: errors);
-    } on BadRequestException catch (e) {
+      throw ApiException.badRequest(errors: errors);
+    } on ApiException catch (e) {
       return Left(ValidationFailure(message: e.message, errors: e.errors, statusCode: e.statusCode));
     }
   }

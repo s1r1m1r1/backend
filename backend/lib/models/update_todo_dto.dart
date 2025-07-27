@@ -1,7 +1,7 @@
+import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:either_dart/either.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../exceptions/bad_request_exceptions.dart';
 import '../failures/validation_failure.dart';
 
 part 'update_todo_dto.freezed.dart';
@@ -16,19 +16,19 @@ abstract class UpdateTodoDto with _$UpdateTodoDto {
 
   static Either<ValidationFailure, UpdateTodoDto> validated(Map<String, dynamic> json) {
     try {
-      final errors = <String, List<String>>{};
+      final errors = <String>[];
       if (json['title'] == null || json['title'] == '') {
-        errors['title'] = ['At least one field must be provided'];
+        errors.add('title must not be empty');
       }
       if (json['description'] == null || json['description'] == '') {
-        errors['description'] = ['At least one field must be provided'];
+        errors.add('description must not be empty');
       }
       if (json['completed'] == null) {
-        errors['completed'] = ['At least one field must be provided'];
+        errors.add('completed must not be empty');
       }
       if (errors.length < 3) return Right(UpdateTodoDto.fromJson(json));
-      throw BadRequestException(message: 'Validation failed', errors: errors);
-    } on BadRequestException catch (e) {
+      throw ApiException.badRequest(message: 'Validation failed', errors: errors);
+    } on ApiException catch (e) {
       return Left(ValidationFailure(message: e.message, statusCode: e.statusCode, errors: e.errors));
     }
   }

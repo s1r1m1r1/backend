@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:backend/utils/typedefs.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:either_dart/either.dart';
 
-import '../exceptions/bad_request_exceptions.dart';
 import '../failures/failure.dart';
 import '../failures/validation_failure.dart';
 import '../request_handler/unimplemented_handler.dart';
@@ -27,17 +27,17 @@ abstract class HttpController {
     try {
       final body = await request.body();
       if (body.isEmpty) {
-        throw const BadRequestException(message: 'Invalid body');
+        throw ApiException.badRequest(message: 'JSON body is empty');
       }
       late final Map<String, dynamic> json;
       try {
         json = jsonDecode(body) as Map<String, dynamic>;
         return Right(json);
       } catch (e) {
-        throw const BadRequestException(message: 'Invalid body');
+        throw ApiException.badRequest(message: 'JSON is not Map');
       }
-    } on BadRequestException catch (e) {
-      return Left(ValidationFailure(message: e.message, errors: {}));
+    } on ApiException catch (e) {
+      return Left(ValidationFailure(message: e.message, statusCode: e.statusCode));
     }
   }
 }

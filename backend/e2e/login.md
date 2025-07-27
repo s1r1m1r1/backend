@@ -47,7 +47,6 @@ response
 }
 <!--  -->
 curl -s -L -X POST 'http://localhost:8080/users/signup' -H 'Content-Type: application/json' --data-raw '{
-  "name": "testname",
     "email":"sailes@gmail.com",
     "password":"6aMj@UBByu"
 }'

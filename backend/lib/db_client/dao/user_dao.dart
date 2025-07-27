@@ -1,7 +1,7 @@
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/db_client/tables/user_table.dart';
+import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:drift/drift.dart';
-import '../../exceptions/not_found_exceptions.dart';
 
 part 'user_dao.g.dart';
 
@@ -32,7 +32,7 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
       final result = await (select(userTable)..where((t) => t.id.equals(userId))).getSingle();
       return result;
     } catch (e) {
-      throw NotFoundException('User not found');
+      throw ApiException.notFound(message: 'User with Id not found');
     }
   }
 
@@ -41,10 +41,8 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
       final result = await (select(userTable)..where((t) => t.email.equals(email))).getSingle();
       return result;
     } catch (e) {
-      /*************  ✨ Windsurf Command ⭐  *************/
       print('Error getting user by email: $e');
-      /*******  a8c062bc-bf31-4b6f-907e-424db27a6148  *******/
-      throw NotFoundException('User not found');
+      throw ApiException.notFound(message: 'User with email not found');
     }
   }
 }

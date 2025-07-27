@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../../exceptions/api_exceptions.dart';
 import '../../exceptions/server_exceptions.dart';
 import '../../failures/failure.dart';
 import '../../failures/server_failure.dart';
@@ -42,7 +43,7 @@ class UserRepositoryImpl extends UserRepository {
     try {
       final userExists = await getUserByEmail(createUserDto.email);
       if (userExists.isRight) {
-        throw const ServerException('Email already in use');
+        throw ServerException(message: 'Email already in use');
       }
       // dto is already validated in the controller
       // we will hash the password here
@@ -73,7 +74,7 @@ class UserRepositoryImpl extends UserRepository {
       switch (userExists) {
         case Left(value: var f):
           stdout.writeln('loginUser exception not userExits');
-          throw ServerException(f.message);
+          throw ServerException(message: f.message);
 
         case Right(value: var s):
           final user = s;
@@ -90,7 +91,7 @@ class UserRepositoryImpl extends UserRepository {
           );
           if (!isPasswordCorrect) {
             stdout.writeln('loginUser Fail check passw incorrect');
-            throw const ServerException('password is incorrect');
+            throw ServerException(message: 'password is incorrect');
           }
           stdout.writeln('loginUser Success  passw ');
           return Right(user);

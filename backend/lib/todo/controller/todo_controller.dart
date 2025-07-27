@@ -14,11 +14,12 @@ class TodoController extends HttpController {
   final TodoRepository _repo;
   @override
   FutureOr<Response> index(Request request) async {
-    final res = await _repo.getTodos();
-    return res.fold(
-      (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
-      (right) => Response.json(body: right.map((e) => e.toJson()).toList()),
-    );
+    try {
+      final list = await _repo.getTodos();
+      return Response.json(body: list.map((todo) => todo.toJson()).toList());
+    } catch (e) {
+      return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
+    }
   }
 
   @override

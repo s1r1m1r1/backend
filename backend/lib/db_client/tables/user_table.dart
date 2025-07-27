@@ -7,7 +7,6 @@ class UserTable extends Table {
   Set<Column> get primaryKey => {id};
   // primary key
   TextColumn get id => text().clientDefault(() => const Uuid().v1())();
-  TextColumn get name => text()();
   TextColumn get email => text()();
   TextColumn get password => text()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();

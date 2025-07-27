@@ -1,8 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:backend/exceptions/not_found_exceptions.dart';
-import 'package:backend/exceptions/server_exceptions.dart';
+import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:backend/failures/server_failure.dart';
 import 'package:either_dart/either.dart';
 
@@ -15,7 +14,7 @@ import '../../utils/typedefs.dart';
 import '../datasource/todo_datasource.dart';
 
 abstract class TodoRepository {
-  Future<Either<Failure, List<Todo>>> getTodos();
+  Future<List<Todo>> getTodos();
 
   Future<Either<Failure, Todo>> getTodoById(TodoId id);
 
@@ -67,7 +66,7 @@ class TodoRepositoryImpl implements TodoRepository {
     try {
       final res = await _datasource.getTodoById(id, user.userId);
       return Right(res);
-    } on NotFoundException catch (e) {
+    } on ApiException catch (e) {
       // log(e.message);
       return Left(ServerFailure(message: e.toString(), statusCode: e.statusCode));
     } on ServerException catch (e) {
@@ -77,12 +76,14 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<Either<Failure, List<Todo>>> getTodos() async {
+  Future<List<Todo>> getTodos() async {
     try {
       final res = await _datasource.getAllTodo(user.userId);
-      return Right(res);
+      return res;
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      rethrow;
+    } on Object catch (e, stackTrace) {
+      Error.throwWithStackTrace(ApiException.internalServerError(), stackTrace);
     }
   }
 
@@ -91,9 +92,8 @@ class TodoRepositoryImpl implements TodoRepository {
     try {
       final r = await _datasource.updateTodo(id: id, todo: updateTodoDto, userId: user.userId);
       return Right(r);
-    } on NotFoundException catch (e) {
-      log(e.message);
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+    } on ApiException catch (e) {
+      return Left(ServerFailure(message: e.message ?? '', statusCode: e.statusCode));
     } on ServerException catch (e) {
       log(e.message);
       return Left(ServerFailure(message: e.message));

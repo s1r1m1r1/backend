@@ -1,7 +1,7 @@
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/db_client/tables/todo_table.dart';
+import 'package:backend/exceptions/api_exceptions.dart';
 import 'package:drift/drift.dart';
-import '../../exceptions/not_found_exceptions.dart';
 import '../../utils/typedefs.dart';
 
 part 'todo_dao.g.dart';
@@ -38,7 +38,7 @@ class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
       final result = await (select(todoTable)..where((t) => t.id.equals(id) & t.userId.equals(userId))).getSingle();
       return result;
     } catch (e) {
-      throw NotFoundException('Todo not found');
+      throw ApiException.notFound(message: 'Todo not found');
     }
   }
 }
