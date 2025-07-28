@@ -1,5 +1,8 @@
 // lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
+import 'package:frontend/app/router/routes.dart';
+import 'package:frontend/features/todo/domain/todo.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,19 +15,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/login');
-              },
-              child: const Text('Go to Login'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/signup');
-              },
-              child: const Text('Go to Signup'),
-            ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
@@ -35,7 +25,7 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushNamed('/todos');
+                TodoListRoute().go(context);
               },
               child: const Text('View Todos'),
             ),

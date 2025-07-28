@@ -11,9 +11,10 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:dio/dio.dart' as _i361;
 import 'package:frontend/bloc/user/user_bloc.dart' as _i990;
-import 'package:frontend/core/network/api_service.dart' as _i201;
 import 'package:frontend/core/network/auth_interceptor.dart' as _i921;
 import 'package:frontend/core/network/dio_module.dart' as _i339;
+import 'package:frontend/core/network/protected_api_service.dart' as _i365;
+import 'package:frontend/core/network/registration_api_service.dart' as _i436;
 import 'package:frontend/db/db_client.dart' as _i569;
 import 'package:frontend/db/db_modulte.dart' as _i788;
 import 'package:frontend/features/auth/domain/auth_repository.dart' as _i887;
@@ -51,14 +52,14 @@ extension GetItInjectableX on _i174.GetIt {
       () => dioModule.unauthorizedDio(),
       instanceName: 'unauthorizedDio',
     );
-    gh.lazySingleton<_i201.RegistrationApiService>(
-      () => _i201.RegistrationApiService(
+    gh.lazySingleton<_i436.RegistrationApiService>(
+      () => _i436.RegistrationApiService(
         gh<_i361.Dio>(instanceName: 'unauthorizedDio'),
       ),
     );
     gh.lazySingleton<_i887.AuthRepository>(
       () => _i887.AuthRepositoryImpl(
-        gh<_i201.RegistrationApiService>(),
+        gh<_i436.RegistrationApiService>(),
         gh<_i569.DbClient>(),
       ),
       dispose: (i) => i.dispose(),
@@ -79,13 +80,13 @@ extension GetItInjectableX on _i174.GetIt {
       () => dioModule.dio(gh<_i887.AuthRepository>()),
       instanceName: 'protectedDio',
     );
-    gh.lazySingleton<_i201.ProtectedApiService>(
-      () => _i201.ProtectedApiService(
+    gh.lazySingleton<_i365.ProtectedApiService>(
+      () => _i365.ProtectedApiService(
         gh<_i361.Dio>(instanceName: 'protectedDio'),
       ),
     );
     gh.lazySingleton<_i739.TodoRepository>(
-      () => _i739.TodoRepositoryImpl(gh<_i201.ProtectedApiService>()),
+      () => _i739.TodoRepositoryImpl(gh<_i365.ProtectedApiService>()),
     );
     gh.factory<_i615.TodoBloc>(
       () => _i615.TodoBloc(gh<_i739.TodoRepository>()),

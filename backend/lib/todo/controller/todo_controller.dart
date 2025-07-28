@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:backend/exceptions/new_api_exceptions.dart';
 import 'package:backend/models/create_todo_dto.dart';
 import 'package:backend/utils/typedefs.dart';
 import 'package:dart_frog/dart_frog.dart';
@@ -15,9 +16,14 @@ class TodoController extends HttpController {
   @override
   FutureOr<Response> index(Request request) async {
     try {
+      stdout.writeln('TodoController index start');
       final list = await _repo.getTodos();
       return Response.json(body: list.map((todo) => todo.toJson()).toList());
-    } catch (e) {
+    } on ApiException catch (e, stack) {
+      stdout.writeln('UserController ${e.statusCode} ${stack}');
+      return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
+    } on Object catch (e, stack) {
+      stdout.writeln('UserController UNKNOWN ERROR ${stack}');
       return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
     }
   }

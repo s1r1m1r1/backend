@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:frontend/features/todo/domain/todo_repository.dart';
-import 'package:frontend/models/todo.dart';
+import 'package:frontend/features/todo/domain/todo.dart';
 import 'package:injectable/injectable.dart';
+
+import '../../domain/create_todo.dart';
 
 part 'todo_event.dart';
 part 'todo_state.dart';
@@ -29,7 +31,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
   void _onAddTodo(AddTodo event, Emitter<TodoState> emit) async {
     try {
-      // await _apiService.createTodo(event.todo);
+      await _todoRepository.createTodo(event.todo);
       add(LoadTodos()); // Reload todos after adding
     } catch (e) {
       emit(TodoError(e.toString()));

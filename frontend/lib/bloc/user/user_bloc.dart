@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/models/user.dart';
 import 'package:injectable/injectable.dart';
-import '../../core/network/api_service.dart';
 part 'user_event.dart';
 part 'user_state.dart';
 

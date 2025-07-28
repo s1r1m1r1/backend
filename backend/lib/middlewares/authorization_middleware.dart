@@ -1,4 +1,4 @@
-import 'dart:io' show HttpHeaders;
+import 'dart:io' show HttpHeaders, connectionClosedWithoutResponse, stdout, HttpStatus;
 
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/services/jwt_service.dart';
@@ -14,6 +14,7 @@ import '../models/user.dart';
 Handler authorizationMiddleware(Handler handler) {
   return (context) async {
     try {
+      stdout.writeln('AuthorizationMiddleware start');
       final request = context.request;
       final authHeader = request.headers[HttpHeaders.authorizationHeader] ?? '';
       final token = authHeader.replaceFirst('Bearer ', '');
@@ -27,7 +28,14 @@ Handler authorizationMiddleware(Handler handler) {
       context = _handleAuthDependencies(context, user.right);
       return handler(context);
     } on ApiException catch (e) {
+      stdout.writeln('AuthorizationMiddleware ${e.statusCode} ${e.message}');
       return Response.json(body: {'message': e.message}, statusCode: e.statusCode);
+    } on Object catch (e, stack) {
+      stdout.writeln('AuthorizationMiddleware  ${stack}');
+      return Response.json(
+        body: {'message': 'An unexpected error occurred'},
+        statusCode: HttpStatus.internalServerError,
+      );
     }
   };
 }

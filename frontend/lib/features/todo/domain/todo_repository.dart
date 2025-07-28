@@ -1,11 +1,14 @@
-import 'package:frontend/core/network/api_service.dart';
-import 'package:frontend/features/todo/data/response_todo_dto.dart';
+import 'package:frontend/features/todo/data/todo_dto.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../models/todo.dart';
+import '../../../core/network/protected_api_service.dart';
+import '../data/create_todo_dto.dart';
+import 'create_todo.dart';
+import 'todo.dart';
 
 abstract class TodoRepository {
-  Future getTodos() async {}
+  Future<List<Todo>> getTodos();
+  Future<Todo> createTodo(CreateTodo todo);
 }
 
 @LazySingleton(as: TodoRepository)
@@ -18,5 +21,11 @@ class TodoRepositoryImpl implements TodoRepository {
     final dto = await _apiService.fetchTodos();
     final todos = dto.map((dto) => dto.toModel()).toList();
     return todos;
+  }
+
+  @override
+  Future<Todo> createTodo(CreateTodo todo) async {
+    final dto = await _apiService.createTodo(CreateTodoDto.fromModel(todo));
+    return dto.toModel();
   }
 }

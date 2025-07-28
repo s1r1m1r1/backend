@@ -77,14 +77,8 @@ class TodoRepositoryImpl implements TodoRepository {
 
   @override
   Future<List<Todo>> getTodos() async {
-    try {
-      final res = await _datasource.getAllTodo(user.userId);
-      return res;
-    } on ApiException catch (e) {
-      rethrow;
-    } on Object catch (e, stackTrace) {
-      Error.throwWithStackTrace(ApiException.internalServerError(), stackTrace);
-    }
+    final res = await _datasource.getAllTodo(user.userId);
+    return res;
   }
 
   @override

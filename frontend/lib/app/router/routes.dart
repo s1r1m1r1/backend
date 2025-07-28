@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/auth/view/pages/login_screen.dart';
+import 'package:frontend/features/todo/view/page/todo_list_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/view/pages/signup_screen.dart';
@@ -32,4 +33,13 @@ class SignupRoute extends GoRouteData with _$SignupRoute {
 
   @override
   Widget build(context, state) => SignupScreen();
+}
+
+@TypedGoRoute<TodoListRoute>(path: TodoListRoute.path)
+class TodoListRoute extends GoRouteData with _$TodoListRoute {
+  static const path = '/todo-list';
+  const TodoListRoute();
+
+  @override
+  Widget build(context, state) => TodoListScreen();
 }

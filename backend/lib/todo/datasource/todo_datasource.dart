@@ -76,16 +76,10 @@ class TodoDataSourceImpl implements TodoDataSource {
 
   @override
   Future<List<Todo>> getAllTodo(String userId) async {
-    try {
-      final result = await _dao.getAllTodo(userId);
-      return result
-          .map((i) => Todo(id: i.id, title: i.title, description: i.description, createdAt: i.createdAt))
-          .toList();
-    } on Exception catch (e) {
-      throw ApiException.badRequest(message: 'Unexpected error');
-    } finally {
-      // await _databaseConnection.close();
-    }
+    final result = await _dao.getAllTodo(userId);
+    return result
+        .map((i) => Todo(id: i.id, title: i.title, description: i.description, createdAt: i.createdAt))
+        .toList();
   }
 
   @override

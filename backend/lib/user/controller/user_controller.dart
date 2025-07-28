@@ -77,10 +77,8 @@ class UserController extends HttpController {
 
   Response _signAndSendToken(User user, [int? httpStatus]) {
     final token = _jwtService.sign(user.toJson());
-    return Response.json(
-      body: {'token': token, 'user': user.toJson()..remove('password')},
-      statusCode: httpStatus ?? HttpStatus.ok,
-    );
+    final userDto = UserDto.fromUser(user);
+    return Response.json(body: {'token': token, 'user': userDto.toJson()}, statusCode: HttpStatus.created);
   }
 
   @override
