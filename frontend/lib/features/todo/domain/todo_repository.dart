@@ -9,6 +9,7 @@ import 'todo.dart';
 abstract class TodoRepository {
   Future<List<Todo>> getTodos();
   Future<Todo> createTodo(CreateTodo todo);
+  Future<void> deleteTodo(int todoId);
 }
 
 @LazySingleton(as: TodoRepository)
@@ -25,7 +26,12 @@ class TodoRepositoryImpl implements TodoRepository {
 
   @override
   Future<Todo> createTodo(CreateTodo todo) async {
-    final dto = await _apiService.createTodo(CreateTodoDto.fromModel(todo));
+    final dto = await _apiService.createTodo(todo.toDto());
     return dto.toModel();
+  }
+
+  @override
+  Future<bool> deleteTodo(int todoId) async {
+    return _apiService.deleteTodo(todoId);
   }
 }

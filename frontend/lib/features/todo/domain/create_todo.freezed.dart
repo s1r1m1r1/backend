@@ -207,7 +207,7 @@ return $default(_that.title,_that.description);case _:
 
 
 class _CreateTodo extends CreateTodo {
-  const _CreateTodo({required this.title, this.description = ''}): super._();
+  const _CreateTodo({required this.title, this.description = 'test'}): super._();
   
 
 @override final  String title;

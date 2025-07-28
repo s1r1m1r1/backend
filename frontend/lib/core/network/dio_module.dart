@@ -13,7 +13,7 @@ final host3 = 'localhost';
 
 @module
 abstract class DioModule {
-  @Named('protectedDio')
+  @Named('withToken')
   @lazySingleton
   Dio dio(AuthRepository authRepository) {
     final dio = Dio(BaseOptions(baseUrl: 'http://$host:8080'));
@@ -22,8 +22,8 @@ abstract class DioModule {
   }
 
   @lazySingleton
-  @Named('unauthorizedDio')
-  Dio unauthorizedDio() {
+  @Named('registration')
+  Dio registrationDio() {
     final dio = Dio(BaseOptions(baseUrl: 'http://$host:8080'));
     dio.interceptors.add(RegistrationInterceptor());
     return dio;

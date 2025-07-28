@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:backend/models/create_todo_dto.dart';
-import 'package:backend/models/todo.dart';
 import 'package:backend/models/update_todo_dto.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
@@ -27,9 +25,7 @@ void main() {
     test('POST /todos to create a new todo', () async {
       final response = await http.post(
         Uri.parse('http://localhost:8080/todos'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(_createTodoDto.toJson()),
       );
       expect(response.statusCode, HttpStatus.created);
@@ -47,24 +43,17 @@ void main() {
     });
 
     test('GET /todos/:id returns the created todo', () async {
-      final response = await http.get(
-        Uri.parse('http://localhost:8080/todos/${createdTodo.id}'),
-      );
+      final response = await http.get(Uri.parse('http://localhost:8080/todos/${createdTodo.id}'));
       expect(response.statusCode, HttpStatus.ok);
       final todo = Todo.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
       expect(todo.id, equals(createdTodo.id));
     });
 
     test('PUT /todos/:id to update the created todo', () async {
-      final updateTodoDto = UpdateTodoDto(
-        title: 'updated title',
-        description: 'updated description',
-      );
+      final updateTodoDto = UpdateTodoDto(title: 'updated title', description: 'updated description');
       final response = await http.put(
         Uri.parse('http://localhost:8080/todos/${createdTodo.id}'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(updateTodoDto.toJson()),
       );
       expect(response.statusCode, HttpStatus.ok);
@@ -75,15 +64,10 @@ void main() {
     });
 
     test('PATCH /todos/:id to update the created todo', () async {
-      final updateTodoDto = UpdateTodoDto(
-        title: 'UPDATED TITLE',
-        description: 'UPDATED DESCRIPTION',
-      );
+      final updateTodoDto = UpdateTodoDto(title: 'UPDATED TITLE', description: 'UPDATED DESCRIPTION');
       final response = await http.patch(
         Uri.parse('http://localhost:8080/todos/${createdTodo.id}'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(updateTodoDto.toJson()),
       );
       expect(response.statusCode, HttpStatus.ok);
@@ -92,9 +76,7 @@ void main() {
       expect(todo.description, equals(updateTodoDto.description));
     });
     test('DELETE /todos/:id to delete the created todo', () async {
-      final response = await http.delete(
-        Uri.parse('http://localhost:8080/todos/${createdTodo.id}'),
-      );
+      final response = await http.delete(Uri.parse('http://localhost:8080/todos/${createdTodo.id}'));
       expect(response.statusCode, HttpStatus.ok);
       expect(response.body, jsonEncode({'message': 'OK'}));
     });
@@ -106,7 +88,4 @@ void main() {
   });
 }
 
-final _createTodoDto = CreateTodoDto(
-  title: 'title',
-  description: 'description',
-);
+final _createTodoDto = CreateTodoDto(title: 'title', description: 'description');

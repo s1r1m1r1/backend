@@ -2,15 +2,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-
-import '../../features/todo/data/create_todo_dto.dart';
-import '../../features/todo/data/todo_dto.dart';
+import 'package:shared/shared.dart';
 
 @lazySingleton
 class ProtectedApiService {
   final Dio _client;
-
-  ProtectedApiService(@Named('protectedDio') this._client) {}
+  const ProtectedApiService(@Named('withToken') this._client);
 
   Future<List<TodoDto>> fetchTodos() async {
     final response = await _client.get('/todos');
@@ -24,7 +21,7 @@ class ProtectedApiService {
 
   Future<TodoDto> createTodo(CreateTodoDto todo) async {
     final response = await _client.post('/todos', data: json.encode(todo.toJson()));
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return TodoDto.fromJson(response.data);
     } else {
       throw Exception('Failed to create todo');
@@ -32,21 +29,18 @@ class ProtectedApiService {
   }
 
   Future<void> updateTodo(String id, TodoDto todo) async {
-    final response = await _client.put(
-      '/users/todos/$id',
-      data: json.encode(todo.toJson()),
-      options: Options(headers: {'Content-Type': 'application/json'}),
-    );
+    final response = await _client.put('/users/todos/$id', data: json.encode(todo.toJson()));
     if (response.statusCode != 200) {
       throw Exception('Failed to update todo');
     }
   }
 
-  Future<void> deleteTodo(String id) async {
+  Future<bool> deleteTodo(int id) async {
     final response = await _client.delete('/todos/$id');
-    if (response.statusCode != 204) {
-      throw Exception('Failed to delete todo');
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return true;
     }
+    return false;
   }
 
   Future<TodoDto> fetchTodoById(String id) async {

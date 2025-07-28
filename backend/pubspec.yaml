@@ -9,9 +9,9 @@ environment:
 dependencies:
   dart_frog: ^1.1.0
   mailer: ^6.4.1
-  drift: ^2.1.0  
-  path: ^1.9.0    
-  sqlite3: ^2.1.0 
+  drift: ^2.1.0
+  path: ^1.9.0
+  sqlite3: ^2.1.0
   dotenv: ^4.2.0
   json_annotation: ^4.8.0
   freezed_annotation: ^3.0.0
@@ -21,6 +21,8 @@ dependencies:
   dart_jsonwebtoken: ^3.2.0
   either_dart: ^1.0.0
   # result_type: ^1.0.0
+  shared:
+    path: ../shared
 
 dev_dependencies:
   mocktail: ^1.0.3
@@ -29,7 +31,3 @@ dev_dependencies:
   drift_dev: ^2.1.0
   freezed: ^3.0.0
   json_serializable: ^6.7.1
-
-
-
- 

@@ -2,7 +2,6 @@ import 'package:backend/db_client/db_client.dart';
 import 'package:backend/db_client/tables/todo_table.dart';
 import 'package:backend/exceptions/new_api_exceptions.dart';
 import 'package:drift/drift.dart';
-import '../../utils/typedefs.dart';
 
 part 'todo_dao.g.dart';
 
@@ -16,14 +15,14 @@ class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
     return into(todoTable).insertReturning(companion);
   }
 
-  Future<int> updateTodo(TodoId id, TodoTableCompanion companion) async {
+  Future<int> updateTodo(int todoId, TodoTableCompanion companion) async {
     return (update(
       todoTable,
-    )..where((t) => t.id.equals(id) & t.userId.equalsNullable(companion.userId.value))).write(companion);
+    )..where((t) => t.id.equals(todoId) & t.userId.equalsNullable(companion.userId.value))).write(companion);
   }
 
-  Future<int> deleteTodoById(TodoId id, String userId) async {
-    return (delete(todoTable)..where((t) => t.id.equals(id) & t.userId.equals(userId))).go();
+  Future<int> deleteTodoById(int todoId, String userId) async {
+    return (delete(todoTable)..where((t) => t.id.equals(todoId) & t.userId.equals(userId))).go();
   }
 
   Future<List<TodoEntry>> getAllTodo(String userId) async {
@@ -33,9 +32,9 @@ class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
         .get();
   }
 
-  Future<TodoEntry> getTodoById(TodoId id, String userId) async {
+  Future<TodoEntry> getTodoById(int todoId, String userId) async {
     try {
-      final result = await (select(todoTable)..where((t) => t.id.equals(id) & t.userId.equals(userId))).getSingle();
+      final result = await (select(todoTable)..where((t) => t.id.equals(todoId) & t.userId.equals(userId))).getSingle();
       return result;
     } catch (e) {
       throw ApiException.notFound(message: 'Todo not found');
