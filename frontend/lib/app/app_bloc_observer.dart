@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 
-import '../features/auth/view/bloc/auth_cubit.dart';
 import 'logger/log_colors.dart';
 
 ///  /\_/\
@@ -22,6 +21,8 @@ class MyBlocObserver extends BlocObserver {
       error,
       stackTrace,
     );
+    // not throw excepted exception error to this
+    // Sentry.captureException(error, stackTrace: stackTrace);
     super.onError(bloc, error, stackTrace);
   }
 
@@ -30,7 +31,6 @@ class MyBlocObserver extends BlocObserver {
     if (kDebugMode) {
       /* UNCOMMENT IF YOU NEED TO FILTER SPECIFIC BLOCS
          JUST COPY LINE AND RENAME WHAT YOU WANT */
-      if (bloc is! AuthCubit) return;
       // if(bloc is! OtherCubit) return;
       _logger.info(
         '${bloc.runtimeType}:\n'
@@ -39,6 +39,20 @@ class MyBlocObserver extends BlocObserver {
       );
     }
     super.onTransition(bloc, transition);
+  }
+
+  @override
+  void onEvent(Bloc bloc, Object? event) {
+    // if (kDebugMode) {
+    /* UNCOMMENT IF YOU NEED TO FILTER SPECIFIC BLOCS
+         JUST COPY LINE AND RENAME WHAT YOU WANT */
+    // if(bloc is! OtherCubit) return;
+    _logger.info(
+      '${bloc.runtimeType}:\n'
+      'event: ${event}\n',
+    );
+    // }
+    super.onEvent(bloc, event);
   }
 
   @override

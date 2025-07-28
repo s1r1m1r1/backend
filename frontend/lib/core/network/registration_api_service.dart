@@ -11,7 +11,7 @@ import '../../models/user.dart';
 class RegistrationApiService {
   final Dio _client;
 
-  RegistrationApiService(@Named('unauthorizedDio') this._client);
+  RegistrationApiService(@Named('registration') this._client);
 
   Future<ResponseTokenDto> signup(RequestEmailCredentialDto dto) async {
     final response = await _client.post(

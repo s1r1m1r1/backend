@@ -5,7 +5,7 @@ import 'package:frontend/app/app.dart';
 import 'package:frontend/app/app_bloc_observer.dart';
 import 'package:frontend/features/auth/view/bloc/login/login_bloc.dart';
 import 'package:frontend/features/auth/view/bloc/signup/signup_bloc.dart';
-import 'package:frontend/features/todo/view/todo/todo_bloc.dart';
+import 'package:frontend/features/todo/view/bloc/todo_bloc.dart';
 import 'package:frontend/bloc/user/user_bloc.dart';
 import 'package:logging/logging.dart';
 

@@ -1,7 +1,7 @@
 // lib/screens/todo_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/features/todo/view/todo/todo_bloc.dart';
+import 'package:frontend/features/todo/view/bloc/todo_bloc.dart';
 
 import '../../domain/create_todo.dart';
 
@@ -32,7 +32,7 @@ class TodoListScreen extends StatelessWidget {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
-                      BlocProvider.of<TodoBloc>(context).add(DeleteTodo(todo.id));
+                      context.read<TodoBloc>().add(DeleteTodo(todo.id));
                     },
                   ),
                 );

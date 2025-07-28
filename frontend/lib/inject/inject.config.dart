@@ -24,7 +24,7 @@ import 'package:frontend/features/auth/view/bloc/login/login_bloc.dart'
 import 'package:frontend/features/auth/view/bloc/signup/signup_bloc.dart'
     as _i917;
 import 'package:frontend/features/todo/domain/todo_repository.dart' as _i739;
-import 'package:frontend/features/todo/view/todo/todo_bloc.dart' as _i615;
+import 'package:frontend/features/todo/view/bloc/todo_bloc.dart' as _i955;
 import 'package:frontend/features/user/domain/user_repository.dart' as _i935;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -47,14 +47,14 @@ extension GetItInjectableX on _i174.GetIt {
       () => dbClientModule.memoryDbClient,
       instanceName: 'Memory',
     );
-    gh.lazySingleton<_i935.UserRepository>(() => _i935.UserRepositoryImpl());
     gh.lazySingleton<_i361.Dio>(
-      () => dioModule.unauthorizedDio(),
-      instanceName: 'unauthorizedDio',
+      () => dioModule.registrationDio(),
+      instanceName: 'registration',
     );
+    gh.lazySingleton<_i935.UserRepository>(() => _i935.UserRepositoryImpl());
     gh.lazySingleton<_i436.RegistrationApiService>(
       () => _i436.RegistrationApiService(
-        gh<_i361.Dio>(instanceName: 'unauthorizedDio'),
+        gh<_i361.Dio>(instanceName: 'registration'),
       ),
     );
     gh.lazySingleton<_i887.AuthRepository>(
@@ -78,18 +78,16 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i361.Dio>(
       () => dioModule.dio(gh<_i887.AuthRepository>()),
-      instanceName: 'protectedDio',
+      instanceName: 'withToken',
     );
     gh.lazySingleton<_i365.ProtectedApiService>(
-      () => _i365.ProtectedApiService(
-        gh<_i361.Dio>(instanceName: 'protectedDio'),
-      ),
+      () => _i365.ProtectedApiService(gh<_i361.Dio>(instanceName: 'withToken')),
     );
     gh.lazySingleton<_i739.TodoRepository>(
       () => _i739.TodoRepositoryImpl(gh<_i365.ProtectedApiService>()),
     );
-    gh.factory<_i615.TodoBloc>(
-      () => _i615.TodoBloc(gh<_i739.TodoRepository>()),
+    gh.factory<_i955.TodoBloc>(
+      () => _i955.TodoBloc(gh<_i739.TodoRepository>()),
     );
     return this;
   }
