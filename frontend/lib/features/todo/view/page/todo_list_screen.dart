@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/todo/view/todo/todo_bloc.dart';
-import 'package:frontend/models/todo.dart';
+
+import '../../domain/create_todo.dart';
 
 class TodoListScreen extends StatelessWidget {
   const TodoListScreen({super.key});
@@ -69,11 +70,7 @@ class TodoListScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 if (_todoTitleController.text.isNotEmpty) {
-                  final newTodo = Todo(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(), // Simple unique ID
-                    title: _todoTitleController.text,
-                    completed: false,
-                  );
+                  final newTodo = CreateTodo(title: _todoTitleController.text);
                   BlocProvider.of<TodoBloc>(context).add(AddTodo(newTodo));
                   Navigator.of(context).pop();
                 }

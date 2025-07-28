@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:frontend/core/network/api_service.dart';
+import 'package:frontend/core/network/registration_api_service.dart';
 import 'package:frontend/db/db_client.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:injectable/injectable.dart';
@@ -37,6 +37,7 @@ class AuthRepositoryImpl extends AuthRepository {
     try {
       final token = await _client.getKeyValue('accessToken');
       _tokenSubject.add(token);
+      _authStatusSbj.add(AuthStatus.loggedIn);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -82,10 +83,8 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<void> signup(String email, String password) async {
-    // final response = await _chopper.getService<RegistrationChopperService>().signup(
-    //   RequestEmailCredentialDto(email: email, password: password),
-    // );
     final response = await _api.signup(RequestEmailCredentialDto(email: email, password: password));
     await _client.saveKeyValue('accessToken', response.accessToken);
+    _authStatusSbj.add(AuthStatus.loggedIn);
   }
 }

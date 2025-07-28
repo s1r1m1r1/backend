@@ -16,7 +16,7 @@ abstract class DioModule {
   @Named('protectedDio')
   @lazySingleton
   Dio dio(AuthRepository authRepository) {
-    final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8080'));
+    final dio = Dio(BaseOptions(baseUrl: 'http://$host:8080'));
     dio.interceptors.add(AuthInterceptor(authRepository));
     return dio;
   }
