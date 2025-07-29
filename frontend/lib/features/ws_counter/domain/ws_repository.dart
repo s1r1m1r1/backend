@@ -2,7 +2,6 @@ import 'package:frontend/core/network/network_constants.dart';
 import 'package:injectable/injectable.dart';
 import 'package:web_socket_client/web_socket_client.dart';
 
-import '../../../core/network/dio_module.dart';
 import 'message.dart';
 
 /// {@template counter_repository}

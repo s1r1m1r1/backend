@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:backend/db_client/dao/channel_dao.dart';
+import 'package:backend/db_client/dao/session_dao.dart';
 import 'package:backend/db_client/dao/todo_dao.dart';
 import 'package:backend/db_client/tables/channel_table.dart';
 import 'package:backend/db_client/tables/todo_table.dart';
@@ -9,12 +10,16 @@ import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 
 import 'dao/user_dao.dart';
+import 'tables/session_table.dart';
 import 'tables/user_table.dart';
 import 'package:uuid/uuid.dart';
 
 part 'db_client.g.dart';
 
-@DriftDatabase(tables: [ChannelTable, TodoTable, UserTable], daos: [ChannelDao, TodoDao, UserDao])
+@DriftDatabase(
+  tables: [ChannelTable, TodoTable, UserTable, SessionTable],
+  daos: [ChannelDao, TodoDao, UserDao, SessionDao],
+)
 class DbClient extends _$DbClient {
   DbClient(super.e);
 
