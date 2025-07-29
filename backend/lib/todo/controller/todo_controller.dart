@@ -4,8 +4,8 @@ import 'package:backend/exceptions/new_api_exceptions.dart';
 import 'package:backend/models/validation/create_todo_validated.dart';
 import 'package:dart_frog/dart_frog.dart';
 import '../../controller/http_controller.dart';
-import '../../models/update_todo_dto.dart';
 import '../../models/validation/map_to_int.dart';
+import '../../models/validation/update_todo_validated.dart';
 import '../repository/todo_repository.dart';
 
 class TodoController extends HttpController {
@@ -32,10 +32,7 @@ class TodoController extends HttpController {
     try {
       final todoId = mapToInt(id);
       final res = await _repo.getTodoById(todoId);
-      return res.fold(
-        (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
-        (right) => Response.json(body: right.toJson()),
-      );
+      return Response.json(body: res.toJson());
     } on ApiException catch (e, stack) {
       stdout.writeln('store errors${e.errors} ${stack}');
       return Response.json(
@@ -55,10 +52,10 @@ class TodoController extends HttpController {
       final todoId = mapToInt(id);
 
       final res = await _repo.deleteTodo(todoId);
-      return Response.json(body: {'message': 'OK'});
-    } on ApiException catch (e, stack) {
-      stdout.writeln('store errors${e.errors} ${stack}');
-      return Response.json(body: {'message': e.toString(), "errors": e.errors}, statusCode: HttpStatus.noContent);
+      if (res == 0) {
+        return Response(statusCode: HttpStatus.notFound);
+      }
+      return Response.json();
     } on Object catch (e) {
       stdout.writeln('store UNEXPECTED ERROR');
       return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
@@ -90,19 +87,14 @@ class TodoController extends HttpController {
     try {
       final parsedBody = await parseJson(request);
       final todoId = mapToInt(id);
-
-      final updateTodoDto = UpdateTodoDto.validated(parsedBody);
-      return updateTodoDto.fold<FutureOr<Response>>(
-        (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
-        (UpdateTodoDto dto) async {
-          final res = await _repo.updateTodo(todoId: todoId, updateTodoDto: dto);
-          return res.fold<Response>(
-            (left) => Response.json(body: {'message': left.message}, statusCode: left.statusCode),
-            (right) => Response.json(body: right.toJson()),
-          );
-        },
-      );
-    } catch (e, stackTrace) {
+      final dto = UpdateTodoMethod.validated(parsedBody);
+      stdout.writeln('TodoController update start');
+      final res = await _repo.updateTodo(todoId: todoId, updateTodoDto: dto);
+      return Response.json(body: res.toJson());
+    } on ApiException catch (e, stack) {
+      stdout.writeln('TodoController err: ${stack}');
+      return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
+    } on Object catch (e, stackTrace) {
       stdout.writeln('TodoController UNKNOWN ERROR ${stackTrace}');
       return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
     }

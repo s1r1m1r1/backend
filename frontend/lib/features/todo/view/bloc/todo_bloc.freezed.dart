@@ -55,13 +55,13 @@ extension TodoEventPatterns on TodoEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoadTodos value)?  loadTodos,TResult Function( AddTodo value)?  addTodo,TResult Function( UpdateTodo value)?  updateTodo,TResult Function( DeleteTodo value)?  deleteTodo,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( LoadTodosEvent value)?  loadTodos,TResult Function( AddTodoEvent value)?  addTodo,TResult Function( UpdateTodoEvent value)?  updateTodo,TResult Function( DeleteTodoEvent value)?  deleteTodo,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case LoadTodos() when loadTodos != null:
-return loadTodos(_that);case AddTodo() when addTodo != null:
-return addTodo(_that);case UpdateTodo() when updateTodo != null:
-return updateTodo(_that);case DeleteTodo() when deleteTodo != null:
+case LoadTodosEvent() when loadTodos != null:
+return loadTodos(_that);case AddTodoEvent() when addTodo != null:
+return addTodo(_that);case UpdateTodoEvent() when updateTodo != null:
+return updateTodo(_that);case DeleteTodoEvent() when deleteTodo != null:
 return deleteTodo(_that);case _:
   return orElse();
 
@@ -80,13 +80,13 @@ return deleteTodo(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoadTodos value)  loadTodos,required TResult Function( AddTodo value)  addTodo,required TResult Function( UpdateTodo value)  updateTodo,required TResult Function( DeleteTodo value)  deleteTodo,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( LoadTodosEvent value)  loadTodos,required TResult Function( AddTodoEvent value)  addTodo,required TResult Function( UpdateTodoEvent value)  updateTodo,required TResult Function( DeleteTodoEvent value)  deleteTodo,}){
 final _that = this;
 switch (_that) {
-case LoadTodos():
-return loadTodos(_that);case AddTodo():
-return addTodo(_that);case UpdateTodo():
-return updateTodo(_that);case DeleteTodo():
+case LoadTodosEvent():
+return loadTodos(_that);case AddTodoEvent():
+return addTodo(_that);case UpdateTodoEvent():
+return updateTodo(_that);case DeleteTodoEvent():
 return deleteTodo(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -104,13 +104,13 @@ return deleteTodo(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoadTodos value)?  loadTodos,TResult? Function( AddTodo value)?  addTodo,TResult? Function( UpdateTodo value)?  updateTodo,TResult? Function( DeleteTodo value)?  deleteTodo,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( LoadTodosEvent value)?  loadTodos,TResult? Function( AddTodoEvent value)?  addTodo,TResult? Function( UpdateTodoEvent value)?  updateTodo,TResult? Function( DeleteTodoEvent value)?  deleteTodo,}){
 final _that = this;
 switch (_that) {
-case LoadTodos() when loadTodos != null:
-return loadTodos(_that);case AddTodo() when addTodo != null:
-return addTodo(_that);case UpdateTodo() when updateTodo != null:
-return updateTodo(_that);case DeleteTodo() when deleteTodo != null:
+case LoadTodosEvent() when loadTodos != null:
+return loadTodos(_that);case AddTodoEvent() when addTodo != null:
+return addTodo(_that);case UpdateTodoEvent() when updateTodo != null:
+return updateTodo(_that);case DeleteTodoEvent() when deleteTodo != null:
 return deleteTodo(_that);case _:
   return null;
 
@@ -128,12 +128,12 @@ return deleteTodo(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadTodos,TResult Function( CreateTodo todo)?  addTodo,TResult Function( Todo todo)?  updateTodo,TResult Function( int id)?  deleteTodo,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadTodos,TResult Function( CreateTodo todo)?  addTodo,TResult Function( UpdateTodo todo)?  updateTodo,TResult Function( int id)?  deleteTodo,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case LoadTodos() when loadTodos != null:
-return loadTodos();case AddTodo() when addTodo != null:
-return addTodo(_that.todo);case UpdateTodo() when updateTodo != null:
-return updateTodo(_that.todo);case DeleteTodo() when deleteTodo != null:
+case LoadTodosEvent() when loadTodos != null:
+return loadTodos();case AddTodoEvent() when addTodo != null:
+return addTodo(_that.todo);case UpdateTodoEvent() when updateTodo != null:
+return updateTodo(_that.todo);case DeleteTodoEvent() when deleteTodo != null:
 return deleteTodo(_that.id);case _:
   return orElse();
 
@@ -152,12 +152,12 @@ return deleteTodo(_that.id);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadTodos,required TResult Function( CreateTodo todo)  addTodo,required TResult Function( Todo todo)  updateTodo,required TResult Function( int id)  deleteTodo,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadTodos,required TResult Function( CreateTodo todo)  addTodo,required TResult Function( UpdateTodo todo)  updateTodo,required TResult Function( int id)  deleteTodo,}) {final _that = this;
 switch (_that) {
-case LoadTodos():
-return loadTodos();case AddTodo():
-return addTodo(_that.todo);case UpdateTodo():
-return updateTodo(_that.todo);case DeleteTodo():
+case LoadTodosEvent():
+return loadTodos();case AddTodoEvent():
+return addTodo(_that.todo);case UpdateTodoEvent():
+return updateTodo(_that.todo);case DeleteTodoEvent():
 return deleteTodo(_that.id);case _:
   throw StateError('Unexpected subclass');
 
@@ -175,12 +175,12 @@ return deleteTodo(_that.id);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadTodos,TResult? Function( CreateTodo todo)?  addTodo,TResult? Function( Todo todo)?  updateTodo,TResult? Function( int id)?  deleteTodo,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadTodos,TResult? Function( CreateTodo todo)?  addTodo,TResult? Function( UpdateTodo todo)?  updateTodo,TResult? Function( int id)?  deleteTodo,}) {final _that = this;
 switch (_that) {
-case LoadTodos() when loadTodos != null:
-return loadTodos();case AddTodo() when addTodo != null:
-return addTodo(_that.todo);case UpdateTodo() when updateTodo != null:
-return updateTodo(_that.todo);case DeleteTodo() when deleteTodo != null:
+case LoadTodosEvent() when loadTodos != null:
+return loadTodos();case AddTodoEvent() when addTodo != null:
+return addTodo(_that.todo);case UpdateTodoEvent() when updateTodo != null:
+return updateTodo(_that.todo);case DeleteTodoEvent() when deleteTodo != null:
 return deleteTodo(_that.id);case _:
   return null;
 
@@ -192,8 +192,8 @@ return deleteTodo(_that.id);case _:
 /// @nodoc
 
 
-class LoadTodos extends TodoEvent {
-  const LoadTodos(): super._();
+class LoadTodosEvent extends TodoEvent {
+  const LoadTodosEvent(): super._();
   
 
 
@@ -203,7 +203,7 @@ class LoadTodos extends TodoEvent {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoadTodos);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoadTodosEvent);
 }
 
 
@@ -224,8 +224,8 @@ String toString() {
 /// @nodoc
 
 
-class AddTodo extends TodoEvent {
-  const AddTodo(this.todo): super._();
+class AddTodoEvent extends TodoEvent {
+  const AddTodoEvent(this.todo): super._();
   
 
  final  CreateTodo todo;
@@ -234,13 +234,13 @@ class AddTodo extends TodoEvent {
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$AddTodoCopyWith<AddTodo> get copyWith => _$AddTodoCopyWithImpl<AddTodo>(this, _$identity);
+$AddTodoEventCopyWith<AddTodoEvent> get copyWith => _$AddTodoEventCopyWithImpl<AddTodoEvent>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddTodo&&(identical(other.todo, todo) || other.todo == todo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddTodoEvent&&(identical(other.todo, todo) || other.todo == todo));
 }
 
 
@@ -256,8 +256,8 @@ String toString() {
 }
 
 /// @nodoc
-abstract mixin class $AddTodoCopyWith<$Res> implements $TodoEventCopyWith<$Res> {
-  factory $AddTodoCopyWith(AddTodo value, $Res Function(AddTodo) _then) = _$AddTodoCopyWithImpl;
+abstract mixin class $AddTodoEventCopyWith<$Res> implements $TodoEventCopyWith<$Res> {
+  factory $AddTodoEventCopyWith(AddTodoEvent value, $Res Function(AddTodoEvent) _then) = _$AddTodoEventCopyWithImpl;
 @useResult
 $Res call({
  CreateTodo todo
@@ -268,17 +268,17 @@ $CreateTodoCopyWith<$Res> get todo;
 
 }
 /// @nodoc
-class _$AddTodoCopyWithImpl<$Res>
-    implements $AddTodoCopyWith<$Res> {
-  _$AddTodoCopyWithImpl(this._self, this._then);
+class _$AddTodoEventCopyWithImpl<$Res>
+    implements $AddTodoEventCopyWith<$Res> {
+  _$AddTodoEventCopyWithImpl(this._self, this._then);
 
-  final AddTodo _self;
-  final $Res Function(AddTodo) _then;
+  final AddTodoEvent _self;
+  final $Res Function(AddTodoEvent) _then;
 
 /// Create a copy of TodoEvent
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? todo = null,}) {
-  return _then(AddTodo(
+  return _then(AddTodoEvent(
 null == todo ? _self.todo : todo // ignore: cast_nullable_to_non_nullable
 as CreateTodo,
   ));
@@ -299,23 +299,23 @@ $CreateTodoCopyWith<$Res> get todo {
 /// @nodoc
 
 
-class UpdateTodo extends TodoEvent {
-  const UpdateTodo(this.todo): super._();
+class UpdateTodoEvent extends TodoEvent {
+  const UpdateTodoEvent(this.todo): super._();
   
 
- final  Todo todo;
+ final  UpdateTodo todo;
 
 /// Create a copy of TodoEvent
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$UpdateTodoCopyWith<UpdateTodo> get copyWith => _$UpdateTodoCopyWithImpl<UpdateTodo>(this, _$identity);
+$UpdateTodoEventCopyWith<UpdateTodoEvent> get copyWith => _$UpdateTodoEventCopyWithImpl<UpdateTodoEvent>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateTodo&&(identical(other.todo, todo) || other.todo == todo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateTodoEvent&&(identical(other.todo, todo) || other.todo == todo));
 }
 
 
@@ -331,31 +331,31 @@ String toString() {
 }
 
 /// @nodoc
-abstract mixin class $UpdateTodoCopyWith<$Res> implements $TodoEventCopyWith<$Res> {
-  factory $UpdateTodoCopyWith(UpdateTodo value, $Res Function(UpdateTodo) _then) = _$UpdateTodoCopyWithImpl;
+abstract mixin class $UpdateTodoEventCopyWith<$Res> implements $TodoEventCopyWith<$Res> {
+  factory $UpdateTodoEventCopyWith(UpdateTodoEvent value, $Res Function(UpdateTodoEvent) _then) = _$UpdateTodoEventCopyWithImpl;
 @useResult
 $Res call({
- Todo todo
+ UpdateTodo todo
 });
 
 
-$TodoCopyWith<$Res> get todo;
+$UpdateTodoCopyWith<$Res> get todo;
 
 }
 /// @nodoc
-class _$UpdateTodoCopyWithImpl<$Res>
-    implements $UpdateTodoCopyWith<$Res> {
-  _$UpdateTodoCopyWithImpl(this._self, this._then);
+class _$UpdateTodoEventCopyWithImpl<$Res>
+    implements $UpdateTodoEventCopyWith<$Res> {
+  _$UpdateTodoEventCopyWithImpl(this._self, this._then);
 
-  final UpdateTodo _self;
-  final $Res Function(UpdateTodo) _then;
+  final UpdateTodoEvent _self;
+  final $Res Function(UpdateTodoEvent) _then;
 
 /// Create a copy of TodoEvent
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? todo = null,}) {
-  return _then(UpdateTodo(
+  return _then(UpdateTodoEvent(
 null == todo ? _self.todo : todo // ignore: cast_nullable_to_non_nullable
-as Todo,
+as UpdateTodo,
   ));
 }
 
@@ -363,9 +363,9 @@ as Todo,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$TodoCopyWith<$Res> get todo {
+$UpdateTodoCopyWith<$Res> get todo {
   
-  return $TodoCopyWith<$Res>(_self.todo, (value) {
+  return $UpdateTodoCopyWith<$Res>(_self.todo, (value) {
     return _then(_self.copyWith(todo: value));
   });
 }
@@ -374,8 +374,8 @@ $TodoCopyWith<$Res> get todo {
 /// @nodoc
 
 
-class DeleteTodo extends TodoEvent {
-  const DeleteTodo(this.id): super._();
+class DeleteTodoEvent extends TodoEvent {
+  const DeleteTodoEvent(this.id): super._();
   
 
  final  int id;
@@ -384,13 +384,13 @@ class DeleteTodo extends TodoEvent {
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$DeleteTodoCopyWith<DeleteTodo> get copyWith => _$DeleteTodoCopyWithImpl<DeleteTodo>(this, _$identity);
+$DeleteTodoEventCopyWith<DeleteTodoEvent> get copyWith => _$DeleteTodoEventCopyWithImpl<DeleteTodoEvent>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeleteTodo&&(identical(other.id, id) || other.id == id));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeleteTodoEvent&&(identical(other.id, id) || other.id == id));
 }
 
 
@@ -406,8 +406,8 @@ String toString() {
 }
 
 /// @nodoc
-abstract mixin class $DeleteTodoCopyWith<$Res> implements $TodoEventCopyWith<$Res> {
-  factory $DeleteTodoCopyWith(DeleteTodo value, $Res Function(DeleteTodo) _then) = _$DeleteTodoCopyWithImpl;
+abstract mixin class $DeleteTodoEventCopyWith<$Res> implements $TodoEventCopyWith<$Res> {
+  factory $DeleteTodoEventCopyWith(DeleteTodoEvent value, $Res Function(DeleteTodoEvent) _then) = _$DeleteTodoEventCopyWithImpl;
 @useResult
 $Res call({
  int id
@@ -418,17 +418,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$DeleteTodoCopyWithImpl<$Res>
-    implements $DeleteTodoCopyWith<$Res> {
-  _$DeleteTodoCopyWithImpl(this._self, this._then);
+class _$DeleteTodoEventCopyWithImpl<$Res>
+    implements $DeleteTodoEventCopyWith<$Res> {
+  _$DeleteTodoEventCopyWithImpl(this._self, this._then);
 
-  final DeleteTodo _self;
-  final $Res Function(DeleteTodo) _then;
+  final DeleteTodoEvent _self;
+  final $Res Function(DeleteTodoEvent) _then;
 
 /// Create a copy of TodoEvent
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? id = null,}) {
-  return _then(DeleteTodo(
+  return _then(DeleteTodoEvent(
 null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,
   ));

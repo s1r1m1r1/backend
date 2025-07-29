@@ -28,11 +28,16 @@ class ProtectedApiService {
     }
   }
 
-  Future<void> updateTodo(String id, TodoDto todo) async {
-    final response = await _client.put('/users/todos/$id', data: json.encode(todo.toJson()));
+  Future<TodoDto> updateTodo(UpdateTodoDto dto) async {
+    print('start update');
+    final response = await _client.put('/todos/${dto.id}', data: json.encode(dto.toJson()));
     if (response.statusCode != 200) {
+      print('start not 200');
       throw Exception('Failed to update todo');
     }
+
+    print('start good ${response.data}');
+    return TodoDto.fromJson(response.data);
   }
 
   Future<bool> deleteTodo(int id) async {

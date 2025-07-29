@@ -31,3 +31,4 @@ dev_dependencies:
   drift_dev: ^2.1.0
   freezed: ^3.0.0
   json_serializable: ^6.7.1
+  mockito: ^5.5.0

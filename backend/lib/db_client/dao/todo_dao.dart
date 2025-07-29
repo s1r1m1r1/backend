@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/db_client/tables/todo_table.dart';
 import 'package:backend/exceptions/new_api_exceptions.dart';
@@ -15,10 +17,22 @@ class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
     return into(todoTable).insertReturning(companion);
   }
 
-  Future<int> updateTodo(int todoId, TodoTableCompanion companion) async {
-    return (update(
-      todoTable,
-    )..where((t) => t.id.equals(todoId) & t.userId.equalsNullable(companion.userId.value))).write(companion);
+  Future<int> updateTodo(TodoTableCompanion companion) async {
+    return (update(todoTable)..where((t) => t.id.equals(companion.id.value))).write(companion);
+  }
+
+  Future<bool> hasPermission(int todoId, String userId) async {
+    try {
+      final result = await (select(todoTable)..where((t) => t.id.equals(todoId) & t.userId.equals(userId))).getSingle();
+
+      stdout.writeln('\n OK permission \n');
+      return true;
+    } catch (e, stack) {
+      stdout.writeln('\n\n');
+      stdout.writeln("hasPermission $e ${stack}");
+      stdout.writeln('\n\n');
+      return false;
+    }
   }
 
   Future<int> deleteTodoById(int todoId, String userId) async {

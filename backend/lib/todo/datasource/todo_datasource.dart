@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:backend/db_client/dao/todo_dao.dart';
 import 'package:backend/db_client/db_client.dart';
-import 'package:backend/models/update_todo_dto.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:shared/shared.dart';
 
@@ -24,7 +23,7 @@ abstract class TodoDataSource {
   Future<TodoDto> updateTodo({required int todoId, required UpdateTodoDto todo, required String userId});
 
   /// Deletes a todo item with the given [id] from the data source
-  Future<void> deleteTodoById(int todoId, String userId);
+  Future<int> deleteTodoById(int todoId, String userId);
 }
 
 class TodoDataSourceImpl implements TodoDataSource {
@@ -62,73 +61,64 @@ class TodoDataSourceImpl implements TodoDataSource {
   }
 
   @override
-  Future<void> deleteTodoById(int todoId, String userId) async {
-    try {
-      final deletedRows = await _dao.deleteTodoById(todoId, userId);
-    } on Exception catch (e) {
-      throw ApiException.badRequest(message: 'Unexpected error');
-    } finally {
-      // await _databaseConnection.close();
-    }
+  Future<int> deleteTodoById(int todoId, String userId) async {
+    return await _dao.deleteTodoById(todoId, userId);
   }
 
   @override
   Future<List<TodoDto>> getAllTodo(String userId) async {
     final result = await _dao.getAllTodo(userId);
     return result
-        .map((i) => TodoDto(id: i.id, title: i.title, description: i.description, createdAt: i.createdAt))
+        .map(
+          (i) => TodoDto(
+            id: i.id,
+            title: i.title,
+            description: i.description,
+            completed: i.completed,
+            createdAt: i.createdAt,
+          ),
+        )
         .toList();
   }
 
   @override
   Future<TodoDto> getTodoById(int todoId, String userId) async {
-    try {
-      // await _databaseConnection.connect();
-      final result = await _dao.getTodoById(todoId, userId);
-      return TodoDto(id: result.id, title: result.title, createdAt: result.createdAt);
-    } on ApiException {
-      rethrow;
-    } on Exception catch (e) {
-      throw ApiException.badRequest(message: 'Unexpected error');
-    } finally {
-      // await _databaseConnection.close();
-    }
+    // await _databaseConnection.connect();
+    final result = await _dao.getTodoById(todoId, userId);
+    return TodoDto(id: result.id, title: result.title, createdAt: result.createdAt);
   }
 
   @override
   Future<TodoDto> updateTodo({required int todoId, required UpdateTodoDto todo, required String userId}) async {
-    try {
-      stdout.writeln('datasource update $todo');
-      final amount = await _dao.updateTodo(
-        todoId,
-        TodoTableCompanion(
-          title: Value.absentIfNull(todo.title),
-          description: Value.absentIfNull(todo.description),
-          completed: Value.absentIfNull(todo.completed),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
-      if (amount == 0) {
-        stdout.writeln('datasource update not ok todo 1');
-        throw ApiException.notFound(message: 'Todo not found');
-      }
-
-      stdout.writeln('datasource update ready 1');
-      final updated = await _dao.getTodoById(todoId, userId);
-
-      stdout.writeln('datasource update ready $updated');
-      stdout.writeln('update ok $updated');
-      return TodoDto(
-        id: updated.id,
-        title: updated.title,
-        description: updated.description,
-        createdAt: updated.createdAt,
-      );
-    } on Exception catch (e) {
-      stdout.writeln('update err $e ');
-      throw ApiException.badRequest(message: 'Unexpected error');
-    } finally {
-      // await _databaseConnection.close();
+    stdout.writeln('datasource update ${todo.id} ${todo.completed} $userId');
+    // this should be in repository
+    final hasPermission = await _dao.hasPermission(todoId, userId);
+    if (!hasPermission) {
+      throw ApiException.unauthorized(message: 'Operation denied');
     }
+    final amount = await _dao.updateTodo(
+      TodoTableCompanion(
+        id: Value(todo.id),
+        title: Value.absentIfNull(todo.title),
+        description: Value.absentIfNull(todo.description),
+        completed: Value.absentIfNull(todo.completed),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+    stdout.writeln('datasource update  --- { $amount }');
+    if (amount == 0) {
+      stdout.writeln('datasource update  ok todo  $amount');
+      throw ApiException.notFound(message: 'Todo not found');
+    }
+
+    final updated = await _dao.getTodoById(todoId, userId);
+
+    stdout.writeln('update ok $updated');
+    return TodoDto(
+      id: updated.id,
+      title: updated.title,
+      description: updated.description,
+      createdAt: updated.createdAt,
+    );
   }
 }

@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:backend/models/update_todo_dto.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared/shared.dart';
 import 'package:test/test.dart';
 
 void main() {
-  late Todo createdTodo;
+  late TodoDto createdTodo;
   tearDownAll(() async {
     final response = await http.get(Uri.parse('http://localhost:8080/todos'));
-    final todos = (jsonDecode(response.body) as List).map((e) => Todo.fromJson(e as Map<String, dynamic>)).toList();
+    final todos = (jsonDecode(response.body) as List).map((e) => TodoDto.fromJson(e as Map<String, dynamic>)).toList();
     for (final todo in todos) {
       await http.delete(Uri.parse('http://localhost:8080/todos/${todo.id}'));
     }
@@ -29,7 +29,7 @@ void main() {
         body: jsonEncode(_createTodoDto.toJson()),
       );
       expect(response.statusCode, HttpStatus.created);
-      createdTodo = Todo.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      createdTodo = TodoDto.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
       expect(createdTodo.title, equals(_createTodoDto.title));
       expect(createdTodo.description, equals(_createTodoDto.description));
     });
@@ -37,7 +37,9 @@ void main() {
     test('GET /todos returns list of todos with one todo', () async {
       final response = await http.get(Uri.parse('http://localhost:8080/todos'));
       expect(response.statusCode, HttpStatus.ok);
-      final todos = (jsonDecode(response.body) as List).map((e) => Todo.fromJson(e as Map<String, dynamic>)).toList();
+      final todos = (jsonDecode(response.body) as List)
+          .map((e) => TodoDto.fromJson(e as Map<String, dynamic>))
+          .toList();
       expect(todos.length, equals(1));
       expect(todos.first, equals(createdTodo));
     });
@@ -45,7 +47,7 @@ void main() {
     test('GET /todos/:id returns the created todo', () async {
       final response = await http.get(Uri.parse('http://localhost:8080/todos/${createdTodo.id}'));
       expect(response.statusCode, HttpStatus.ok);
-      final todo = Todo.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      final todo = TodoDto.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
       expect(todo.id, equals(createdTodo.id));
     });
 
@@ -57,7 +59,7 @@ void main() {
         body: jsonEncode(updateTodoDto.toJson()),
       );
       expect(response.statusCode, HttpStatus.ok);
-      final todo = Todo.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      final todo = TodoDto.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
       print('DESCRIPTION -: ${todo.description},-: ${updateTodoDto.description}');
       expect(todo.title, equals(updateTodoDto.title));
       expect(todo.description, equals(updateTodoDto.description));
@@ -71,7 +73,7 @@ void main() {
         body: jsonEncode(updateTodoDto.toJson()),
       );
       expect(response.statusCode, HttpStatus.ok);
-      final todo = Todo.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      final todo = TodoDto.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
       expect(todo.title, equals(updateTodoDto.title));
       expect(todo.description, equals(updateTodoDto.description));
     });
@@ -88,4 +90,4 @@ void main() {
   });
 }
 
-final _createTodoDto = CreateTodoDto(title: 'title', description: 'description');
+final _createTodoDto = CreateTodoDto('title', 'description');

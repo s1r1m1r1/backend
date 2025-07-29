@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:backend/utils/typedefs.dart';
+import 'package:backend/models/typedefs.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 import '../exceptions/new_api_exceptions.dart';

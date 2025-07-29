@@ -1,6 +1,7 @@
 // lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:frontend/app/router/routes.dart';
+import 'package:frontend/l10n/xx_localization.dart';
 import 'package:frontend/features/todo/domain/todo.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,6 +10,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    // finla t = l.
     return Scaffold(
       appBar: AppBar(title: const Text('Home')),
       body: Center(
