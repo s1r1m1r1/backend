@@ -22,7 +22,8 @@
         "**/flutter_launcher_i*.yaml": true,
         "**/flutter_*.png": true,
         "**/flutter_native*.yaml": true,
-        "**/crowdin.yml": true
+        "**/crowdin.yml": true,
+        // "**/combined/*": true,
     },
     "cSpell.dictionaries": [
         "dart"

@@ -37,7 +37,7 @@ class AuthRepositoryImpl extends AuthRepository {
     try {
       final token = await _client.getKeyValue('accessToken');
       _tokenSubject.add(token);
-      _authStatusSbj.add(AuthStatus.loggedIn);
+      _authStatusSbj.add(token != null ? AuthStatus.loggedIn : AuthStatus.loggedOut);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -78,6 +78,8 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<bool> login(String email, String password) async {
     final tokens = await _api.login(RequestEmailCredentialDto(email: email, password: password));
     await _client.saveKeyValue('accessToken', tokens.accessToken);
+    _authStatusSbj.add(AuthStatus.loggedIn);
+    _tokenSubject.add(tokens.accessToken);
     return true;
   }
 
@@ -86,5 +88,6 @@ class AuthRepositoryImpl extends AuthRepository {
     final response = await _api.signup(RequestEmailCredentialDto(email: email, password: password));
     await _client.saveKeyValue('accessToken', response.accessToken);
     _authStatusSbj.add(AuthStatus.loggedIn);
+    _tokenSubject.add(response.accessToken);
   }
 }

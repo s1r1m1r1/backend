@@ -3,39 +3,49 @@ import 'dart:io';
 
 import 'package:backend/exceptions/new_api_exceptions.dart';
 import 'package:backend/models/create_user_dto.dart';
+import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/models/user.dart';
 import 'package:backend/services/jwt_service.dart';
+import 'package:backend/session/session_repository.dart';
 import 'package:backend/user/controller/user_controller.dart';
 import 'package:backend/user/repository/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart' as frog;
 import 'package:dart_frog/dart_frog.dart';
 
 FutureOr<frog.Response> onRequest(frog.RequestContext context) {
-  final userController = context.read<UserController>();
-
   return switch (context.request.method) {
-    frog.HttpMethod.post => userController.store(context.request),
+    frog.HttpMethod.post => signup(context),
     _ => Future.value(frog.Response(statusCode: HttpStatus.methodNotAllowed)),
   };
 }
 
 FutureOr<Response> signup(RequestContext context) async {
-  stdout.writeln('store store ');
+  stdout.writeln('store ---- start ');
 
   try {
-    final body = await context.request.json() as Map<String, dynamic>;
+    stdout.writeln('store store 0');
+
+    final body = await parseJson(context.request);
+    stdout.writeln('store store 1');
     final createTodoDto = CreateUserDto.validated(body);
+    stdout.writeln('store store 2');
     final userRepository = context.read<UserRepository>();
-    final jwtService = context.read<JWTService>();
-    // final sessionRepository = context.read<SessionRepository>();
+
+    stdout.writeln('store store 3');
     final user = await userRepository.createUser(createTodoDto);
-    stdout.writeln('store res right');
-    return _signAndSendToken(jwtService, user, HttpStatus.created);
-  } on ApiException catch (e) {
-    // stdout.writeln('UserController  ${e.errors}');
+    stdout.writeln('store store 4');
+
+    final sessionRepository = context.read<SessionRepository>();
+    stdout.writeln('store store 5');
+    final session = await sessionRepository.createSession(user.userId);
+    stdout.writeln('store store 6');
+    final userDto = UserDto.fromUser(user);
+    return Response.json(body: {'token': session.token, 'user': userDto.toJson()}, statusCode: HttpStatus.created);
+  } on ApiException catch (e, stack) {
+    stdout.writeln('signup  ApiException ${e.errors} ${stack}');
     return Response.json(body: {'message': e.message, 'errors': e.errors}, statusCode: e.statusCode);
   } catch (e, stack) {
-    stdout.writeln('UserController UNKNOWN ERROR ${stack}');
+    stdout.writeln('signup UNKNOWN ERROR ${stack}');
     return Response.json(
       body: {'message': 'An unexpected error occurred. Please try again later'},
       statusCode: HttpStatus.internalServerError,

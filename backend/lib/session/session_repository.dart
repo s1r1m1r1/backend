@@ -6,7 +6,7 @@ import 'session.dart';
 
 abstract class SessionRepository {
   Future<Session> createSession(String userId);
-  Future<Session?> sessionFromToken(String token);
+  Future<Session?> getSession(String token);
 }
 
 class SessionRepositoryImpl implements SessionRepository {
@@ -24,7 +24,8 @@ class SessionRepositoryImpl implements SessionRepository {
     final session = Session(
       token: '${userId}_${now.toIso8601String()}'.hashValue,
       userId: userId,
-      expiryDate: now.add(const Duration(days: 1)),
+      // expiryDate: now.add(const Duration(days: 1)),
+      expiryDate: now.add(const Duration(minutes: 1)),
       createdAt: now,
     );
     final isOk = await sessionDatasource.saveSession(session);
@@ -35,7 +36,7 @@ class SessionRepositoryImpl implements SessionRepository {
   /// Searches and return a session by its [token].
   ///
   /// If the session is not found or is expired, returns `null`.
-  Future<Session?> sessionFromToken(String token) async {
+  Future<Session?> getSession(String token) async {
     final session = await sessionDatasource.sessionFromToken(token);
 
     if (session != null && session.expiryDate.isAfter(_now())) {

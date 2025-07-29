@@ -39,41 +39,34 @@ class UserController extends HttpController {
   }
 
   /// Login a user
-  FutureOr<Response> login(Request request) async {
-    try {
-      final parsedBody = await parseJson(request);
-      stdout.writeln('login parsedBody start');
+  // FutureOr<Response> login(Request request) async {
+  //   try {
+  //     final parsedBody = await parseJson(request);
+  //     stdout.writeln('login parsedBody start');
 
-      stdout.writeln('login parsedBody right');
-      final loginUserDto = LoginUserDto.validated(parsedBody);
-      return loginUserDto.fold<FutureOr<Response>>(
-        (left) {
-          stdout.writeln('login loginUserDto fail');
-          return Response.json(
-            body: {"status": left.statusCode, 'message': left.message, 'errors': left.errors},
-            statusCode: left.statusCode,
-          );
-        },
-        (LoginUserDto dto) async {
-          stdout.writeln('login loginUserDto success');
-          final res = await _repo.loginUser(dto);
-          return res.fold<Response>(
-            (left) {
-              stdout.writeln('login loginUser fail');
-              return Response.json(body: {'message': left.message}, statusCode: left.statusCode);
-            },
-            (User user) {
-              stdout.writeln('login loginUser success');
-              return _signAndSendToken(user);
-            },
-          );
-        },
-      );
-    } catch (e, stack) {
-      stdout.writeln('UserController UNKNOWN ERROR ${stack}');
-      return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
-    }
-  }
+  //     stdout.writeln('login parsedBody right');
+  //     final loginUserDto = LoginUserDto.validated(parsedBody);
+  //     return loginUserDto.fold<FutureOr<Response>>(
+  //       (left) {
+  //         stdout.writeln('login loginUserDto fail');
+  //         return Response.json(
+  //           body: {"status": left.statusCode, 'message': left.message, 'errors': left.errors},
+  //           statusCode: left.statusCode,
+  //         );
+  //       },
+  //       (LoginUserDto dto) async {
+  //         stdout.writeln('login loginUserDto success');
+  //         final user = await _repo.loginUser(dto);
+
+  //         stdout.writeln('login loginUser success');
+  //         return _signAndSendToken(user);
+  //       },
+  //     );
+  //   } catch (e, stack) {
+  //     stdout.writeln('UserController UNKNOWN ERROR ${stack}');
+  //     return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
+  //   }
+  // }
 
   Response _signAndSendToken(User user, [int? httpStatus]) {
     final token = _jwtService.sign(user.toJson());

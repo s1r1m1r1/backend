@@ -14,21 +14,17 @@ abstract class LoginUserDto with _$LoginUserDto {
 
   factory LoginUserDto.fromJson(Map<String, dynamic> json) => _$LoginUserDtoFromJson(json);
 
-  static Either<ValidationFailure, LoginUserDto> validated(Map<String, dynamic> json) {
-    try {
-      final errors = <String>[];
-      final email = json['email'] as String? ?? '';
-      final password = json['password'] as String? ?? '';
-      if (email.isEmpty) {
-        errors.add('Email is required');
-      }
-      if (password.isEmpty) {
-        errors.add('Password is required');
-      }
-      if (errors.isEmpty) return Right(LoginUserDto.fromJson(json));
-      throw ApiException.badRequest(errors: errors);
-    } on ApiException catch (e) {
-      return Left(ValidationFailure(message: e.message, errors: e.errors, statusCode: e.statusCode));
+  static LoginUserDto validated(Map<String, dynamic> json) {
+    final errors = <String>[];
+    final email = json['email'] as String? ?? '';
+    final password = json['password'] as String? ?? '';
+    if (email.isEmpty) {
+      errors.add('Email is required');
     }
+    if (password.isEmpty) {
+      errors.add('Password is required');
+    }
+    if (errors.isEmpty) return LoginUserDto.fromJson(json);
+    throw ApiException.badRequest(errors: errors);
   }
 }
