@@ -11,6 +11,7 @@ List<RouteBase> get $appRoutes => [
   $loginRoute,
   $signupRoute,
   $todoListRoute,
+  $wSCounterRoute,
 ];
 
 RouteBase get $homeRoute =>
@@ -90,6 +91,33 @@ mixin _$TodoListRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/todo-list');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $wSCounterRoute => GoRouteData.$route(
+  path: '/ws-counter',
+
+  factory: _$WSCounterRoute._fromState,
+);
+
+mixin _$WSCounterRoute on GoRouteData {
+  static WSCounterRoute _fromState(GoRouterState state) =>
+      const WSCounterRoute();
+
+  @override
+  String get location => GoRouteData.$location('/ws-counter');
 
   @override
   void go(BuildContext context) => context.go(location);
