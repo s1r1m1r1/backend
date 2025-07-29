@@ -45,7 +45,7 @@ Future<void> main() async {
         BlocProvider<UserBloc>(create: (_) => getIt<UserBloc>()..add(LoadUsers())),
         BlocProvider<LoginBloc>(create: (_) => getIt<LoginBloc>()),
         BlocProvider<SignupBloc>(create: (_) => getIt<SignupBloc>()),
-        BlocProvider<TodoBloc>(create: (_) => getIt<TodoBloc>()..add(LoadTodos())),
+        BlocProvider<TodoBloc>(create: (_) => getIt<TodoBloc>()..add(LoadTodosEvent())),
       ],
       child: const App(),
     ),

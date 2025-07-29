@@ -1,26 +1,23 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:backend/failures/server_failure.dart';
-import 'package:either_dart/either.dart';
 import 'package:shared/shared.dart';
 
 import '../../exceptions/new_api_exceptions.dart';
-import '../../failures/failure.dart';
-import '../../models/update_todo_dto.dart';
 import '../../models/user.dart';
 import '../datasource/todo_datasource.dart';
 
 abstract class TodoRepository {
   Future<List<TodoDto>> getTodos();
 
-  Future<Either<Failure, TodoDto>> getTodoById(int todoId);
+  FutureOr<TodoDto> getTodoById(int todoId);
 
   Future<TodoDto> createTodo(CreateTodoDto createTodoDto);
 
-  Future<Either<Failure, TodoDto>> updateTodo({required int todoId, required UpdateTodoDto updateTodoDto});
+  FutureOr<TodoDto> updateTodo({required int todoId, required UpdateTodoDto updateTodoDto});
 
-  Future<void> deleteTodo(int todoId);
+  Future<int> deleteTodo(int todoId);
 }
 
 class TodoRepositoryImpl implements TodoRepository {
@@ -37,27 +34,15 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<void> deleteTodo(int todoId) async {
-    try {
-      final result = await getTodoById(todoId);
-      await _datasource.deleteTodoById(todoId, user.userId);
-    } catch (e) {
-      log(e.toString());
-    }
+  Future<int> deleteTodo(int todoId) async {
+    // final result = await getTodoById(todoId);
+    return _datasource.deleteTodoById(todoId, user.userId);
   }
 
   @override
-  Future<Either<Failure, TodoDto>> getTodoById(int todoId) async {
-    try {
-      final res = await _datasource.getTodoById(todoId, user.userId);
-      return Right(res);
-    } on ApiException catch (e) {
-      // log(e.message);
-      return Left(ServerFailure(message: e.toString(), statusCode: e.statusCode));
-    } on ApiException catch (e) {
-      log(e.message);
-      return Left(ServerFailure(message: e.message));
-    }
+  FutureOr<TodoDto> getTodoById(int todoId) async {
+    final res = await _datasource.getTodoById(todoId, user.userId);
+    return res;
   }
 
   @override
@@ -67,15 +52,8 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<Either<Failure, TodoDto>> updateTodo({required int todoId, required UpdateTodoDto updateTodoDto}) async {
-    try {
-      final r = await _datasource.updateTodo(todoId: todoId, todo: updateTodoDto, userId: user.userId);
-      return Right(r);
-    } on ApiException catch (e) {
-      return Left(ServerFailure(message: e.message ?? '', statusCode: e.statusCode));
-    } on ApiException catch (e) {
-      log(e.message);
-      return Left(ServerFailure(message: e.message));
-    }
+  FutureOr<TodoDto> updateTodo({required int todoId, required UpdateTodoDto updateTodoDto}) async {
+    final r = await _datasource.updateTodo(todoId: todoId, todo: updateTodoDto, userId: user.userId);
+    return r;
   }
 }

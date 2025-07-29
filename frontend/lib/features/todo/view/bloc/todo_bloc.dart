@@ -4,6 +4,7 @@ import 'package:frontend/features/todo/domain/todo.dart';
 import 'package:injectable/injectable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/create_todo.dart';
+import '../../domain/update_todo.dart';
 part 'todo_bloc.freezed.dart';
 
 part 'todo_event.dart';
@@ -14,13 +15,13 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   final TodoRepository _todoRepository;
 
   TodoBloc(this._todoRepository) : super(TodoLoading()) {
-    on<LoadTodos>(_onLoadTodos);
-    on<AddTodo>(_onAddTodo);
-    on<UpdateTodo>(_onUpdateTodo);
-    on<DeleteTodo>(_onDeleteTodo);
+    on<LoadTodosEvent>(_onLoadTodos);
+    on<AddTodoEvent>(_onAddTodo);
+    on<UpdateTodoEvent>(_onUpdateTodo);
+    on<DeleteTodoEvent>(_onDeleteTodo);
   }
 
-  void _onLoadTodos(LoadTodos event, Emitter<TodoState> emit) async {
+  void _onLoadTodos(LoadTodosEvent event, Emitter<TodoState> emit) async {
     try {
       final todos = await _todoRepository.getTodos();
       emit(TodoState.loaded(todos: todos));
@@ -29,7 +30,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     }
   }
 
-  void _onAddTodo(AddTodo event, Emitter<TodoState> emit) async {
+  void _onAddTodo(AddTodoEvent event, Emitter<TodoState> emit) async {
     try {
       await _todoRepository.createTodo(event.todo);
       add(TodoEvent.loadTodos()); // Reload todos after adding
@@ -38,19 +39,19 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     }
   }
 
-  void _onUpdateTodo(UpdateTodo event, Emitter<TodoState> emit) async {
+  void _onUpdateTodo(UpdateTodoEvent event, Emitter<TodoState> emit) async {
     try {
-      // await _apiService.updateTodo(event.todo.id, event.todo);
-      add(LoadTodos()); // Reload todos after updating
+      await _todoRepository.updateTodo(event.todo);
+      add(LoadTodosEvent()); // Reload todos after updating
     } catch (e) {
       emit(TodoState.error(message: e.toString()));
     }
   }
 
-  void _onDeleteTodo(DeleteTodo event, Emitter<TodoState> emit) async {
+  void _onDeleteTodo(DeleteTodoEvent event, Emitter<TodoState> emit) async {
     try {
       await _todoRepository.deleteTodo(event.id);
-      add(LoadTodos()); // Reload todos after deleting
+      add(LoadTodosEvent()); // Reload todos after deleting
     } catch (e) {
       emit(TodoState.error(message: e.toString()));
     }

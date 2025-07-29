@@ -1,4 +1,3 @@
-// lib/screens/todo_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/features/todo/view/bloc/todo_bloc.dart';
@@ -26,13 +25,15 @@ class TodoListScreen extends StatelessWidget {
                   leading: Checkbox(
                     value: todo.completed,
                     onChanged: (bool? newValue) {
-                      // BlocProvider.of<TodoBloc>(context).add(UpdateTodo(todo.copyWith(completed: newValue)));
+                      BlocProvider.of<TodoBloc>(
+                        context,
+                      ).add(UpdateTodoEvent(todo.copyWith(completed: newValue).toUpdateTodo()));
                     },
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
-                      context.read<TodoBloc>().add(DeleteTodo(todo.id));
+                      context.read<TodoBloc>().add(DeleteTodoEvent(todo.id));
                     },
                   ),
                 );
@@ -71,7 +72,7 @@ class TodoListScreen extends StatelessWidget {
               onPressed: () {
                 if (_todoTitleController.text.isNotEmpty) {
                   final newTodo = CreateTodo(title: _todoTitleController.text);
-                  BlocProvider.of<TodoBloc>(context).add(AddTodo(newTodo));
+                  BlocProvider.of<TodoBloc>(context).add(AddTodoEvent(newTodo));
                   Navigator.of(context).pop();
                 }
               },

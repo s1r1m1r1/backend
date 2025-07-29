@@ -1,0 +1,23 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'update_todo_dto.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+UpdateTodoDto _$UpdateTodoDtoFromJson(Map<String, dynamic> json) =>
+    UpdateTodoDto(
+      (json['id'] as num).toInt(),
+      title: json['title'] as String?,
+      description: json['description'] as String?,
+      completed: json['completed'] as bool?,
+    );
+
+Map<String, dynamic> _$UpdateTodoDtoToJson(UpdateTodoDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'description': instance.description,
+      'completed': instance.completed,
+    };
