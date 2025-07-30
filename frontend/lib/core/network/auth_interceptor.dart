@@ -14,9 +14,18 @@ class AuthInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final token = _authRepository.getToken(); // Retrieve token from secure storage
     if (token != null) {
+      debugPrint('with Bearer $token');
       options.headers['Authorization'] = 'Bearer $token';
+    } else {
+      debugPrint('No token found, proceeding without Authorization header');
     }
     super.onRequest(options, handler);
+  }
+
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    debugPrint('Response body: ${response.data} status code: ${response.statusCode}');
+    super.onResponse(response, handler);
   }
 
   @override
@@ -37,6 +46,8 @@ class RegistrationInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    debugPrint('Request headers: ${options.headers}');
+
     debugPrint('Request URL: ${options.uri} body: ${options.data}');
     super.onRequest(options, handler);
   }

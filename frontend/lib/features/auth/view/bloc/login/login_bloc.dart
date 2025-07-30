@@ -17,8 +17,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   void _onLoginButtonPressed(LoginButtonPressed event, Emitter<LoginState> emit) async {
     emit(LoginLoading());
     try {
-      // final response = await _apiService.login(event.username, event.password);
-      // emit(LoginSuccess('Login successful! Welcome ${response['username'] ?? ''}'));
+      final response = await _authRepository.login(event.username, event.password);
+      emit(LoginSuccess());
     } catch (e) {
       emit(LoginFailure(e.toString()));
     }

@@ -26,8 +26,8 @@ class _LoginScreenState extends State<LoginScreen> {
         child: BlocListener<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
-              Navigator.of(context).pushReplacementNamed('/'); // Navigate to home or dashboard
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Welcome back")));
+              HomeRoute().go(context);
             } else if (state is LoginFailure) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Failed: ${state.error}')));
             }

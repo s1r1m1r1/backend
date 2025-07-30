@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import '../../exceptions/new_api_exceptions.dart';
@@ -11,13 +12,13 @@ import '../datasource/user_datasource.dart';
 import 'package:either_dart/either.dart';
 
 abstract class UserRepository {
-  Future<Either<Failure, User>> getUserById(String userId);
+  Future<User> getUserById(String userId);
 
   Future<User> createUser(CreateUserDto createUserDto);
 
-  Future<Either<Failure, User>> loginUser(LoginUserDto loginUserDto);
+  Future<User> loginUser(LoginUserDto loginUserDto);
 
-  Future<Either<Failure, User>> getUserByEmail(String email);
+  FutureOr<User?> getUserByEmail(String email);
 }
 
 class UserRepositoryImpl extends UserRepository {
@@ -28,20 +29,16 @@ class UserRepositoryImpl extends UserRepository {
   final PasswordHasherService passwordHasherService;
 
   @override
-  Future<Either<Failure, User>> getUserById(String userId) async {
-    try {
-      final result = await _datasource.getUserById(userId);
-      return Right(result);
-    } on ApiException catch (e) {
-      return Left(ServerFailure(message: 'user with this id did not found'));
-    }
+  Future<User> getUserById(String userId) async {
+    final result = await _datasource.getUserById(userId);
+    return result;
   }
 
   @override
   Future<User> createUser(CreateUserDto createUserDto) async {
     final userExists = await getUserByEmail(createUserDto.email);
-    if (userExists.isRight) {
-      throw ApiException.conflict(message: 'Email already in use');
+    if (userExists != null) {
+      throw ApiException.unauthorized(message: 'Email already in use');
     }
     // dto is already validated in the controller
     // we will hash the password here
@@ -51,49 +48,38 @@ class UserRepositoryImpl extends UserRepository {
   }
 
   @override
-  Future<Either<Failure, User>> getUserByEmail(String email) async {
+  FutureOr<User?> getUserByEmail(String email) async {
     try {
-      final result = await _datasource.getUserByEmail(email);
-      return Right(result);
-    } on ApiException {
-      return Left(ServerFailure(message: 'user with this email did not found'));
+      final user = await _datasource.getUserByEmail(email);
+      return user;
+    } catch (_) {
+      return null;
     }
   }
 
   @override
-  Future<Either<Failure, User>> loginUser(LoginUserDto loginUserDto) async {
-    try {
-      stdout.writeln('loginUser email ${loginUserDto.email}');
-      final email = loginUserDto.email;
-      final userExists = await getUserByEmail(email);
-      switch (userExists) {
-        case Left(value: var f):
-          stdout.writeln('loginUser exception not userExits');
-          throw ApiException.notFound(message: f.message ?? '');
+  Future<User> loginUser(LoginUserDto loginUserDto) async {
+    stdout.writeln('loginUser email ${loginUserDto.email}');
+    final email = loginUserDto.email;
+    final user = await getUserByEmail(email);
 
-        case Right(value: var s):
-          final user = s;
-          final password = loginUserDto.password;
-
-          stdout.writeln(
-            'loginUser check passw----\n'
-            '--pass: $password\n'
-            '--hashPass: ${user.password.length} ${user.password}\n',
-          );
-          final isPasswordCorrect = passwordHasherService.checkPassword(
-            password: password,
-            hashedPassword: user.password,
-          );
-          if (!isPasswordCorrect) {
-            stdout.writeln('loginUser Fail check passw incorrect');
-            throw ApiException.forbidden(message: 'password is incorrect');
-          }
-          stdout.writeln('loginUser Success  passw ');
-          return Right(user);
-      }
-    } on ApiException catch (e) {
-      stdout.writeln('exception login user ${e.runtimeType}');
-      return Left(ServerFailure(message: e.message, statusCode: HttpStatus.unauthorized));
+    if (user == null) {
+      stdout.writeln('loginUser exception not userExits');
+      throw ApiException.notFound();
     }
+    final password = loginUserDto.password;
+
+    stdout.writeln(
+      'loginUser check passw----\n'
+      '--pass: $password\n'
+      '--hashPass: ${user.password.length} ${user.password}\n',
+    );
+    final isPasswordCorrect = passwordHasherService.checkPassword(password: password, hashedPassword: user.password);
+    if (!isPasswordCorrect) {
+      stdout.writeln('loginUser Fail check passw incorrect');
+      throw ApiException.forbidden(message: 'password is incorrect');
+    }
+    stdout.writeln('loginUser Success  passw ');
+    return user;
   }
 }

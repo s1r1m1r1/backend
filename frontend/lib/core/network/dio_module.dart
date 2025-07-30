@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../features/auth/domain/auth_repository.dart';
 import 'auth_interceptor.dart';
+import 'network_constants.dart';
 
 // iOS
 final host = '127.0.0.1';
@@ -16,7 +17,7 @@ abstract class DioModule {
   @Named('withToken')
   @lazySingleton
   Dio dio(AuthRepository authRepository) {
-    final dio = Dio(BaseOptions(baseUrl: 'http://$host:8080'));
+    final dio = Dio(BaseOptions(baseUrl: HttpConst.baseUrl));
     dio.interceptors.add(AuthInterceptor(authRepository));
     return dio;
   }
@@ -24,7 +25,7 @@ abstract class DioModule {
   @lazySingleton
   @Named('registration')
   Dio registrationDio() {
-    final dio = Dio(BaseOptions(baseUrl: 'http://$host:8080'));
+    final dio = Dio(BaseOptions(baseUrl: HttpConst.baseUrl));
     dio.interceptors.add(RegistrationInterceptor());
     return dio;
   }

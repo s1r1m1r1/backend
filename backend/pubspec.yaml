@@ -23,6 +23,8 @@ dependencies:
   # result_type: ^1.0.0
   shared:
     path: ../shared
+  dart_frog_web_socket: ^1.0.0
+  broadcast_bloc: ^0.1.0-dev.2
 
 dev_dependencies:
   mocktail: ^1.0.3

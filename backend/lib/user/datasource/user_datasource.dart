@@ -54,7 +54,7 @@ class UserDataSourceImpl implements UserDataSource {
       final entry = await _userDao.getUserById(userId);
       return User(userId: entry.id, email: entry.email, createdAt: entry.createdAt);
     } on Object catch (e, stack) {
-      throw ApiException.internalServerError(message: 'SQLite error with ${e.runtimeType}', stackTrace: stack);
+      throw ApiException.notFound(message: 'not found user', stackTrace: stack);
     } finally {
       // await _databaseConnection.close();
     }

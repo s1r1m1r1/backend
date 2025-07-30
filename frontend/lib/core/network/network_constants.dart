@@ -16,6 +16,10 @@ final host = switch (defaultTargetPlatform) {
   _ => localhost,
 };
 
-class HttpConst {
+abstract class HttpConst {
   static final baseUrl = 'http://$host:$port';
+}
+
+abstract class WebSocketConst {
+  static final baseUrl = 'ws://$host:$port/counter/ws';
 }
