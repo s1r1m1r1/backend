@@ -36,7 +36,7 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<void> init() async {
     try {
       final token = await _client.getKeyValue('accessToken');
-      _tokenSubject.add(token);
+      _tokenSubj.add(token);
       _authStatusSbj.add(token != null ? AuthStatus.loggedIn : AuthStatus.loggedOut);
     } catch (e) {
       debugPrint(e.toString());
@@ -44,7 +44,7 @@ class AuthRepositoryImpl extends AuthRepository {
     // _sessionManager.addListener(_onChangeSessionStatus);
   }
 
-  final _tokenSubject = BehaviorSubject<String?>();
+  final _tokenSubj = BehaviorSubject<String?>();
 
   @override
   Stream<AuthStatus> get authStatusStream => _authStatusSbj.stream;
@@ -65,22 +65,27 @@ class AuthRepositoryImpl extends AuthRepository {
   AuthStatus get authStatus => _authStatusSbj.value;
 
   @override
-  String? getToken() => _tokenSubject.value;
+  String? getToken() => _tokenSubj.value;
 
   @override
   void onTokenExpired() {
     unawaited(_client.deleteKeyValue('accessToken'));
-    _tokenSubject.add(null);
+    _tokenSubj.add(null);
     _authStatusSbj.add(AuthStatus.loggedOut);
   }
 
   @override
   Future<bool> login(String email, String password) async {
-    final tokens = await _api.login(RequestEmailCredentialDto(email: email, password: password));
-    await _client.saveKeyValue('accessToken', tokens.accessToken);
-    _authStatusSbj.add(AuthStatus.loggedIn);
-    _tokenSubject.add(tokens.accessToken);
-    return true;
+    try {
+      debugPrint('login');
+      final tokens = await _api.login(RequestEmailCredentialDto(email: email, password: password));
+      await _client.saveKeyValue('accessToken', tokens.accessToken);
+      _authStatusSbj.add(AuthStatus.loggedIn);
+      _tokenSubj.add(tokens.accessToken);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override
@@ -88,6 +93,6 @@ class AuthRepositoryImpl extends AuthRepository {
     final response = await _api.signup(RequestEmailCredentialDto(email: email, password: password));
     await _client.saveKeyValue('accessToken', response.accessToken);
     _authStatusSbj.add(AuthStatus.loggedIn);
-    _tokenSubject.add(response.accessToken);
+    _tokenSubj.add(response.accessToken);
   }
 }

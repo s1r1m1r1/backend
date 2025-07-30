@@ -20,25 +20,15 @@ FutureOr<frog.Response> onRequest(frog.RequestContext context) {
 }
 
 FutureOr<Response> signup(RequestContext context) async {
-  stdout.writeln('store ---- start ');
-
   try {
-    stdout.writeln('store store 0');
-
     final body = await parseJson(context.request);
-    stdout.writeln('store store 1');
-    final createTodoDto = CreateUserDto.validated(body);
-    stdout.writeln('store store 2');
+    final createUser = CreateUserDto.validated(body);
     final userRepository = context.read<UserRepository>();
 
-    stdout.writeln('store store 3');
-    final user = await userRepository.createUser(createTodoDto);
-    stdout.writeln('store store 4');
+    final user = await userRepository.createUser(createUser);
 
     final sessionRepository = context.read<SessionRepository>();
-    stdout.writeln('store store 5');
     final session = await sessionRepository.createSession(user.userId);
-    stdout.writeln('store store 6');
     final userDto = UserDto.fromUser(user);
     return Response.json(body: {'token': session.token, 'user': userDto.toJson()}, statusCode: HttpStatus.created);
   } on ApiException catch (e, stack) {

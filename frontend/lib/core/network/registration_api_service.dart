@@ -34,6 +34,7 @@ class RegistrationApiService {
 
   Future<User> createUser(User user) async {
     final response = await _client.post('/users', data: user.toJson());
+
     if (response.statusCode == 201) {
       return User.fromJson(response.data);
     } else {
@@ -43,6 +44,11 @@ class RegistrationApiService {
 
   Future<ResponseTokenDto> login(RequestEmailCredentialDto dto) async {
     final response = await _client.post('/users/login', data: dto.toJson());
+    print(
+      '/n'
+      '${response.data}'
+      '',
+    );
     if (response.statusCode == 200 || response.statusCode == 201) {
       final decoded = response.data; // Assuming it returns some user data/token
       return ResponseTokenDto.fromJson(decoded);
