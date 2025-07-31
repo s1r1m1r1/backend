@@ -1,0 +1,11 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+WsEventDto _$WsEventDtoFromJson(Map<String, dynamic> json) => WsEventDto(
+  eventType: json['eventType'] as String,
+  data: json['data'] as Map<String, dynamic>,
+);
+
+Map<String, dynamic> _$WsEventDtoToJson(WsEventDto instance) =>
+    <String, dynamic>{'eventType': instance.eventType, 'data': instance.data};

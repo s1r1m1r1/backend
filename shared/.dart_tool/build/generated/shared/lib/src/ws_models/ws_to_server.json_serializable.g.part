@@ -1,0 +1,21 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+WsToServer _$WsToServerFromJson(Map<String, dynamic> json) => WsToServer(
+  eventType: $enumDecode(_$WsEventToServerEnumMap, json['event']),
+  payload: json['payload'] as Map<String, dynamic>,
+);
+
+Map<String, dynamic> _$WsToServerToJson(WsToServer instance) =>
+    <String, dynamic>{
+      'event': _$WsEventToServerEnumMap[instance.eventType]!,
+      'payload': instance.payload,
+    };
+
+const _$WsEventToServerEnumMap = {
+  WsEventToServer.newMessage: 'newMessage',
+  WsEventToServer.deleteMessage: 'deleteMessage',
+  WsEventToServer.incrementCounter: 'incrementCounter',
+  WsEventToServer.decrementCounter: 'decrementCounter',
+};

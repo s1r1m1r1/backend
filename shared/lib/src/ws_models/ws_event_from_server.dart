@@ -1,0 +1,1 @@
+enum WsEventFromServer { messageCreated, counter }

@@ -10,6 +10,11 @@ Future<Response> onRequest(RequestContext context) async {
     channel.sink.add('${cubit.state}');
 
     channel.stream.listen((event) {
+      if (event is! String) {
+        channel.sink.add('Invalid message');
+        return;
+      }
+
       switch ('$event'.toMessage()) {
         case Message.increment:
           cubit.increment();
