@@ -21,5 +21,5 @@ abstract class HttpConst {
 }
 
 abstract class WebSocketConst {
-  static final baseUrl = 'ws://$host:$port/counter/ws';
+  static final baseUrl = 'ws://$host:$port/ws/';
 }

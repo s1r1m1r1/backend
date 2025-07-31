@@ -11,11 +11,15 @@ class MessagesDao extends DatabaseAccessor<DbClient> with _$MessagesDaoMixin {
   // of this object.
   MessagesDao(super.db);
 
-  Future<List<MessageEntry>> get() {
+  Future<List<MessageEntry>> getMessages() {
     return select(messageTable).get();
   }
 
-  Future<int> insertRow(MessageTableCompanion toCompanion) {
-    return into(messageTable).insert(toCompanion);
+  Future<List<MessageEntry>> getMessagesByChannel(int channelId) {
+    return (select(messageTable)..where((t) => t.channelId.equals(channelId))).get();
+  }
+
+  Future<MessageEntry?> insertRow(MessageTableCompanion toCompanion) {
+    return into(messageTable).insertReturningOrNull(toCompanion);
   }
 }

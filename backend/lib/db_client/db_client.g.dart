@@ -2047,6 +2047,572 @@ class MessageTableCompanion extends UpdateCompanion<MessageEntry> {
   }
 }
 
+class $ChatRoomTableTable extends ChatRoomTable
+    with TableInfo<$ChatRoomTableTable, ChatRoomEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChatRoomTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, deletedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'chat_room_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ChatRoomEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ChatRoomEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChatRoomEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $ChatRoomTableTable createAlias(String alias) {
+    return $ChatRoomTableTable(attachedDatabase, alias);
+  }
+}
+
+class ChatRoomEntry extends DataClass implements Insertable<ChatRoomEntry> {
+  final int id;
+  final DateTime? deletedAt;
+  const ChatRoomEntry({required this.id, this.deletedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  ChatRoomTableCompanion toCompanion(bool nullToAbsent) {
+    return ChatRoomTableCompanion(
+      id: Value(id),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory ChatRoomEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChatRoomEntry(
+      id: serializer.fromJson<int>(json['id']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  ChatRoomEntry copyWith({
+    int? id,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => ChatRoomEntry(
+    id: id ?? this.id,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  ChatRoomEntry copyWithCompanion(ChatRoomTableCompanion data) {
+    return ChatRoomEntry(
+      id: data.id.present ? data.id.value : this.id,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChatRoomEntry(')
+          ..write('id: $id, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, deletedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChatRoomEntry &&
+          other.id == this.id &&
+          other.deletedAt == this.deletedAt);
+}
+
+class ChatRoomTableCompanion extends UpdateCompanion<ChatRoomEntry> {
+  final Value<int> id;
+  final Value<DateTime?> deletedAt;
+  const ChatRoomTableCompanion({
+    this.id = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  });
+  ChatRoomTableCompanion.insert({
+    this.id = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  });
+  static Insertable<ChatRoomEntry> custom({
+    Expression<int>? id,
+    Expression<DateTime>? deletedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+    });
+  }
+
+  ChatRoomTableCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime?>? deletedAt,
+  }) {
+    return ChatRoomTableCompanion(
+      id: id ?? this.id,
+      deletedAt: deletedAt ?? this.deletedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChatRoomTableCompanion(')
+          ..write('id: $id, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LetterTableTable extends LetterTable
+    with TableInfo<$LetterTableTable, LetterEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LetterTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _chatRoomIdMeta = const VerificationMeta(
+    'chatRoomId',
+  );
+  @override
+  late final GeneratedColumn<int> chatRoomId = GeneratedColumn<int>(
+    'chat_room_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES chat_room_table (id)',
+    ),
+  );
+  static const VerificationMeta _senderIdMeta = const VerificationMeta(
+    'senderId',
+  );
+  @override
+  late final GeneratedColumn<int> senderId = GeneratedColumn<int>(
+    'sender_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contentMeta = const VerificationMeta(
+    'content',
+  );
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+    'content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    chatRoomId,
+    senderId,
+    content,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'letter_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LetterEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('chat_room_id')) {
+      context.handle(
+        _chatRoomIdMeta,
+        chatRoomId.isAcceptableOrUnknown(
+          data['chat_room_id']!,
+          _chatRoomIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sender_id')) {
+      context.handle(
+        _senderIdMeta,
+        senderId.isAcceptableOrUnknown(data['sender_id']!, _senderIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_senderIdMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(
+        _contentMeta,
+        content.isAcceptableOrUnknown(data['content']!, _contentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LetterEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LetterEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      chatRoomId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chat_room_id'],
+      ),
+      senderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sender_id'],
+      )!,
+      content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $LetterTableTable createAlias(String alias) {
+    return $LetterTableTable(attachedDatabase, alias);
+  }
+}
+
+class LetterEntry extends DataClass implements Insertable<LetterEntry> {
+  final int id;
+  final int? chatRoomId;
+  final int senderId;
+  final String content;
+  final DateTime createdAt;
+  const LetterEntry({
+    required this.id,
+    this.chatRoomId,
+    required this.senderId,
+    required this.content,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || chatRoomId != null) {
+      map['chat_room_id'] = Variable<int>(chatRoomId);
+    }
+    map['sender_id'] = Variable<int>(senderId);
+    map['content'] = Variable<String>(content);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  LetterTableCompanion toCompanion(bool nullToAbsent) {
+    return LetterTableCompanion(
+      id: Value(id),
+      chatRoomId: chatRoomId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chatRoomId),
+      senderId: Value(senderId),
+      content: Value(content),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory LetterEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LetterEntry(
+      id: serializer.fromJson<int>(json['id']),
+      chatRoomId: serializer.fromJson<int?>(json['chatRoomId']),
+      senderId: serializer.fromJson<int>(json['senderId']),
+      content: serializer.fromJson<String>(json['content']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'chatRoomId': serializer.toJson<int?>(chatRoomId),
+      'senderId': serializer.toJson<int>(senderId),
+      'content': serializer.toJson<String>(content),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  LetterEntry copyWith({
+    int? id,
+    Value<int?> chatRoomId = const Value.absent(),
+    int? senderId,
+    String? content,
+    DateTime? createdAt,
+  }) => LetterEntry(
+    id: id ?? this.id,
+    chatRoomId: chatRoomId.present ? chatRoomId.value : this.chatRoomId,
+    senderId: senderId ?? this.senderId,
+    content: content ?? this.content,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  LetterEntry copyWithCompanion(LetterTableCompanion data) {
+    return LetterEntry(
+      id: data.id.present ? data.id.value : this.id,
+      chatRoomId: data.chatRoomId.present
+          ? data.chatRoomId.value
+          : this.chatRoomId,
+      senderId: data.senderId.present ? data.senderId.value : this.senderId,
+      content: data.content.present ? data.content.value : this.content,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LetterEntry(')
+          ..write('id: $id, ')
+          ..write('chatRoomId: $chatRoomId, ')
+          ..write('senderId: $senderId, ')
+          ..write('content: $content, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, chatRoomId, senderId, content, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LetterEntry &&
+          other.id == this.id &&
+          other.chatRoomId == this.chatRoomId &&
+          other.senderId == this.senderId &&
+          other.content == this.content &&
+          other.createdAt == this.createdAt);
+}
+
+class LetterTableCompanion extends UpdateCompanion<LetterEntry> {
+  final Value<int> id;
+  final Value<int?> chatRoomId;
+  final Value<int> senderId;
+  final Value<String> content;
+  final Value<DateTime> createdAt;
+  const LetterTableCompanion({
+    this.id = const Value.absent(),
+    this.chatRoomId = const Value.absent(),
+    this.senderId = const Value.absent(),
+    this.content = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  LetterTableCompanion.insert({
+    this.id = const Value.absent(),
+    this.chatRoomId = const Value.absent(),
+    required int senderId,
+    required String content,
+    this.createdAt = const Value.absent(),
+  }) : senderId = Value(senderId),
+       content = Value(content);
+  static Insertable<LetterEntry> custom({
+    Expression<int>? id,
+    Expression<int>? chatRoomId,
+    Expression<int>? senderId,
+    Expression<String>? content,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (chatRoomId != null) 'chat_room_id': chatRoomId,
+      if (senderId != null) 'sender_id': senderId,
+      if (content != null) 'content': content,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  LetterTableCompanion copyWith({
+    Value<int>? id,
+    Value<int?>? chatRoomId,
+    Value<int>? senderId,
+    Value<String>? content,
+    Value<DateTime>? createdAt,
+  }) {
+    return LetterTableCompanion(
+      id: id ?? this.id,
+      chatRoomId: chatRoomId ?? this.chatRoomId,
+      senderId: senderId ?? this.senderId,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (chatRoomId.present) {
+      map['chat_room_id'] = Variable<int>(chatRoomId.value);
+    }
+    if (senderId.present) {
+      map['sender_id'] = Variable<int>(senderId.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LetterTableCompanion(')
+          ..write('id: $id, ')
+          ..write('chatRoomId: $chatRoomId, ')
+          ..write('senderId: $senderId, ')
+          ..write('content: $content, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DbClient extends GeneratedDatabase {
   _$DbClient(QueryExecutor e) : super(e);
   $DbClientManager get managers => $DbClientManager(this);
@@ -2055,11 +2621,15 @@ abstract class _$DbClient extends GeneratedDatabase {
   late final $TodoTableTable todoTable = $TodoTableTable(this);
   late final $SessionTableTable sessionTable = $SessionTableTable(this);
   late final $MessageTableTable messageTable = $MessageTableTable(this);
+  late final $ChatRoomTableTable chatRoomTable = $ChatRoomTableTable(this);
+  late final $LetterTableTable letterTable = $LetterTableTable(this);
   late final ChannelDao channelDao = ChannelDao(this as DbClient);
   late final TodoDao todoDao = TodoDao(this as DbClient);
   late final UserDao userDao = UserDao(this as DbClient);
   late final SessionDao sessionDao = SessionDao(this as DbClient);
   late final MessagesDao messagesDao = MessagesDao(this as DbClient);
+  late final LettersDao lettersDao = LettersDao(this as DbClient);
+  late final ChatRoomDao chatRoomDao = ChatRoomDao(this as DbClient);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2070,6 +2640,8 @@ abstract class _$DbClient extends GeneratedDatabase {
     todoTable,
     sessionTable,
     messageTable,
+    chatRoomTable,
+    letterTable,
   ];
 }
 
@@ -3809,6 +4381,558 @@ typedef $$MessageTableTableProcessedTableManager =
       MessageEntry,
       PrefetchHooks Function({bool channelId})
     >;
+typedef $$ChatRoomTableTableCreateCompanionBuilder =
+    ChatRoomTableCompanion Function({
+      Value<int> id,
+      Value<DateTime?> deletedAt,
+    });
+typedef $$ChatRoomTableTableUpdateCompanionBuilder =
+    ChatRoomTableCompanion Function({
+      Value<int> id,
+      Value<DateTime?> deletedAt,
+    });
+
+final class $$ChatRoomTableTableReferences
+    extends BaseReferences<_$DbClient, $ChatRoomTableTable, ChatRoomEntry> {
+  $$ChatRoomTableTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<$LetterTableTable, List<LetterEntry>>
+  _letterTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
+    db.letterTable,
+    aliasName: $_aliasNameGenerator(
+      db.chatRoomTable.id,
+      db.letterTable.chatRoomId,
+    ),
+  );
+
+  $$LetterTableTableProcessedTableManager get letterTableRefs {
+    final manager = $$LetterTableTableTableManager(
+      $_db,
+      $_db.letterTable,
+    ).filter((f) => f.chatRoomId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_letterTableRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ChatRoomTableTableFilterComposer
+    extends Composer<_$DbClient, $ChatRoomTableTable> {
+  $$ChatRoomTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> letterTableRefs(
+    Expression<bool> Function($$LetterTableTableFilterComposer f) f,
+  ) {
+    final $$LetterTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.letterTable,
+      getReferencedColumn: (t) => t.chatRoomId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LetterTableTableFilterComposer(
+            $db: $db,
+            $table: $db.letterTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ChatRoomTableTableOrderingComposer
+    extends Composer<_$DbClient, $ChatRoomTableTable> {
+  $$ChatRoomTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ChatRoomTableTableAnnotationComposer
+    extends Composer<_$DbClient, $ChatRoomTableTable> {
+  $$ChatRoomTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  Expression<T> letterTableRefs<T extends Object>(
+    Expression<T> Function($$LetterTableTableAnnotationComposer a) f,
+  ) {
+    final $$LetterTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.letterTable,
+      getReferencedColumn: (t) => t.chatRoomId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LetterTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.letterTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ChatRoomTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $ChatRoomTableTable,
+          ChatRoomEntry,
+          $$ChatRoomTableTableFilterComposer,
+          $$ChatRoomTableTableOrderingComposer,
+          $$ChatRoomTableTableAnnotationComposer,
+          $$ChatRoomTableTableCreateCompanionBuilder,
+          $$ChatRoomTableTableUpdateCompanionBuilder,
+          (ChatRoomEntry, $$ChatRoomTableTableReferences),
+          ChatRoomEntry,
+          PrefetchHooks Function({bool letterTableRefs})
+        > {
+  $$ChatRoomTableTableTableManager(_$DbClient db, $ChatRoomTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ChatRoomTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChatRoomTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ChatRoomTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => ChatRoomTableCompanion(id: id, deletedAt: deletedAt),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => ChatRoomTableCompanion.insert(id: id, deletedAt: deletedAt),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ChatRoomTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({letterTableRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (letterTableRefs) db.letterTable],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (letterTableRefs)
+                    await $_getPrefetchedData<
+                      ChatRoomEntry,
+                      $ChatRoomTableTable,
+                      LetterEntry
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ChatRoomTableTableReferences
+                          ._letterTableRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$ChatRoomTableTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).letterTableRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.chatRoomId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ChatRoomTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $ChatRoomTableTable,
+      ChatRoomEntry,
+      $$ChatRoomTableTableFilterComposer,
+      $$ChatRoomTableTableOrderingComposer,
+      $$ChatRoomTableTableAnnotationComposer,
+      $$ChatRoomTableTableCreateCompanionBuilder,
+      $$ChatRoomTableTableUpdateCompanionBuilder,
+      (ChatRoomEntry, $$ChatRoomTableTableReferences),
+      ChatRoomEntry,
+      PrefetchHooks Function({bool letterTableRefs})
+    >;
+typedef $$LetterTableTableCreateCompanionBuilder =
+    LetterTableCompanion Function({
+      Value<int> id,
+      Value<int?> chatRoomId,
+      required int senderId,
+      required String content,
+      Value<DateTime> createdAt,
+    });
+typedef $$LetterTableTableUpdateCompanionBuilder =
+    LetterTableCompanion Function({
+      Value<int> id,
+      Value<int?> chatRoomId,
+      Value<int> senderId,
+      Value<String> content,
+      Value<DateTime> createdAt,
+    });
+
+final class $$LetterTableTableReferences
+    extends BaseReferences<_$DbClient, $LetterTableTable, LetterEntry> {
+  $$LetterTableTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ChatRoomTableTable _chatRoomIdTable(_$DbClient db) =>
+      db.chatRoomTable.createAlias(
+        $_aliasNameGenerator(db.letterTable.chatRoomId, db.chatRoomTable.id),
+      );
+
+  $$ChatRoomTableTableProcessedTableManager? get chatRoomId {
+    final $_column = $_itemColumn<int>('chat_room_id');
+    if ($_column == null) return null;
+    final manager = $$ChatRoomTableTableTableManager(
+      $_db,
+      $_db.chatRoomTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_chatRoomIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$LetterTableTableFilterComposer
+    extends Composer<_$DbClient, $LetterTableTable> {
+  $$LetterTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get senderId => $composableBuilder(
+    column: $table.senderId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ChatRoomTableTableFilterComposer get chatRoomId {
+    final $$ChatRoomTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.chatRoomId,
+      referencedTable: $db.chatRoomTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChatRoomTableTableFilterComposer(
+            $db: $db,
+            $table: $db.chatRoomTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LetterTableTableOrderingComposer
+    extends Composer<_$DbClient, $LetterTableTable> {
+  $$LetterTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get senderId => $composableBuilder(
+    column: $table.senderId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get content => $composableBuilder(
+    column: $table.content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ChatRoomTableTableOrderingComposer get chatRoomId {
+    final $$ChatRoomTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.chatRoomId,
+      referencedTable: $db.chatRoomTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChatRoomTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.chatRoomTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LetterTableTableAnnotationComposer
+    extends Composer<_$DbClient, $LetterTableTable> {
+  $$LetterTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get senderId =>
+      $composableBuilder(column: $table.senderId, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ChatRoomTableTableAnnotationComposer get chatRoomId {
+    final $$ChatRoomTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.chatRoomId,
+      referencedTable: $db.chatRoomTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChatRoomTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.chatRoomTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LetterTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $LetterTableTable,
+          LetterEntry,
+          $$LetterTableTableFilterComposer,
+          $$LetterTableTableOrderingComposer,
+          $$LetterTableTableAnnotationComposer,
+          $$LetterTableTableCreateCompanionBuilder,
+          $$LetterTableTableUpdateCompanionBuilder,
+          (LetterEntry, $$LetterTableTableReferences),
+          LetterEntry,
+          PrefetchHooks Function({bool chatRoomId})
+        > {
+  $$LetterTableTableTableManager(_$DbClient db, $LetterTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LetterTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LetterTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LetterTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> chatRoomId = const Value.absent(),
+                Value<int> senderId = const Value.absent(),
+                Value<String> content = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => LetterTableCompanion(
+                id: id,
+                chatRoomId: chatRoomId,
+                senderId: senderId,
+                content: content,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> chatRoomId = const Value.absent(),
+                required int senderId,
+                required String content,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => LetterTableCompanion.insert(
+                id: id,
+                chatRoomId: chatRoomId,
+                senderId: senderId,
+                content: content,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$LetterTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({chatRoomId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (chatRoomId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.chatRoomId,
+                                referencedTable: $$LetterTableTableReferences
+                                    ._chatRoomIdTable(db),
+                                referencedColumn: $$LetterTableTableReferences
+                                    ._chatRoomIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$LetterTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $LetterTableTable,
+      LetterEntry,
+      $$LetterTableTableFilterComposer,
+      $$LetterTableTableOrderingComposer,
+      $$LetterTableTableAnnotationComposer,
+      $$LetterTableTableCreateCompanionBuilder,
+      $$LetterTableTableUpdateCompanionBuilder,
+      (LetterEntry, $$LetterTableTableReferences),
+      LetterEntry,
+      PrefetchHooks Function({bool chatRoomId})
+    >;
 
 class $DbClientManager {
   final _$DbClient _db;
@@ -3823,4 +4947,8 @@ class $DbClientManager {
       $$SessionTableTableTableManager(_db, _db.sessionTable);
   $$MessageTableTableTableManager get messageTable =>
       $$MessageTableTableTableManager(_db, _db.messageTable);
+  $$ChatRoomTableTableTableManager get chatRoomTable =>
+      $$ChatRoomTableTableTableManager(_db, _db.chatRoomTable);
+  $$LetterTableTableTableManager get letterTable =>
+      $$LetterTableTableTableManager(_db, _db.letterTable);
 }

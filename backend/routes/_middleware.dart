@@ -1,3 +1,5 @@
+import 'package:backend/chat/counter_repository.dart';
+import 'package:backend/chat/message_repository.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/services/jwt_service.dart';
 import 'package:backend/user/password_hash_service.dart';
@@ -15,7 +17,8 @@ const _passwordHasher = PasswordHasherService();
 final _userRepo = UserRepositoryImpl(_userDatasource, _passwordHasher);
 final _jwtService = JWTService(env);
 final _sessionRepository = SessionRepositoryImpl(sessionDatasource: SessionSqliteDatasourceImpl(_db.sessionDao));
-
+final _messageRepository = LettersRepository(_db.lettersDao);
+final _counterRepository = CounterRepository();
 Handler middleware(Handler handler) {
   return handler
       .use(requestLogger())
@@ -23,5 +26,7 @@ Handler middleware(Handler handler) {
       .use(provider<DbClient>((_) => _db))
       .use(provider<UserRepository>((_) => _userRepo))
       .use(provider<SessionRepository>((_) => _sessionRepository))
+      .use(provider<LettersRepository>((_) => _messageRepository))
+      .use(provider<CounterRepository>((_) => _counterRepository))
       .use(provider<PasswordHasherService>((_) => _passwordHasher));
 }

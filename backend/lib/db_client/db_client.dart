@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:backend/db_client/dao/channel_dao.dart';
+import 'package:backend/db_client/dao/letters_dao.dart';
 import 'package:backend/db_client/dao/session_dao.dart';
 import 'package:backend/db_client/dao/todo_dao.dart';
 import 'package:backend/db_client/tables/channel_table.dart';
@@ -8,19 +9,21 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
-
+import 'package:uuid/uuid.dart';
+import 'dao/chat_room_dao.dart';
 import 'dao/messages_dao.dart';
 import 'dao/user_dao.dart';
+import 'tables/chat_room_table.dart';
+import 'tables/letter_table.dart';
 import 'tables/message_table.dart';
 import 'tables/session_table.dart';
 import 'tables/user_table.dart';
-import 'package:uuid/uuid.dart';
 
 part 'db_client.g.dart';
 
 @DriftDatabase(
-  tables: [ChannelTable, TodoTable, UserTable, SessionTable, MessageTable],
-  daos: [ChannelDao, TodoDao, UserDao, SessionDao, MessagesDao],
+  tables: [ChannelTable, TodoTable, UserTable, SessionTable, MessageTable, LetterTable, ChatRoomTable],
+  daos: [ChannelDao, TodoDao, UserDao, SessionDao, MessagesDao, LettersDao, ChatRoomDao],
 )
 class DbClient extends _$DbClient {
   DbClient(super.e);
