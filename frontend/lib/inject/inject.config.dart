@@ -11,7 +11,6 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:dio/dio.dart' as _i361;
 import 'package:frontend/bloc/user/user_bloc.dart' as _i990;
-import 'package:frontend/core/network/auth_interceptor.dart' as _i921;
 import 'package:frontend/core/network/dio_module.dart' as _i339;
 import 'package:frontend/core/network/protected_api_service.dart' as _i365;
 import 'package:frontend/core/network/registration_api_service.dart' as _i436;
@@ -44,12 +43,13 @@ extension GetItInjectableX on _i174.GetIt {
     final dbClientModule = _$DbClientModule();
     final dioModule = _$DioModule();
     gh.factory<_i990.UserBloc>(() => _i990.UserBloc());
-    gh.lazySingleton<_i921.RegistrationInterceptor>(
-      () => _i921.RegistrationInterceptor(),
-    );
     gh.lazySingleton<_i798.CounterRepository>(() => _i798.CounterRepository());
     gh.lazySingleton<_i83.WebSocketClient>(() => _i83.WebSocketClient());
     gh.lazySingleton<_i569.DbClient>(() => dbClientModule.dbClient);
+    gh.lazySingleton<_i361.Dio>(
+      () => dioModule.retryDio(),
+      instanceName: 'retryDio',
+    );
     gh.lazySingleton<_i569.DbClient>(
       () => dbClientModule.memoryDbClient,
       instanceName: 'Memory',
@@ -83,11 +83,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i805.LoginBloc>(
       () => _i805.LoginBloc(gh<_i887.AuthRepository>()),
     );
-    gh.lazySingleton<_i921.AuthInterceptor>(
-      () => _i921.AuthInterceptor(gh<_i887.AuthRepository>()),
-    );
     gh.lazySingleton<_i361.Dio>(
-      () => dioModule.dio(gh<_i887.AuthRepository>()),
+      () => dioModule.dio(
+        gh<_i887.AuthRepository>(),
+        gh<_i361.Dio>(instanceName: 'retryDio'),
+      ),
       instanceName: 'withToken',
     );
     gh.lazySingleton<_i365.ProtectedApiService>(

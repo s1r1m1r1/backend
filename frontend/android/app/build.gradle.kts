@@ -6,9 +6,9 @@ plugins {
 }
 
 android {
+    ndkVersion = "27.0.12077973"
     namespace = "com.example.frontend"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -37,6 +37,20 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+     // -------- flavor config    --------------------
+     flavorDimensions += "default"
+     productFlavors {
+        create("dev") {
+            dimension = "default"
+            applicationIdSuffix = ".dev"
+        }
+        create("prod") {
+            dimension = "default"
+            applicationIdSuffix = ".prod"
+        }
+    }
+    //--------------------------------------------------------
+    
 }
 
 flutter {

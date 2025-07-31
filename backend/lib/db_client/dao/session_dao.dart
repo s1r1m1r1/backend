@@ -21,8 +21,17 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
     return into(sessionTable).insert(toCompanion);
   }
 
+  Future<int> updateRow(SessionTableCompanion toCompanion) {
+    return into(sessionTable).insert(toCompanion, mode: InsertMode.replace);
+  }
+
   Future<SessionEntry> getSessionFromToken(String token) async {
     final result = await (select(sessionTable)..where((t) => t.token.equals(token))).getSingle();
+    return result;
+  }
+
+  Future<SessionEntry> getSessionFromRefreshToken(String refresh) async {
+    final result = await (select(sessionTable)..where((t) => t.refreshToken.equals(refresh))).getSingle();
     return result;
   }
 
@@ -30,5 +39,11 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
     (update(
       sessionTable,
     )..where((t) => t.token.equals(token))).write(SessionTableCompanion(deletedAt: Value(DateTime.now())));
+  }
+
+  void softDeleteSessionByUserId(String userId) {
+    (update(
+      sessionTable,
+    )..where((t) => t.userId.equals(userId))).write(SessionTableCompanion(deletedAt: Value(DateTime.now())));
   }
 }

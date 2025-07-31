@@ -1,9 +1,11 @@
 // lib/services/api_service.dart
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:frontend/features/auth/data/request_email_credential_dto.dart';
-import 'package:frontend/features/auth/data/response_token_dto.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/shared.dart';
 
 import '../../models/user.dart';
 
@@ -13,7 +15,7 @@ class RegistrationApiService {
 
   RegistrationApiService(@Named('registration') this._client);
 
-  Future<ResponseTokenDto> signup(RequestEmailCredentialDto dto) async {
+  Future<TokenDto> signup(RequestEmailCredentialDto dto) async {
     final response = await _client.post(
       '/users/signup',
       data: json.encode(dto.toJson()),
@@ -21,12 +23,8 @@ class RegistrationApiService {
     );
     if (response.statusCode == 200 || response.statusCode == 201) {
       final decoded = response.data; // Assuming it returns some user data/
-      print(
-        '/n'
-        '${decoded}'
-        '',
-      );
-      return ResponseTokenDto.fromJson(decoded);
+
+      return TokenDto.fromJson(decoded);
     } else {
       throw Exception('Failed to sign up');
     }
@@ -35,25 +33,38 @@ class RegistrationApiService {
   Future<User> createUser(User user) async {
     final response = await _client.post('/users', data: user.toJson());
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == HttpStatus.created) {
       return User.fromJson(response.data);
     } else {
       throw Exception('Failed to create user');
     }
   }
 
-  Future<ResponseTokenDto> login(RequestEmailCredentialDto dto) async {
+  Future<TokenDto> login(RequestEmailCredentialDto dto) async {
     final response = await _client.post('/users/login', data: dto.toJson());
-    print(
-      '/n'
-      '${response.data}'
-      '',
-    );
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == HttpStatus.accepted) {
       final decoded = response.data; // Assuming it returns some user data/token
-      return ResponseTokenDto.fromJson(decoded);
+
+      debugPrint('Login  response: $decoded');
+      return TokenDto.fromJson(decoded);
     } else {
       throw Exception('Failed to log in');
+    }
+  }
+
+  Future<TokenDto> refresh(String refreshToken) async {
+    final response = await _client.post(
+      '/users/refresh',
+      data: RefreshDto(refreshToken).toJson(),
+      options: Options(headers: {'Content-Type': 'application/json'}),
+    );
+
+    if (response.statusCode == HttpStatus.accepted) {
+      final decoded = response.data; // Assuming it returns some user data/token
+      debugPrint('Refresh token response: $decoded');
+      return TokenDto.fromJson(decoded);
+    } else {
+      throw Exception('Failed to refresh token');
     }
   }
 }

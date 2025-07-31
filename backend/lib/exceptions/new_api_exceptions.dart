@@ -16,7 +16,6 @@ sealed class ApiException with _$ApiException implements Exception {
     @Default('Bad request') String message,
     List<String>? errors,
     @Default(HttpStatus.badRequest) int statusCode,
-    StackTrace? stackTrace,
   }) = _BadRequestException;
 
   // Use when a requested resource is not found (404)
@@ -24,7 +23,6 @@ sealed class ApiException with _$ApiException implements Exception {
     @Default('Resource not found') String message,
     List<String>? errors,
     @Default(HttpStatus.notFound) int statusCode,
-    StackTrace? stackTrace,
   }) = _NotFoundException;
 
   // Use for authentication failures (401)
@@ -32,7 +30,6 @@ sealed class ApiException with _$ApiException implements Exception {
     @Default('Unauthorized access') String message,
     List<String>? errors,
     @Default(HttpStatus.unauthorized) int statusCode,
-    StackTrace? stackTrace,
   }) = _UnauthorizedException;
 
   // Use when access to a resource is forbidden (403)
@@ -40,7 +37,6 @@ sealed class ApiException with _$ApiException implements Exception {
     @Default('Forbidden access') String message,
     List<String>? errors,
     @Default(HttpStatus.forbidden) int statusCode,
-    StackTrace? stackTrace,
   }) = _ForbiddenException;
 
   // Use for conflict errors (e.g., duplicate resource, 409)
@@ -48,7 +44,6 @@ sealed class ApiException with _$ApiException implements Exception {
     @Default('Conflict') String message,
     List<String>? errors,
     @Default(HttpStatus.conflict) int statusCode,
-    StackTrace? stackTrace,
   }) = _ConflictException; // Added for email already exists
 
   // Use for semantic validation errors where input is valid but unprocessable (422)
@@ -56,7 +51,6 @@ sealed class ApiException with _$ApiException implements Exception {
     @Default('Unprocessable Content') String message,
     List<String>? errors,
     @Default(HttpStatus.unprocessableEntity) int statusCode, // HttpStatus.unprocessableEntity is 422
-    StackTrace? stackTrace,
   }) = _UnprocessableContentException;
 
   // Use for server-side errors (500)
@@ -64,7 +58,6 @@ sealed class ApiException with _$ApiException implements Exception {
     @Default('Internal server error') String message,
     List<String>? errors, // Changed to nullable consistent with others
     @Default(HttpStatus.internalServerError) int statusCode,
-    StackTrace? stackTrace,
   }) = _InternalServerErrorException;
 
   // You can define common getters for all sealed union types
@@ -75,7 +68,6 @@ sealed class ApiException with _$ApiException implements Exception {
   // Override toString for better logging/debugging
   @override
   String toString() {
-    final stack = stackTrace != null ? '\nStackTrace: $stackTrace' : '';
-    return 'ApiException ($runtimeType): $message (Status: $statusCode) Errors: $errorMessage$stack';
+    return 'ApiException ($runtimeType): $message (Status: $statusCode) Errors: $errorMessage';
   }
 }

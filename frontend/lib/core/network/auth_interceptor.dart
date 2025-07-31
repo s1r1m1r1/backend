@@ -4,11 +4,11 @@ import 'package:injectable/injectable.dart';
 
 import '../../features/auth/domain/auth_repository.dart';
 
-@lazySingleton
 class AuthInterceptor extends Interceptor {
   final AuthRepository _authRepository;
+  final Dio retryDio;
 
-  AuthInterceptor(this._authRepository);
+  AuthInterceptor(this._authRepository, this.retryDio);
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
@@ -35,12 +35,37 @@ class AuthInterceptor extends Interceptor {
       debugPrint('Unauthorized. Attempting to refresh token...');
       _authRepository.onTokenExpired();
       // Potentially attempt to refresh token and retry the request
+
+      // Prevent infinite loop if refresh token itself fails with 401
+      // Make sure the refresh token endpoint doesn't itself trigger this logic
+      // by either having a specific path check or handling its 401s differently.
+      final RequestOptions requestOptions = err.requestOptions;
+      final bool tokenRefreshed = await _authRepository.refreshAccessToken();
+      if (tokenRefreshed) {
+        debugPrint('Token refresh successful. Retrying original request.');
+        // Update the token in the original request's headers
+        requestOptions.headers['Authorization'] = 'Bearer ${_authRepository.getToken()}';
+
+        // Retry the original request with the new token
+        try {
+          final response = await retryDio.fetch(requestOptions);
+          handler.resolve(response); // Resolve with the new response
+          return; // Important: prevent further handling
+        } on DioException catch (retryErr) {
+          debugPrint('Retry failed: $retryErr');
+          _authRepository.onTokenExpired(); // Force re-login if retry fails
+          handler.next(retryErr); // Pass the retry error down
+          return;
+        }
+      } else {
+        debugPrint('Token refresh failed. User needs to re-authenticate.');
+        _authRepository.onTokenExpired(); // Navigate to login screen
+      }
     }
     super.onError(err, handler);
   }
 }
 
-@lazySingleton
 class RegistrationInterceptor extends Interceptor {
   RegistrationInterceptor();
 

@@ -15,8 +15,7 @@ T _$identity<T>(T value) => value;
 mixin _$ApiException {
 
  String get message; List<String>? get errors;// Changed to nullable consistent with others
- int get statusCode;// HttpStatus.unprocessableEntity is 422
- StackTrace? get stackTrace;
+ int get statusCode;
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,12 +26,12 @@ $ApiExceptionCopyWith<ApiException> get copyWith => _$ApiExceptionCopyWithImpl<A
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.errors, errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.errors, errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(errors),statusCode,stackTrace);
+int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(errors),statusCode);
 
 
 
@@ -43,7 +42,7 @@ abstract mixin class $ApiExceptionCopyWith<$Res>  {
   factory $ApiExceptionCopyWith(ApiException value, $Res Function(ApiException) _then) = _$ApiExceptionCopyWithImpl;
 @useResult
 $Res call({
- String message, List<String>? errors, int statusCode, StackTrace? stackTrace
+ String message, List<String>? errors, int statusCode
 });
 
 
@@ -60,13 +59,12 @@ class _$ApiExceptionCopyWithImpl<$Res>
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,Object? stackTrace = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,}) {
   return _then(_self.copyWith(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,errors: freezed == errors ? _self.errors : errors // ignore: cast_nullable_to_non_nullable
 as List<String>?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
-as StackTrace?,
+as int,
   ));
 }
 
@@ -166,16 +164,16 @@ return internalServerError(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  badRequest,TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  notFound,TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  unauthorized,TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  forbidden,TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  conflict,TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  unprocessableContent,TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  internalServerError,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String message,  List<String>? errors,  int statusCode)?  badRequest,TResult Function( String message,  List<String>? errors,  int statusCode)?  notFound,TResult Function( String message,  List<String>? errors,  int statusCode)?  unauthorized,TResult Function( String message,  List<String>? errors,  int statusCode)?  forbidden,TResult Function( String message,  List<String>? errors,  int statusCode)?  conflict,TResult Function( String message,  List<String>? errors,  int statusCode)?  unprocessableContent,TResult Function( String message,  List<String>? errors,  int statusCode)?  internalServerError,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BadRequestException() when badRequest != null:
-return badRequest(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _NotFoundException() when notFound != null:
-return notFound(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _UnauthorizedException() when unauthorized != null:
-return unauthorized(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _ForbiddenException() when forbidden != null:
-return forbidden(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _ConflictException() when conflict != null:
-return conflict(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _UnprocessableContentException() when unprocessableContent != null:
-return unprocessableContent(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _InternalServerErrorException() when internalServerError != null:
-return internalServerError(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _:
+return badRequest(_that.message,_that.errors,_that.statusCode);case _NotFoundException() when notFound != null:
+return notFound(_that.message,_that.errors,_that.statusCode);case _UnauthorizedException() when unauthorized != null:
+return unauthorized(_that.message,_that.errors,_that.statusCode);case _ForbiddenException() when forbidden != null:
+return forbidden(_that.message,_that.errors,_that.statusCode);case _ConflictException() when conflict != null:
+return conflict(_that.message,_that.errors,_that.statusCode);case _UnprocessableContentException() when unprocessableContent != null:
+return unprocessableContent(_that.message,_that.errors,_that.statusCode);case _InternalServerErrorException() when internalServerError != null:
+return internalServerError(_that.message,_that.errors,_that.statusCode);case _:
   return orElse();
 
 }
@@ -193,16 +191,16 @@ return internalServerError(_that.message,_that.errors,_that.statusCode,_that.sta
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)  badRequest,required TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)  notFound,required TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)  unauthorized,required TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)  forbidden,required TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)  conflict,required TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)  unprocessableContent,required TResult Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)  internalServerError,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String message,  List<String>? errors,  int statusCode)  badRequest,required TResult Function( String message,  List<String>? errors,  int statusCode)  notFound,required TResult Function( String message,  List<String>? errors,  int statusCode)  unauthorized,required TResult Function( String message,  List<String>? errors,  int statusCode)  forbidden,required TResult Function( String message,  List<String>? errors,  int statusCode)  conflict,required TResult Function( String message,  List<String>? errors,  int statusCode)  unprocessableContent,required TResult Function( String message,  List<String>? errors,  int statusCode)  internalServerError,}) {final _that = this;
 switch (_that) {
 case _BadRequestException():
-return badRequest(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _NotFoundException():
-return notFound(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _UnauthorizedException():
-return unauthorized(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _ForbiddenException():
-return forbidden(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _ConflictException():
-return conflict(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _UnprocessableContentException():
-return unprocessableContent(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _InternalServerErrorException():
-return internalServerError(_that.message,_that.errors,_that.statusCode,_that.stackTrace);}
+return badRequest(_that.message,_that.errors,_that.statusCode);case _NotFoundException():
+return notFound(_that.message,_that.errors,_that.statusCode);case _UnauthorizedException():
+return unauthorized(_that.message,_that.errors,_that.statusCode);case _ForbiddenException():
+return forbidden(_that.message,_that.errors,_that.statusCode);case _ConflictException():
+return conflict(_that.message,_that.errors,_that.statusCode);case _UnprocessableContentException():
+return unprocessableContent(_that.message,_that.errors,_that.statusCode);case _InternalServerErrorException():
+return internalServerError(_that.message,_that.errors,_that.statusCode);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -216,16 +214,16 @@ return internalServerError(_that.message,_that.errors,_that.statusCode,_that.sta
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  badRequest,TResult? Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  notFound,TResult? Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  unauthorized,TResult? Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  forbidden,TResult? Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  conflict,TResult? Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  unprocessableContent,TResult? Function( String message,  List<String>? errors,  int statusCode,  StackTrace? stackTrace)?  internalServerError,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String message,  List<String>? errors,  int statusCode)?  badRequest,TResult? Function( String message,  List<String>? errors,  int statusCode)?  notFound,TResult? Function( String message,  List<String>? errors,  int statusCode)?  unauthorized,TResult? Function( String message,  List<String>? errors,  int statusCode)?  forbidden,TResult? Function( String message,  List<String>? errors,  int statusCode)?  conflict,TResult? Function( String message,  List<String>? errors,  int statusCode)?  unprocessableContent,TResult? Function( String message,  List<String>? errors,  int statusCode)?  internalServerError,}) {final _that = this;
 switch (_that) {
 case _BadRequestException() when badRequest != null:
-return badRequest(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _NotFoundException() when notFound != null:
-return notFound(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _UnauthorizedException() when unauthorized != null:
-return unauthorized(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _ForbiddenException() when forbidden != null:
-return forbidden(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _ConflictException() when conflict != null:
-return conflict(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _UnprocessableContentException() when unprocessableContent != null:
-return unprocessableContent(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _InternalServerErrorException() when internalServerError != null:
-return internalServerError(_that.message,_that.errors,_that.statusCode,_that.stackTrace);case _:
+return badRequest(_that.message,_that.errors,_that.statusCode);case _NotFoundException() when notFound != null:
+return notFound(_that.message,_that.errors,_that.statusCode);case _UnauthorizedException() when unauthorized != null:
+return unauthorized(_that.message,_that.errors,_that.statusCode);case _ForbiddenException() when forbidden != null:
+return forbidden(_that.message,_that.errors,_that.statusCode);case _ConflictException() when conflict != null:
+return conflict(_that.message,_that.errors,_that.statusCode);case _UnprocessableContentException() when unprocessableContent != null:
+return unprocessableContent(_that.message,_that.errors,_that.statusCode);case _InternalServerErrorException() when internalServerError != null:
+return internalServerError(_that.message,_that.errors,_that.statusCode);case _:
   return null;
 
 }
@@ -237,7 +235,7 @@ return internalServerError(_that.message,_that.errors,_that.statusCode,_that.sta
 
 
 class _BadRequestException extends ApiException {
-  const _BadRequestException({this.message = 'Bad request', final  List<String>? errors, this.statusCode = HttpStatus.badRequest, this.stackTrace}): _errors = errors,super._();
+  const _BadRequestException({this.message = 'Bad request', final  List<String>? errors, this.statusCode = HttpStatus.badRequest}): _errors = errors,super._();
   
 
 @override@JsonKey() final  String message;
@@ -251,7 +249,6 @@ class _BadRequestException extends ApiException {
 }
 
 @override@JsonKey() final  int statusCode;
-@override final  StackTrace? stackTrace;
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
@@ -263,12 +260,12 @@ _$BadRequestExceptionCopyWith<_BadRequestException> get copyWith => __$BadReques
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BadRequestException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BadRequestException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode,stackTrace);
+int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
 
 
@@ -279,7 +276,7 @@ abstract mixin class _$BadRequestExceptionCopyWith<$Res> implements $ApiExceptio
   factory _$BadRequestExceptionCopyWith(_BadRequestException value, $Res Function(_BadRequestException) _then) = __$BadRequestExceptionCopyWithImpl;
 @override @useResult
 $Res call({
- String message, List<String>? errors, int statusCode, StackTrace? stackTrace
+ String message, List<String>? errors, int statusCode
 });
 
 
@@ -296,13 +293,12 @@ class __$BadRequestExceptionCopyWithImpl<$Res>
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,Object? stackTrace = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,}) {
   return _then(_BadRequestException(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,errors: freezed == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
 as List<String>?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
-as StackTrace?,
+as int,
   ));
 }
 
@@ -313,7 +309,7 @@ as StackTrace?,
 
 
 class _NotFoundException extends ApiException {
-  const _NotFoundException({this.message = 'Resource not found', final  List<String>? errors, this.statusCode = HttpStatus.notFound, this.stackTrace}): _errors = errors,super._();
+  const _NotFoundException({this.message = 'Resource not found', final  List<String>? errors, this.statusCode = HttpStatus.notFound}): _errors = errors,super._();
   
 
 @override@JsonKey() final  String message;
@@ -327,7 +323,6 @@ class _NotFoundException extends ApiException {
 }
 
 @override@JsonKey() final  int statusCode;
-@override final  StackTrace? stackTrace;
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
@@ -339,12 +334,12 @@ _$NotFoundExceptionCopyWith<_NotFoundException> get copyWith => __$NotFoundExcep
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NotFoundException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NotFoundException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode,stackTrace);
+int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
 
 
@@ -355,7 +350,7 @@ abstract mixin class _$NotFoundExceptionCopyWith<$Res> implements $ApiExceptionC
   factory _$NotFoundExceptionCopyWith(_NotFoundException value, $Res Function(_NotFoundException) _then) = __$NotFoundExceptionCopyWithImpl;
 @override @useResult
 $Res call({
- String message, List<String>? errors, int statusCode, StackTrace? stackTrace
+ String message, List<String>? errors, int statusCode
 });
 
 
@@ -372,13 +367,12 @@ class __$NotFoundExceptionCopyWithImpl<$Res>
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,Object? stackTrace = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,}) {
   return _then(_NotFoundException(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,errors: freezed == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
 as List<String>?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
-as StackTrace?,
+as int,
   ));
 }
 
@@ -389,7 +383,7 @@ as StackTrace?,
 
 
 class _UnauthorizedException extends ApiException {
-  const _UnauthorizedException({this.message = 'Unauthorized access', final  List<String>? errors, this.statusCode = HttpStatus.unauthorized, this.stackTrace}): _errors = errors,super._();
+  const _UnauthorizedException({this.message = 'Unauthorized access', final  List<String>? errors, this.statusCode = HttpStatus.unauthorized}): _errors = errors,super._();
   
 
 @override@JsonKey() final  String message;
@@ -403,7 +397,6 @@ class _UnauthorizedException extends ApiException {
 }
 
 @override@JsonKey() final  int statusCode;
-@override final  StackTrace? stackTrace;
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
@@ -415,12 +408,12 @@ _$UnauthorizedExceptionCopyWith<_UnauthorizedException> get copyWith => __$Unaut
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UnauthorizedException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UnauthorizedException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode,stackTrace);
+int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
 
 
@@ -431,7 +424,7 @@ abstract mixin class _$UnauthorizedExceptionCopyWith<$Res> implements $ApiExcept
   factory _$UnauthorizedExceptionCopyWith(_UnauthorizedException value, $Res Function(_UnauthorizedException) _then) = __$UnauthorizedExceptionCopyWithImpl;
 @override @useResult
 $Res call({
- String message, List<String>? errors, int statusCode, StackTrace? stackTrace
+ String message, List<String>? errors, int statusCode
 });
 
 
@@ -448,13 +441,12 @@ class __$UnauthorizedExceptionCopyWithImpl<$Res>
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,Object? stackTrace = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,}) {
   return _then(_UnauthorizedException(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,errors: freezed == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
 as List<String>?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
-as StackTrace?,
+as int,
   ));
 }
 
@@ -465,7 +457,7 @@ as StackTrace?,
 
 
 class _ForbiddenException extends ApiException {
-  const _ForbiddenException({this.message = 'Forbidden access', final  List<String>? errors, this.statusCode = HttpStatus.forbidden, this.stackTrace}): _errors = errors,super._();
+  const _ForbiddenException({this.message = 'Forbidden access', final  List<String>? errors, this.statusCode = HttpStatus.forbidden}): _errors = errors,super._();
   
 
 @override@JsonKey() final  String message;
@@ -479,7 +471,6 @@ class _ForbiddenException extends ApiException {
 }
 
 @override@JsonKey() final  int statusCode;
-@override final  StackTrace? stackTrace;
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
@@ -491,12 +482,12 @@ _$ForbiddenExceptionCopyWith<_ForbiddenException> get copyWith => __$ForbiddenEx
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ForbiddenException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ForbiddenException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode,stackTrace);
+int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
 
 
@@ -507,7 +498,7 @@ abstract mixin class _$ForbiddenExceptionCopyWith<$Res> implements $ApiException
   factory _$ForbiddenExceptionCopyWith(_ForbiddenException value, $Res Function(_ForbiddenException) _then) = __$ForbiddenExceptionCopyWithImpl;
 @override @useResult
 $Res call({
- String message, List<String>? errors, int statusCode, StackTrace? stackTrace
+ String message, List<String>? errors, int statusCode
 });
 
 
@@ -524,13 +515,12 @@ class __$ForbiddenExceptionCopyWithImpl<$Res>
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,Object? stackTrace = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,}) {
   return _then(_ForbiddenException(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,errors: freezed == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
 as List<String>?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
-as StackTrace?,
+as int,
   ));
 }
 
@@ -541,7 +531,7 @@ as StackTrace?,
 
 
 class _ConflictException extends ApiException {
-  const _ConflictException({this.message = 'Conflict', final  List<String>? errors, this.statusCode = HttpStatus.conflict, this.stackTrace}): _errors = errors,super._();
+  const _ConflictException({this.message = 'Conflict', final  List<String>? errors, this.statusCode = HttpStatus.conflict}): _errors = errors,super._();
   
 
 @override@JsonKey() final  String message;
@@ -555,7 +545,6 @@ class _ConflictException extends ApiException {
 }
 
 @override@JsonKey() final  int statusCode;
-@override final  StackTrace? stackTrace;
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
@@ -567,12 +556,12 @@ _$ConflictExceptionCopyWith<_ConflictException> get copyWith => __$ConflictExcep
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ConflictException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ConflictException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode,stackTrace);
+int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
 
 
@@ -583,7 +572,7 @@ abstract mixin class _$ConflictExceptionCopyWith<$Res> implements $ApiExceptionC
   factory _$ConflictExceptionCopyWith(_ConflictException value, $Res Function(_ConflictException) _then) = __$ConflictExceptionCopyWithImpl;
 @override @useResult
 $Res call({
- String message, List<String>? errors, int statusCode, StackTrace? stackTrace
+ String message, List<String>? errors, int statusCode
 });
 
 
@@ -600,13 +589,12 @@ class __$ConflictExceptionCopyWithImpl<$Res>
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,Object? stackTrace = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,}) {
   return _then(_ConflictException(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,errors: freezed == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
 as List<String>?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
-as StackTrace?,
+as int,
   ));
 }
 
@@ -617,7 +605,7 @@ as StackTrace?,
 
 
 class _UnprocessableContentException extends ApiException {
-  const _UnprocessableContentException({this.message = 'Unprocessable Content', final  List<String>? errors, this.statusCode = HttpStatus.unprocessableEntity, this.stackTrace}): _errors = errors,super._();
+  const _UnprocessableContentException({this.message = 'Unprocessable Content', final  List<String>? errors, this.statusCode = HttpStatus.unprocessableEntity}): _errors = errors,super._();
   
 
 @override@JsonKey() final  String message;
@@ -631,8 +619,6 @@ class _UnprocessableContentException extends ApiException {
 }
 
 @override@JsonKey() final  int statusCode;
-// HttpStatus.unprocessableEntity is 422
-@override final  StackTrace? stackTrace;
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
@@ -644,12 +630,12 @@ _$UnprocessableContentExceptionCopyWith<_UnprocessableContentException> get copy
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UnprocessableContentException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UnprocessableContentException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode,stackTrace);
+int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
 
 
@@ -660,7 +646,7 @@ abstract mixin class _$UnprocessableContentExceptionCopyWith<$Res> implements $A
   factory _$UnprocessableContentExceptionCopyWith(_UnprocessableContentException value, $Res Function(_UnprocessableContentException) _then) = __$UnprocessableContentExceptionCopyWithImpl;
 @override @useResult
 $Res call({
- String message, List<String>? errors, int statusCode, StackTrace? stackTrace
+ String message, List<String>? errors, int statusCode
 });
 
 
@@ -677,13 +663,12 @@ class __$UnprocessableContentExceptionCopyWithImpl<$Res>
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,Object? stackTrace = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,}) {
   return _then(_UnprocessableContentException(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,errors: freezed == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
 as List<String>?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
-as StackTrace?,
+as int,
   ));
 }
 
@@ -694,7 +679,7 @@ as StackTrace?,
 
 
 class _InternalServerErrorException extends ApiException {
-  const _InternalServerErrorException({this.message = 'Internal server error', final  List<String>? errors, this.statusCode = HttpStatus.internalServerError, this.stackTrace}): _errors = errors,super._();
+  const _InternalServerErrorException({this.message = 'Internal server error', final  List<String>? errors, this.statusCode = HttpStatus.internalServerError}): _errors = errors,super._();
   
 
 @override@JsonKey() final  String message;
@@ -709,7 +694,6 @@ class _InternalServerErrorException extends ApiException {
 
 // Changed to nullable consistent with others
 @override@JsonKey() final  int statusCode;
-@override final  StackTrace? stackTrace;
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
@@ -721,12 +705,12 @@ _$InternalServerErrorExceptionCopyWith<_InternalServerErrorException> get copyWi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InternalServerErrorException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InternalServerErrorException&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._errors, _errors)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode,stackTrace);
+int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
 
 
@@ -737,7 +721,7 @@ abstract mixin class _$InternalServerErrorExceptionCopyWith<$Res> implements $Ap
   factory _$InternalServerErrorExceptionCopyWith(_InternalServerErrorException value, $Res Function(_InternalServerErrorException) _then) = __$InternalServerErrorExceptionCopyWithImpl;
 @override @useResult
 $Res call({
- String message, List<String>? errors, int statusCode, StackTrace? stackTrace
+ String message, List<String>? errors, int statusCode
 });
 
 
@@ -754,13 +738,12 @@ class __$InternalServerErrorExceptionCopyWithImpl<$Res>
 
 /// Create a copy of ApiException
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,Object? stackTrace = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? errors = freezed,Object? statusCode = null,}) {
   return _then(_InternalServerErrorException(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,errors: freezed == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
 as List<String>?,statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
-as int,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
-as StackTrace?,
+as int,
   ));
 }
 

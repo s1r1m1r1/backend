@@ -21,54 +21,58 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: BlocListener<LoginBloc, LoginState>(
-          listener: (context, state) {
-            if (state is LoginSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Welcome back")));
-              HomeRoute().go(context);
-            } else if (state is LoginFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Failed: ${state.error}')));
-            }
-          },
-          child: Column(
-            children: [
-              TextField(
-                controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
-              ),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              BlocBuilder<LoginBloc, LoginState>(
-                builder: (context, state) {
-                  if (state is LoginLoading) {
-                    return const CircularProgressIndicator();
-                  }
-                  return ElevatedButton(
-                    onPressed: () {
-                      BlocProvider.of<LoginBloc>(
-                        context,
-                      ).add(LoginButtonPressed(username: _usernameController.text, password: _passwordController.text));
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: BlocListener<LoginBloc, LoginState>(
+              listener: (context, state) {
+                if (state is LoginSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Welcome back")));
+                  HomeRoute().go(context);
+                } else if (state is LoginFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Failed: ${state.error}')));
+                }
+              },
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(labelText: 'Username'),
+                  ),
+                  TextField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 20),
+                  BlocBuilder<LoginBloc, LoginState>(
+                    builder: (context, state) {
+                      if (state is LoginLoading) {
+                        return const CircularProgressIndicator();
+                      }
+                      return ElevatedButton(
+                        onPressed: () {
+                          BlocProvider.of<LoginBloc>(context).add(
+                            LoginButtonPressed(username: _usernameController.text, password: _passwordController.text),
+                          );
+                        },
+                        child: const Text('Login'),
+                      );
                     },
-                    child: const Text('Login'),
-                  );
-                },
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      GoRouter.of(context).pushReplacement(SignupRoute.path);
+                      // Navigator.of(context).pushNamed('/signup');
+                    },
+                    child: const Text('Don\'t have an account? Sign Up'),
+                  ),
+                ],
               ),
-              TextButton(
-                onPressed: () {
-                  GoRouter.of(context).pushReplacement(SignupRoute.path);
-                  // Navigator.of(context).pushNamed('/signup');
-                },
-                child: const Text('Don\'t have an account? Sign Up'),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

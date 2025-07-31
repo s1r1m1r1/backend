@@ -14,7 +14,7 @@ Handler sessionMiddleware(Handler handler) {
       return Response.json(body: {'message': 'Session token must not be empty'}, statusCode: HttpStatus.unauthorized);
     }
     final sessionRepository = context.read<SessionRepository>();
-    final session = await sessionRepository.getSession(token);
+    final session = await sessionRepository.getSessionByToken(token);
     if (session == null) {
       return Response.json(body: {'message': 'Invalid or expired session token'}, statusCode: HttpStatus.unauthorized);
     }

@@ -8,7 +8,7 @@
         "**/*.g.*": true,
         "**/*.freezed.*": true,
         "**/ios/*": true,
-        "**/android/*": true,
+        "**/android/*": false,
         "**/test/*": true,
         "**/.dart_tool": true,
         "**/.dart_frog": true,
@@ -35,7 +35,8 @@
         "daos",
         "gensalt",
         "googlesignin",
-        "hashpw"
+        "hashpw",
+        "stagging"
     ],
     "cSpell.ignorePaths": [
         "vscode-extension", //

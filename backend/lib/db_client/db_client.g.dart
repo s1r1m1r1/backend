@@ -1236,6 +1236,28 @@ class $SessionTableTable extends SessionTable
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _refreshTokenMeta = const VerificationMeta(
+    'refreshToken',
+  );
+  @override
+  late final GeneratedColumn<String> refreshToken = GeneratedColumn<String>(
+    'refresh_token',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _refreshTokenExpiryMeta =
+      const VerificationMeta('refreshTokenExpiry');
+  @override
+  late final GeneratedColumn<DateTime> refreshTokenExpiry =
+      GeneratedColumn<DateTime>(
+        'refresh_token_expiry',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
   static const VerificationMeta _deletedAtMeta = const VerificationMeta(
     'deletedAt',
   );
@@ -1254,6 +1276,8 @@ class $SessionTableTable extends SessionTable
     userId,
     expiryDate,
     createdAt,
+    refreshToken,
+    refreshTokenExpiry,
     deletedAt,
   ];
   @override
@@ -1303,6 +1327,28 @@ class $SessionTableTable extends SessionTable
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('refresh_token')) {
+      context.handle(
+        _refreshTokenMeta,
+        refreshToken.isAcceptableOrUnknown(
+          data['refresh_token']!,
+          _refreshTokenMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_refreshTokenMeta);
+    }
+    if (data.containsKey('refresh_token_expiry')) {
+      context.handle(
+        _refreshTokenExpiryMeta,
+        refreshTokenExpiry.isAcceptableOrUnknown(
+          data['refresh_token_expiry']!,
+          _refreshTokenExpiryMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_refreshTokenExpiryMeta);
+    }
     if (data.containsKey('deleted_at')) {
       context.handle(
         _deletedAtMeta,
@@ -1338,6 +1384,14 @@ class $SessionTableTable extends SessionTable
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      refreshToken: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}refresh_token'],
+      )!,
+      refreshTokenExpiry: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}refresh_token_expiry'],
+      )!,
       deletedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}deleted_at'],
@@ -1357,6 +1411,8 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
   final String userId;
   final DateTime expiryDate;
   final DateTime createdAt;
+  final String refreshToken;
+  final DateTime refreshTokenExpiry;
   final DateTime? deletedAt;
   const SessionEntry({
     required this.id,
@@ -1364,6 +1420,8 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
     required this.userId,
     required this.expiryDate,
     required this.createdAt,
+    required this.refreshToken,
+    required this.refreshTokenExpiry,
     this.deletedAt,
   });
   @override
@@ -1374,6 +1432,8 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
     map['user_id'] = Variable<String>(userId);
     map['expiry_date'] = Variable<DateTime>(expiryDate);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['refresh_token'] = Variable<String>(refreshToken);
+    map['refresh_token_expiry'] = Variable<DateTime>(refreshTokenExpiry);
     if (!nullToAbsent || deletedAt != null) {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
@@ -1387,6 +1447,8 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
       userId: Value(userId),
       expiryDate: Value(expiryDate),
       createdAt: Value(createdAt),
+      refreshToken: Value(refreshToken),
+      refreshTokenExpiry: Value(refreshTokenExpiry),
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(deletedAt),
@@ -1404,6 +1466,10 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
       userId: serializer.fromJson<String>(json['userId']),
       expiryDate: serializer.fromJson<DateTime>(json['expiryDate']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      refreshToken: serializer.fromJson<String>(json['refreshToken']),
+      refreshTokenExpiry: serializer.fromJson<DateTime>(
+        json['refreshTokenExpiry'],
+      ),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
@@ -1416,6 +1482,8 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
       'userId': serializer.toJson<String>(userId),
       'expiryDate': serializer.toJson<DateTime>(expiryDate),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'refreshToken': serializer.toJson<String>(refreshToken),
+      'refreshTokenExpiry': serializer.toJson<DateTime>(refreshTokenExpiry),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
@@ -1426,6 +1494,8 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
     String? userId,
     DateTime? expiryDate,
     DateTime? createdAt,
+    String? refreshToken,
+    DateTime? refreshTokenExpiry,
     Value<DateTime?> deletedAt = const Value.absent(),
   }) => SessionEntry(
     id: id ?? this.id,
@@ -1433,6 +1503,8 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
     userId: userId ?? this.userId,
     expiryDate: expiryDate ?? this.expiryDate,
     createdAt: createdAt ?? this.createdAt,
+    refreshToken: refreshToken ?? this.refreshToken,
+    refreshTokenExpiry: refreshTokenExpiry ?? this.refreshTokenExpiry,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
   );
   SessionEntry copyWithCompanion(SessionTableCompanion data) {
@@ -1444,6 +1516,12 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
           ? data.expiryDate.value
           : this.expiryDate,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      refreshToken: data.refreshToken.present
+          ? data.refreshToken.value
+          : this.refreshToken,
+      refreshTokenExpiry: data.refreshTokenExpiry.present
+          ? data.refreshTokenExpiry.value
+          : this.refreshTokenExpiry,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
@@ -1456,14 +1534,24 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
           ..write('userId: $userId, ')
           ..write('expiryDate: $expiryDate, ')
           ..write('createdAt: $createdAt, ')
+          ..write('refreshToken: $refreshToken, ')
+          ..write('refreshTokenExpiry: $refreshTokenExpiry, ')
           ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, token, userId, expiryDate, createdAt, deletedAt);
+  int get hashCode => Object.hash(
+    id,
+    token,
+    userId,
+    expiryDate,
+    createdAt,
+    refreshToken,
+    refreshTokenExpiry,
+    deletedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1473,6 +1561,8 @@ class SessionEntry extends DataClass implements Insertable<SessionEntry> {
           other.userId == this.userId &&
           other.expiryDate == this.expiryDate &&
           other.createdAt == this.createdAt &&
+          other.refreshToken == this.refreshToken &&
+          other.refreshTokenExpiry == this.refreshTokenExpiry &&
           other.deletedAt == this.deletedAt);
 }
 
@@ -1482,6 +1572,8 @@ class SessionTableCompanion extends UpdateCompanion<SessionEntry> {
   final Value<String> userId;
   final Value<DateTime> expiryDate;
   final Value<DateTime> createdAt;
+  final Value<String> refreshToken;
+  final Value<DateTime> refreshTokenExpiry;
   final Value<DateTime?> deletedAt;
   const SessionTableCompanion({
     this.id = const Value.absent(),
@@ -1489,6 +1581,8 @@ class SessionTableCompanion extends UpdateCompanion<SessionEntry> {
     this.userId = const Value.absent(),
     this.expiryDate = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.refreshToken = const Value.absent(),
+    this.refreshTokenExpiry = const Value.absent(),
     this.deletedAt = const Value.absent(),
   });
   SessionTableCompanion.insert({
@@ -1497,17 +1591,23 @@ class SessionTableCompanion extends UpdateCompanion<SessionEntry> {
     required String userId,
     required DateTime expiryDate,
     required DateTime createdAt,
+    required String refreshToken,
+    required DateTime refreshTokenExpiry,
     this.deletedAt = const Value.absent(),
   }) : token = Value(token),
        userId = Value(userId),
        expiryDate = Value(expiryDate),
-       createdAt = Value(createdAt);
+       createdAt = Value(createdAt),
+       refreshToken = Value(refreshToken),
+       refreshTokenExpiry = Value(refreshTokenExpiry);
   static Insertable<SessionEntry> custom({
     Expression<int>? id,
     Expression<String>? token,
     Expression<String>? userId,
     Expression<DateTime>? expiryDate,
     Expression<DateTime>? createdAt,
+    Expression<String>? refreshToken,
+    Expression<DateTime>? refreshTokenExpiry,
     Expression<DateTime>? deletedAt,
   }) {
     return RawValuesInsertable({
@@ -1516,6 +1616,9 @@ class SessionTableCompanion extends UpdateCompanion<SessionEntry> {
       if (userId != null) 'user_id': userId,
       if (expiryDate != null) 'expiry_date': expiryDate,
       if (createdAt != null) 'created_at': createdAt,
+      if (refreshToken != null) 'refresh_token': refreshToken,
+      if (refreshTokenExpiry != null)
+        'refresh_token_expiry': refreshTokenExpiry,
       if (deletedAt != null) 'deleted_at': deletedAt,
     });
   }
@@ -1526,6 +1629,8 @@ class SessionTableCompanion extends UpdateCompanion<SessionEntry> {
     Value<String>? userId,
     Value<DateTime>? expiryDate,
     Value<DateTime>? createdAt,
+    Value<String>? refreshToken,
+    Value<DateTime>? refreshTokenExpiry,
     Value<DateTime?>? deletedAt,
   }) {
     return SessionTableCompanion(
@@ -1534,6 +1639,8 @@ class SessionTableCompanion extends UpdateCompanion<SessionEntry> {
       userId: userId ?? this.userId,
       expiryDate: expiryDate ?? this.expiryDate,
       createdAt: createdAt ?? this.createdAt,
+      refreshToken: refreshToken ?? this.refreshToken,
+      refreshTokenExpiry: refreshTokenExpiry ?? this.refreshTokenExpiry,
       deletedAt: deletedAt ?? this.deletedAt,
     );
   }
@@ -1556,6 +1663,14 @@ class SessionTableCompanion extends UpdateCompanion<SessionEntry> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (refreshToken.present) {
+      map['refresh_token'] = Variable<String>(refreshToken.value);
+    }
+    if (refreshTokenExpiry.present) {
+      map['refresh_token_expiry'] = Variable<DateTime>(
+        refreshTokenExpiry.value,
+      );
+    }
     if (deletedAt.present) {
       map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
@@ -1570,6 +1685,8 @@ class SessionTableCompanion extends UpdateCompanion<SessionEntry> {
           ..write('userId: $userId, ')
           ..write('expiryDate: $expiryDate, ')
           ..write('createdAt: $createdAt, ')
+          ..write('refreshToken: $refreshToken, ')
+          ..write('refreshTokenExpiry: $refreshTokenExpiry, ')
           ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
@@ -2549,6 +2666,8 @@ typedef $$SessionTableTableCreateCompanionBuilder =
       required String userId,
       required DateTime expiryDate,
       required DateTime createdAt,
+      required String refreshToken,
+      required DateTime refreshTokenExpiry,
       Value<DateTime?> deletedAt,
     });
 typedef $$SessionTableTableUpdateCompanionBuilder =
@@ -2558,6 +2677,8 @@ typedef $$SessionTableTableUpdateCompanionBuilder =
       Value<String> userId,
       Value<DateTime> expiryDate,
       Value<DateTime> createdAt,
+      Value<String> refreshToken,
+      Value<DateTime> refreshTokenExpiry,
       Value<DateTime?> deletedAt,
     });
 
@@ -2611,6 +2732,16 @@ class $$SessionTableTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get refreshToken => $composableBuilder(
+    column: $table.refreshToken,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get refreshTokenExpiry => $composableBuilder(
+    column: $table.refreshTokenExpiry,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2672,6 +2803,16 @@ class $$SessionTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get refreshToken => $composableBuilder(
+    column: $table.refreshToken,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get refreshTokenExpiry => $composableBuilder(
+    column: $table.refreshTokenExpiry,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
@@ -2723,6 +2864,16 @@ class $$SessionTableTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get refreshToken => $composableBuilder(
+    column: $table.refreshToken,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get refreshTokenExpiry => $composableBuilder(
+    column: $table.refreshTokenExpiry,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
@@ -2784,6 +2935,8 @@ class $$SessionTableTableTableManager
                 Value<String> userId = const Value.absent(),
                 Value<DateTime> expiryDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<String> refreshToken = const Value.absent(),
+                Value<DateTime> refreshTokenExpiry = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
               }) => SessionTableCompanion(
                 id: id,
@@ -2791,6 +2944,8 @@ class $$SessionTableTableTableManager
                 userId: userId,
                 expiryDate: expiryDate,
                 createdAt: createdAt,
+                refreshToken: refreshToken,
+                refreshTokenExpiry: refreshTokenExpiry,
                 deletedAt: deletedAt,
               ),
           createCompanionCallback:
@@ -2800,6 +2955,8 @@ class $$SessionTableTableTableManager
                 required String userId,
                 required DateTime expiryDate,
                 required DateTime createdAt,
+                required String refreshToken,
+                required DateTime refreshTokenExpiry,
                 Value<DateTime?> deletedAt = const Value.absent(),
               }) => SessionTableCompanion.insert(
                 id: id,
@@ -2807,6 +2964,8 @@ class $$SessionTableTableTableManager
                 userId: userId,
                 expiryDate: expiryDate,
                 createdAt: createdAt,
+                refreshToken: refreshToken,
+                refreshTokenExpiry: refreshTokenExpiry,
                 deletedAt: deletedAt,
               ),
           withReferenceMapper: (p0) => p0
