@@ -16,9 +16,9 @@ final host3 = 'localhost';
 abstract class DioModule {
   @Named('withToken')
   @lazySingleton
-  Dio dio(AuthRepository authRepository) {
+  Dio dio(AuthRepository authRepository, @Named('retryDio') Dio retryDio) {
     final dio = Dio(BaseOptions(baseUrl: HttpConst.baseUrl));
-    dio.interceptors.add(AuthInterceptor(authRepository));
+    dio.interceptors.add(AuthInterceptor(authRepository, retryDio));
     return dio;
   }
 
@@ -27,6 +27,14 @@ abstract class DioModule {
   Dio registrationDio() {
     final dio = Dio(BaseOptions(baseUrl: HttpConst.baseUrl));
     dio.interceptors.add(RegistrationInterceptor());
+    return dio;
+  }
+
+  @lazySingleton
+  @Named('retryDio')
+  Dio retryDio() {
+    final dio = Dio(BaseOptions(baseUrl: HttpConst.baseUrl));
+    // dio.interceptors.add(RetryInterceptor());
     return dio;
   }
 }

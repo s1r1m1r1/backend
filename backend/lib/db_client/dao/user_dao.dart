@@ -37,13 +37,12 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
     }
   }
 
-  Future<UserEntry> getUserByEmail(String email) async {
+  Future<UserEntry?> getUserByEmail(String email) async {
     try {
       final result = await (select(userTable)..where((t) => t.email.equals(email))).getSingle();
       return result;
     } catch (e) {
-      print('Error getting user by email: $e');
-      throw ApiException.notFound(message: 'User with email not found');
+      return null;
     }
   }
 }

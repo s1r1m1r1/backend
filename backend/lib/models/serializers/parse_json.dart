@@ -19,13 +19,11 @@ Future<Json> parseJson(Request request) async {
       throw ApiException.badRequest(
         message: 'Request body is not valid JSON.',
         errors: [e.message], // Include the decoding error message
-        stackTrace: StackTrace.current,
       );
     } on TypeError catch (e) {
       throw ApiException.badRequest(
         message: 'JSON body must be a top-level JSON object (Map).',
         errors: [e.toString()], // Include the type error
-        stackTrace: StackTrace.current,
       );
     }
   } on ApiException catch (e) {
@@ -36,9 +34,6 @@ Future<Json> parseJson(Request request) async {
   } on Object catch (e, stackTrace) {
     // Catch any other unexpected errors during body reading or initial parsing
     // This is for truly unexpected internal server issues
-    throw ApiException.internalServerError(
-      message: 'Internal server error during JSON parsing.',
-      stackTrace: stackTrace,
-    );
+    throw ApiException.internalServerError(message: 'Internal server error during JSON parsing.');
   }
 }

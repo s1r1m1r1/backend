@@ -18,10 +18,13 @@ abstract class AuthRepository {
   Stream<AuthStatus> get authStatusStream;
 
   String? getToken();
+  String? getRefreshToken();
 
   void onTokenExpired();
 
   Future<void> signup(String email, String password);
+
+  Future<bool> refreshAccessToken();
 }
 
 @LazySingleton(as: AuthRepository)
@@ -36,7 +39,9 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<void> init() async {
     try {
       final token = await _client.getKeyValue('accessToken');
+      final refreshToken = await _client.getKeyValue('refreshAccessToken');
       _tokenSubj.add(token);
+      _tokenSubj.add(refreshToken);
       _authStatusSbj.add(token != null ? AuthStatus.loggedIn : AuthStatus.loggedOut);
     } catch (e) {
       debugPrint(e.toString());
@@ -44,7 +49,8 @@ class AuthRepositoryImpl extends AuthRepository {
     // _sessionManager.addListener(_onChangeSessionStatus);
   }
 
-  final _tokenSubj = BehaviorSubject<String?>();
+  final _tokenSubj = BehaviorSubject<String?>.seeded(null);
+  final _refreshTokenSubj = BehaviorSubject<String?>.seeded(null);
 
   @override
   Stream<AuthStatus> get authStatusStream => _authStatusSbj.stream;
@@ -68,8 +74,18 @@ class AuthRepositoryImpl extends AuthRepository {
   String? getToken() => _tokenSubj.value;
 
   @override
+  String? getRefreshToken() => _refreshTokenSubj.value;
+
+  @override
   void onTokenExpired() {
     unawaited(_client.deleteKeyValue('accessToken'));
+    _tokenSubj.add(null);
+    _authStatusSbj.add(AuthStatus.loggedOut);
+  }
+
+  @override
+  void onRefreshTokenExpired() {
+    unawaited(_client.deleteKeyValue('refreshAccessToken'));
     _tokenSubj.add(null);
     _authStatusSbj.add(AuthStatus.loggedOut);
   }
@@ -78,10 +94,10 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<bool> login(String email, String password) async {
     try {
       debugPrint('login');
-      final tokens = await _api.login(RequestEmailCredentialDto(email: email, password: password));
-      await _client.saveKeyValue('accessToken', tokens.accessToken);
+      final response = await _api.login(RequestEmailCredentialDto(email: email, password: password));
       _authStatusSbj.add(AuthStatus.loggedIn);
-      _tokenSubj.add(tokens.accessToken);
+      _refreshTokenSubj.add(response.refreshToken);
+      _tokenSubj.add(response.accessToken);
       return true;
     } catch (e) {
       return false;
@@ -93,6 +109,27 @@ class AuthRepositoryImpl extends AuthRepository {
     final response = await _api.signup(RequestEmailCredentialDto(email: email, password: password));
     await _client.saveKeyValue('accessToken', response.accessToken);
     _authStatusSbj.add(AuthStatus.loggedIn);
+    _refreshTokenSubj.add(response.refreshToken);
     _tokenSubj.add(response.accessToken);
+  }
+
+  @override
+  Future<bool> refreshAccessToken() async {
+    if (_refreshTokenSubj.value == null) {
+      debugPrint('No refresh token available');
+      return false;
+    }
+    try {
+      final tokens = await _api.refresh(_refreshTokenSubj.value!);
+      await _client.saveKeyValue('accessToken', tokens.accessToken);
+      await _client.saveKeyValue('refreshAccessToken', tokens.refreshToken);
+      _refreshTokenSubj.add(tokens.refreshToken);
+      _tokenSubj.add(tokens.accessToken);
+      _authStatusSbj.add(AuthStatus.loggedIn);
+      return true;
+    } catch (e) {
+      debugPrint('Failed to refresh access token: $e');
+      return false;
+    }
   }
 }

@@ -11,7 +11,7 @@ abstract class UserDataSource {
 
   Future<User> createUser(CreateUserDto user);
 
-  Future<User> getUserByEmail(String email);
+  Future<User?> getUserByEmail(String email);
 }
 
 class UserDataSourceImpl implements UserDataSource {
@@ -27,7 +27,7 @@ class UserDataSourceImpl implements UserDataSource {
       // count rows
       return User(userId: entry.id, email: entry.email, createdAt: entry.createdAt);
     } on Object catch (e, stack) {
-      throw ApiException.internalServerError(message: 'SQLite error with ${e.runtimeType}', stackTrace: stack);
+      throw ApiException.internalServerError(message: 'SQLite error with ${e.runtimeType}');
     } finally {
       // _dao.close();
       // await _databaseConnection.close();
@@ -35,16 +35,13 @@ class UserDataSourceImpl implements UserDataSource {
   }
 
   @override
-  Future<User> getUserByEmail(String email) async {
-    try {
-      // await _databaseConnection.connect();
-      final entry = await _userDao.getUserByEmail(email);
-      return User(userId: entry.id, email: entry.email, password: entry.password, createdAt: entry.createdAt);
-    } on Object catch (e, stack) {
-      throw ApiException.internalServerError(message: 'SQLite error with ${e.runtimeType}', stackTrace: stack);
-    } finally {
-      // await _databaseConnection.close();
+  Future<User?> getUserByEmail(String email) async {
+    // await _databaseConnection.connect();
+    final entry = await _userDao.getUserByEmail(email);
+    if (entry == null) {
+      return null;
     }
+    return User(userId: entry.id, email: entry.email, password: entry.password, createdAt: entry.createdAt);
   }
 
   @override
@@ -53,8 +50,8 @@ class UserDataSourceImpl implements UserDataSource {
       // await _databaseConnection.connect();
       final entry = await _userDao.getUserById(userId);
       return User(userId: entry.id, email: entry.email, createdAt: entry.createdAt);
-    } on Object catch (e, stack) {
-      throw ApiException.notFound(message: 'not found user', stackTrace: stack);
+    } on Object catch (e) {
+      throw ApiException.notFound(message: 'not found user');
     } finally {
       // await _databaseConnection.close();
     }

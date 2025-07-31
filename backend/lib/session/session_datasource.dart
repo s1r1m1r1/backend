@@ -9,32 +9,10 @@ import '../db_client/dao/session_dao.dart';
 //--------------------------------------------------------------
 abstract class SessionDatasource {
   FutureOr<Session?> sessionFromToken(String token);
-  FutureOr<bool> saveSession(Session session);
-  FutureOr<bool> deleteSession(Session session);
-}
-
-//--------------------------------------------------------------
-class SessionMemoryDatasource implements SessionDatasource {
-  SessionMemoryDatasource();
-  final Map<String, Session> sessionDb = {};
-
-  @override
-  FutureOr<bool> saveSession(Session session) {
-    sessionDb[session.token] = session;
-    return true;
-  }
-
-  @override
-  FutureOr<Session?> sessionFromToken(String token) {
-    final s = sessionDb[token];
-    return s;
-  }
-
-  @override
-  FutureOr<bool> deleteSession(Session session) {
-    sessionDb.remove(session.token);
-    return true;
-  }
+  FutureOr<Session?> sessionFromRefreshToken(String token);
+  FutureOr<bool> insertSession(Session session);
+  FutureOr<bool> updateSession(Session session);
+  FutureOr<bool> deleteSession(String userId);
 }
 
 //--------------------------------------------------------------
@@ -43,13 +21,31 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
   final SessionDao _dao;
 
   @override
-  FutureOr<bool> saveSession(Session session) async {
+  FutureOr<bool> insertSession(Session session) async {
     await _dao.insertRow(
       SessionTableCompanion(
         token: Value(session.token),
         userId: Value(session.userId),
-        expiryDate: Value(session.expiryDate),
+        expiryDate: Value(session.tokenExpiryDate),
         createdAt: Value(session.createdAt),
+        refreshToken: Value(session.refreshToken),
+        refreshTokenExpiry: Value(session.refreshTokenExpiry),
+      ),
+    );
+    return true;
+  }
+
+  @override
+  FutureOr<bool> updateSession(Session session) async {
+    await _dao.insertRow(
+      SessionTableCompanion(
+        id: Value(session.id!),
+        token: Value(session.token),
+        userId: Value(session.userId),
+        expiryDate: Value(session.tokenExpiryDate),
+        createdAt: Value(session.createdAt),
+        refreshToken: Value(session.refreshToken),
+        refreshTokenExpiry: Value(session.refreshTokenExpiry),
       ),
     );
     return true;
@@ -63,7 +59,9 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
         createdAt: entry.createdAt,
         token: entry.token,
         userId: entry.userId,
-        expiryDate: entry.expiryDate,
+        tokenExpiryDate: entry.expiryDate,
+        refreshToken: entry.refreshToken,
+        refreshTokenExpiry: entry.refreshTokenExpiry,
       );
     } catch (_) {
       return null;
@@ -71,9 +69,22 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
   }
 
   @override
-  FutureOr<bool> deleteSession(Session session) {
-    _dao.softDeleteSessionByToken(session.token);
+  FutureOr<bool> deleteSession(String userId) {
+    _dao.softDeleteSessionByToken(userId);
     return true;
+  }
+
+  @override
+  FutureOr<Session?> sessionFromRefreshToken(String token) async {
+    final entry = await _dao.getSessionFromRefreshToken(token);
+    return Session(
+      createdAt: entry.createdAt,
+      token: entry.token,
+      userId: entry.userId,
+      tokenExpiryDate: entry.expiryDate,
+      refreshToken: entry.refreshToken,
+      refreshTokenExpiry: entry.refreshTokenExpiry,
+    );
   }
 }
 //--------------------------------------------------------------

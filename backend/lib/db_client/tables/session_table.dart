@@ -12,6 +12,10 @@ class SessionTable extends Table {
   DateTimeColumn get expiryDate => dateTime()();
 
   DateTimeColumn get createdAt => dateTime()();
+
+  TextColumn get refreshToken => text()();
+
+  DateTimeColumn get refreshTokenExpiry => dateTime()();
   //soft delete
   DateTimeColumn get deletedAt => dateTime().nullable()();
 }
