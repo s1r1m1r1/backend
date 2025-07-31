@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import '../../exceptions/new_api_exceptions.dart';
-import '../../models/create_user_dto.dart';
-import '../../models/login_user_dto.dart';
-import '../../models/user.dart';
-import '../../other/log_colors.dart';
-import '../../services/password_hash_service.dart';
-import '../datasource/user_datasource.dart';
+import '../core/new_api_exceptions.dart';
+import '../models/create_user_dto.dart';
+import '../models/login_user_dto.dart';
+import '../models/user.dart';
+import '../core/log_colors.dart';
+import 'password_hash_service.dart';
+import 'user_datasource.dart';
 
 abstract class UserRepository {
   Future<User> getUserById(String userId);

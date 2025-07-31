@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/db_client/tables/todo_table.dart';
-import 'package:backend/exceptions/new_api_exceptions.dart';
+import 'package:backend/core/new_api_exceptions.dart';
 import 'package:drift/drift.dart';
 
 part 'todo_dao.g.dart';

@@ -1,6 +1,6 @@
 import 'package:shared/shared.dart';
 
-import '../../exceptions/new_api_exceptions.dart';
+import '../../core/new_api_exceptions.dart';
 
 abstract class UpdateTodoMethod {
   static UpdateTodoDto validated(Map<String, dynamic> json) {

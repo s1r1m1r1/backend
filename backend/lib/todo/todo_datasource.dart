@@ -6,7 +6,7 @@ import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:shared/shared.dart';
 
-import '../../exceptions/new_api_exceptions.dart';
+import '../core/new_api_exceptions.dart';
 
 abstract class TodoDataSource {
   /// Returns a list of all todo items in the data source

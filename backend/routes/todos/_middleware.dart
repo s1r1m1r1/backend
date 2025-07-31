@@ -4,10 +4,9 @@ import 'package:backend/db_client/db_client.dart';
 import 'package:backend/models/user.dart';
 import 'package:backend/session/session.dart';
 import 'package:backend/session/session_repository.dart';
-import 'package:backend/todo/controller/todo_controller.dart';
-import 'package:backend/todo/datasource/todo_datasource.dart';
-import 'package:backend/todo/repository/todo_repository.dart';
-import 'package:backend/user/repository/user_repository.dart';
+import 'package:backend/todo/todo_datasource.dart';
+import 'package:backend/todo/todo_repository.dart';
+import 'package:backend/user/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 Handler middleware(Handler handler) {
@@ -42,10 +41,8 @@ RequestContext _handleAuthDependencies(RequestContext context, User user) {
   final todoDao = db.todoDao;
   final todoDs = TodoDataSourceImpl(todoDao);
   final todoRepo = TodoRepositoryImpl(todoDs, user);
-  final todoController = TodoController(todoRepo);
   late RequestContext updatedContext;
   updatedContext = context.provide<User>(() => user);
-  updatedContext = updatedContext.provide<TodoController>(() => todoController);
   updatedContext = updatedContext.provide<TodoRepository>(() => todoRepo);
   updatedContext = updatedContext.provide<TodoDataSource>(() => todoDs);
 

@@ -1,8 +1,6 @@
-import 'package:either_dart/either.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../exceptions/new_api_exceptions.dart';
-import '../failures/validation_failure.dart';
+import '../core/new_api_exceptions.dart';
 
 part 'login_user_dto.freezed.dart';
 part 'login_user_dto.g.dart';

@@ -9,7 +9,9 @@ import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 
+import 'dao/messages_dao.dart';
 import 'dao/user_dao.dart';
+import 'tables/message_table.dart';
 import 'tables/session_table.dart';
 import 'tables/user_table.dart';
 import 'package:uuid/uuid.dart';
@@ -17,8 +19,8 @@ import 'package:uuid/uuid.dart';
 part 'db_client.g.dart';
 
 @DriftDatabase(
-  tables: [ChannelTable, TodoTable, UserTable, SessionTable],
-  daos: [ChannelDao, TodoDao, UserDao, SessionDao],
+  tables: [ChannelTable, TodoTable, UserTable, SessionTable, MessageTable],
+  daos: [ChannelDao, TodoDao, UserDao, SessionDao, MessagesDao],
 )
 class DbClient extends _$DbClient {
   DbClient(super.e);
