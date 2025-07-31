@@ -1,10 +1,10 @@
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart';
 
-import '../../db_client/dao/user_dao.dart';
-import '../../exceptions/new_api_exceptions.dart';
-import '../../models/create_user_dto.dart';
-import '../../models/user.dart';
+import '../db_client/dao/user_dao.dart';
+import '../core/new_api_exceptions.dart';
+import '../models/create_user_dto.dart';
+import '../models/user.dart';
 
 abstract class UserDataSource {
   Future<User> getUserById(String userId);

@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../exceptions/new_api_exceptions.dart';
+import '../core/new_api_exceptions.dart';
 
 part 'create_user_dto.freezed.dart';
 part 'create_user_dto.g.dart';

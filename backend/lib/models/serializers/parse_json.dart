@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:backend/models/typedefs.dart';
 import 'package:dart_frog/dart_frog.dart';
 
-import '../../exceptions/new_api_exceptions.dart';
+import '../../core/new_api_exceptions.dart';
 
 Future<Json> parseJson(Request request) async {
   try {

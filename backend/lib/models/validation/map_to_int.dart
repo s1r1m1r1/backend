@@ -1,4 +1,4 @@
-import '../../exceptions/new_api_exceptions.dart';
+import '../../core/new_api_exceptions.dart';
 
 int mapToInt(String id) {
   final intId = int.tryParse(id);

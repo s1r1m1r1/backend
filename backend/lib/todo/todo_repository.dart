@@ -4,9 +4,9 @@ import 'dart:io';
 
 import 'package:shared/shared.dart';
 
-import '../../exceptions/new_api_exceptions.dart';
-import '../../models/user.dart';
-import '../datasource/todo_datasource.dart';
+import '../core/new_api_exceptions.dart';
+import '../models/user.dart';
+import 'todo_datasource.dart';
 
 abstract class TodoRepository {
   Future<List<TodoDto>> getTodos();

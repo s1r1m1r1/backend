@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:backend/exceptions/new_api_exceptions.dart';
+import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/session/hash_extension.dart';
 import 'package:backend/session/session_datasource.dart';
 
-import '../other/log_colors.dart';
+import '../core/log_colors.dart';
 import 'session.dart';
 
 abstract class SessionRepository {
