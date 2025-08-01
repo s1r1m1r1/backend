@@ -5,6 +5,7 @@ import 'package:frontend/features/ws_counter/view/page/ws_counter_page.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/view/pages/signup_screen.dart';
+import '../../features/letters/view/letters_page.dart';
 import '../../screens/home_screen.dart';
 
 part 'routes.g.dart';
@@ -52,4 +53,13 @@ class WSCounterRoute extends GoRouteData with _$WSCounterRoute {
 
   @override
   Widget build(context, state) => CounterPage();
+}
+
+@TypedGoRoute<LettersRoute>(path: LettersRoute.path)
+class LettersRoute extends GoRouteData with _$LettersRoute {
+  static const path = '/letters';
+  const LettersRoute();
+
+  @override
+  Widget build(context, state) => LettersPage();
 }

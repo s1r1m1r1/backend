@@ -9,7 +9,7 @@ class WsFromServer {
   final WsEventFromServer eventType;
 
   @JsonKey(name: 'payload')
-  final Map<String, dynamic> payload;
+  final Object? payload;
 
   WsFromServer({required this.eventType, required this.payload});
 

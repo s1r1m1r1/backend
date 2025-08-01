@@ -27,3 +27,13 @@ CounterPayload _$CounterPayloadFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$CounterPayloadToJson(CounterPayload instance) =>
     <String, dynamic>{'value': instance.value};
+
+LettersPayload _$LettersPayloadFromJson(Map<String, dynamic> json) =>
+    LettersPayload(
+      (json['letters'] as List<dynamic>).map(
+        (e) => LetterDto.fromJson(e as Map<String, dynamic>),
+      ),
+    );
+
+Map<String, dynamic> _$LettersPayloadToJson(LettersPayload instance) =>
+    <String, dynamic>{'letters': instance.letters.toList()};
