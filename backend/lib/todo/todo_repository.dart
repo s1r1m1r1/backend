@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:shared/shared.dart';
 
-import '../core/new_api_exceptions.dart';
 import '../models/user.dart';
 import 'todo_datasource.dart';
 

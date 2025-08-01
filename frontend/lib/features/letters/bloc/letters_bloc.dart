@@ -37,7 +37,6 @@ class LettersBloc extends Bloc<LettersEvent, LettersState> {
     _lettersRepository.newLetter(
       LetterDto(chatRoomId: 0, senderId: 0, content: event.message, createdAt: DateTime.now()),
     );
-    ;
   }
 
   FutureOr<void> _onCorrectLetter(LettersCorrectLetterPressed event, Emitter<LettersState> emit) {}

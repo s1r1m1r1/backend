@@ -20,7 +20,6 @@ Map<String, dynamic> _$WsToServerToJson(WsToServer instance) =>
 const _$WsEventToServerEnumMap = {
   WsEventToServer.newMessage: 'newMessage',
   WsEventToServer.deleteMessage: 'deleteMessage',
-  WsEventToServer.getMessages: 'getMessages',
   WsEventToServer.incrementCounter: 'incrementCounter',
   WsEventToServer.decrementCounter: 'decrementCounter',
 };

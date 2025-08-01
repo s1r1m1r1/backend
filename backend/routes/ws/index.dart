@@ -18,6 +18,7 @@ Future<Response> onRequest(RequestContext context) async {
         ).toJson(),
       ),
     );
+
     channel.stream.listen(
       (message) {
         if (message is! String) {
@@ -27,89 +28,28 @@ Future<Response> onRequest(RequestContext context) async {
 
         Map<String, dynamic> decoded = jsonDecode(message);
         final request = WsToServer.fromJson(decoded);
+        final command = _commandHandlers[request.eventType];
+        if (command != null) {
+          command.execute(context, channel, request.payload);
+        }
 
         switch (request.eventType) {
-          case WsEventToServer.incrementCounter:
-            context
-                .read<CounterRepository>()
-                .incrementCounter(request.payload)
-                .then((counter) {
-                  channel.sink.add(
-                    jsonEncode(
-                      WsFromServer(
-                        eventType: WsEventFromServer.counter,
-                        payload: CounterPayload(counter).toJson(),
-                      ).toJson(),
-                    ),
-                  );
-                })
-                .catchError((err) {
-                  print('Something went wrong: $err');
-                });
-          case WsEventToServer.decrementCounter:
-            context
-                .read<CounterRepository>()
-                .decrementCounter(request.payload)
-                .then((counter) {
-                  final encoded = jsonEncode(
-                    WsFromServer(
-                      eventType: WsEventFromServer.counter,
-                      payload: CounterPayload(counter).toJson(),
-                    ).toJson(),
-                  );
-                  channel.sink.add(encoded);
-                })
-                .catchError((err) {
-                  print('Something went wrong: $err');
-                });
-          case WsEventToServer.newMessage:
-            context
-                .read<LettersRepository>()
-                .createLetter(request.payload)
-                .then((message) {
-                  if (message != null) {
-                    final encoded = jsonEncode(
-                      WsFromServer(eventType: WsEventFromServer.messageCreated, payload: message.toJson()),
-                    );
-                    channel.sink.add(encoded);
-                  }
-                })
-                .catchError((err) {
-                  print('Something went wrong: $err');
-                });
-          case WsEventToServer.getMessages:
-            context
-                .read<LettersRepository>()
-                .fetchAllMessages()
-                .then((messages) {
-                  if (messages.isNotEmpty) {
-                    final encoded = jsonEncode(
-                      WsFromServer(
-                        eventType: WsEventFromServer.messages,
-                        payload: LettersPayload(messages).toJson(),
-                      ).toJson(),
-                    );
-                    channel.sink.add(encoded);
-                  }
-
-                  // final json = jsonEncode(object)
-                })
-                .catchError((err) {});
-
           case WsEventToServer.deleteMessage:
             context
                 .read<LettersRepository>()
-                .createLetter(request.payload)
+                .deleteLetter(request.payload)
                 .then((message) {
-                  if (message != null) {
-                    channel.sink.add(
-                      jsonEncode(WsFromServer(eventType: WsEventFromServer.messageCreated, payload: message.toJson())),
-                    );
-                  }
+                  // if (message != null) {
+                  //   channel.sink.add(
+                  //     jsonEncode(WsFromServer(eventType: WsEventFromServer.messageCreated, payload: message.toJson())),
+                  //   );
+                  // }
                 })
                 .catchError((err) {
                   print('Something went wrong: $err');
                 });
+            break;
+          default:
             break;
         }
       },
@@ -119,4 +59,74 @@ Future<Response> onRequest(RequestContext context) async {
     );
   });
   return handler(context);
+}
+
+// This map is defined outside the stream listener, usually at the top of the file or in a separate file.
+final _commandHandlers = <WsEventToServer, Command>{
+  WsEventToServer.incrementCounter: IncrementCounterCommand(),
+  WsEventToServer.decrementCounter: DecrementCounterCommand(),
+  WsEventToServer.newMessage: NewMessageCommand(),
+  // ... and so on
+};
+
+abstract class Command {
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload);
+}
+
+class IncrementCounterCommand implements Command {
+  @override
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+    context
+        .read<CounterRepository>()
+        .incrementCounter(payload)
+        .then((counter) {
+          channel.sink.add(
+            jsonEncode(
+              WsFromServer(eventType: WsEventFromServer.counter, payload: CounterPayload(counter).toJson()).toJson(),
+            ),
+          );
+        })
+        .catchError((err) {
+          print('Something went wrong: $err');
+        });
+  }
+}
+
+class DecrementCounterCommand implements Command {
+  @override
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+    context
+        .read<CounterRepository>()
+        .incrementCounter(payload)
+        .then((counter) {
+          channel.sink.add(
+            jsonEncode(
+              WsFromServer(eventType: WsEventFromServer.counter, payload: CounterPayload(counter).toJson()).toJson(),
+            ),
+          );
+        })
+        .catchError((err) {
+          print('Something went wrong: $err');
+        });
+  }
+}
+
+class NewMessageCommand implements Command {
+  @override
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+    context
+        .read<LettersRepository>()
+        .createLetter(payload)
+        .then((message) {
+          if (message != null) {
+            final encoded = jsonEncode(
+              WsFromServer(eventType: WsEventFromServer.messageCreated, payload: message.toJson()),
+            );
+            channel.sink.add(encoded);
+          }
+        })
+        .catchError((err) {
+          print('Something went wrong: $err');
+        });
+  }
 }

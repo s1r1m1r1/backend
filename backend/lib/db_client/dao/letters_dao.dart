@@ -22,4 +22,8 @@ class LettersDao extends DatabaseAccessor<DbClient> with _$LettersDaoMixin {
   Future<LetterEntry?> insertRow(LetterTableCompanion toCompanion) {
     return into(letterTable).insertReturningOrNull(toCompanion);
   }
+
+  Future<void> deleteLetter(int letterId) async {
+    await (delete(letterTable)..where((t) => t.id.equals(letterId))).go();
+  }
 }
