@@ -1,5 +1,4 @@
 import 'package:backend/db_client/db_client.dart';
-import 'package:backend/session/session.dart';
 import 'package:drift/drift.dart';
 
 import '../tables/session_table.dart';
