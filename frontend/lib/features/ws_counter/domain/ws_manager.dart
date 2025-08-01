@@ -30,18 +30,18 @@ class WsManager {
       final decoded = jsonDecode(rawData) as Map<String, dynamic>;
       final fromServer = WsFromServer.fromJson(decoded);
       switch (fromServer.eventType) {
-        case WsEventFromServer.messageCreated:
-          _lettersRepository.onMessage(fromServer.payload as Json);
+        case WsEventFromServer.letterCreated:
+          _lettersRepository.onLetter(fromServer.payload as Json);
           break;
         case WsEventFromServer.counter:
           _counterRepository.onCount(fromServer.payload as Json);
           break;
-        case WsEventFromServer.messages:
+        case WsEventFromServer.letters:
           break;
         case WsEventFromServer.initial:
           final payload = InitialPayload.fromJson(fromServer.payload as Json);
           _counterRepository.setCount(payload.counter);
-          _lettersRepository.setMessages(payload.letters.toList());
+          _lettersRepository.setLetters(payload.letters.toList());
       }
     });
   }
@@ -92,31 +92,55 @@ class WsCounterRepository {
 class WsLettersRepository {
   WsCallback? send;
 
-  final _messagesSubj = BehaviorSubject<List<LetterDto>>.seeded([]);
+  final _lettersSubj = BehaviorSubject<List<LetterDto>>.seeded([]);
 
-  Stream<List<LetterDto>> get letters => _messagesSubj.stream;
+  Stream<List<LetterDto>> get letters => _lettersSubj.stream;
 
-  void newLetter(LetterDto letters) {
-    send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.newMessage, payload: letters.toJson()).toJson()));
+  void newLetter(LetterDto letter) {
+    send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.newLetter, payload: letter.toJson()).toJson()));
   }
 
-  void initMessages(Json payload) {
-    final messages = (payload as List).map((i) => LetterDto.fromJson(i as Json));
-    _messagesSubj.add([...messages]);
+  void joinRoom(String roomId) {
+    send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.joinRoom, payload: {'roomId': roomId}).toJson()));
   }
 
-  void setMessages(List<LetterDto> letters) {
-    _messagesSubj.add(letters);
+  void leaveRoom(String roomId) {
+    send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.leaveRoom, payload: {'roomId': roomId}).toJson()));
   }
 
-  void onMessage(Json rawPayload) {
+  void listRooms() {
+    send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.listRooms, payload: {}).toJson()));
+  }
+
+  void sendLetterToRoom(String roomId, LetterDto letter) {
+    send?.call(
+      jsonEncode(
+        WsToServer(
+          eventType: WsEventToServer.sendLetterToRoom,
+          payload: {'roomId': roomId, 'letter': letter.toJson()},
+        ).toJson(),
+      ),
+    );
+  }
+
+  void fetchRoomHistory(String roomId) {
+    send?.call(
+      jsonEncode(WsToServer(eventType: WsEventToServer.fetchRoomHistory, payload: {'roomId': roomId}).toJson()),
+    );
+  }
+
+  void setLetters(List<LetterDto> letters) {
+    _lettersSubj.add(letters);
+  }
+
+  void onLetter(Json rawPayload) {
     final payload = LetterDto.fromJson(rawPayload);
-    setMessages(List.of(_messagesSubj.value)..add(payload));
+    setLetters(List.of(_lettersSubj.value)..add(payload));
   }
 
   @disposeMethod
   void dispose() {
     send = null;
-    _messagesSubj.close();
+    _lettersSubj.close();
   }
 }

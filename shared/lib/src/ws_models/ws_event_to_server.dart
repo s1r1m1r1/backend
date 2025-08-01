@@ -1,1 +1,13 @@
-enum WsEventToServer { newMessage, deleteMessage, incrementCounter, decrementCounter }
+enum WsEventToServer {
+  newMessage,
+  deleteMessage,
+  incrementCounter,
+  decrementCounter,
+  deleteLetter,
+  newLetter,
+  joinRoom,
+  leaveRoom,
+  listRooms,
+  sendLetterToRoom,
+  fetchRoomHistory,
+}

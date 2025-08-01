@@ -50,7 +50,7 @@ class LettersRepository {
     }
   }
 
-  Future<Iterable<LetterDto>> fetchAllMessages() async {
+  Future<Iterable<LetterDto>> fetchAllLetters() async {
     try {
       final messages = await _dao.getLetters();
 

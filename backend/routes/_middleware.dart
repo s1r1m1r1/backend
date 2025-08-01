@@ -9,9 +9,12 @@ import 'package:backend/user/user_datasource.dart';
 import 'package:backend/user/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dotenv/dotenv.dart';
+import 'package:drift/native.dart';
 
 final env = DotEnv()..load();
-final _db = DbClient(DbClient.openConnection());
+
+/// final _db = DbClient(DbClient.openConnection());
+final _db = DbClient(NativeDatabase.memory());
 final _userDatasource = UserDataSourceImpl(_db.userDao);
 const _passwordHasher = PasswordHasherService();
 final _userRepo = UserRepositoryImpl(_userDatasource, _passwordHasher);

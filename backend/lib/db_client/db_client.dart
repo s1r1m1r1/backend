@@ -49,7 +49,7 @@ class DbClient extends _$DbClient {
       // Initialize SQLite if it hasn't been done (important for some platforms)
       sqlite3.open(dbPath); // This line just ensures sqlite3 is loaded
 
-      return NativeDatabase(file);
+      return NativeDatabase(file, setup: (database) {});
     });
   }
 }

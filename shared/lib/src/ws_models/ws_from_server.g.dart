@@ -19,7 +19,7 @@ Map<String, dynamic> _$WsFromServerToJson(WsFromServer instance) =>
 
 const _$WsEventFromServerEnumMap = {
   WsEventFromServer.initial: 'initial',
-  WsEventFromServer.messageCreated: 'messageCreated',
-  WsEventFromServer.messages: 'messages',
+  WsEventFromServer.letters: 'letters',
   WsEventFromServer.counter: 'counter',
+  WsEventFromServer.letterCreated: 'letterCreated',
 };
