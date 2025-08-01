@@ -3,18 +3,16 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
-import 'package:web_socket_client/web_socket_client.dart';
+import 'package:web_socket_client/web_socket_client.dart' show ConnectionState, Connected, Reconnected;
 
-import '../../domain/ws_repository.dart';
+import '../../domain/ws_manager.dart';
 
 part 'counter_event.dart';
 part 'counter_state.dart';
 
 @injectable
 class CounterBloc extends Bloc<CounterEvent, CounterState> {
-  CounterBloc({required CounterRepository counterRepository})
-    : _counterRepository = counterRepository,
-      super(const CounterState()) {
+  CounterBloc(this._counterRepository, this._wsManager) : super(const CounterState()) {
     on<CounterStarted>(_onCounterStarted);
     on<_CounterConnectionStateChanged>(_onCounterConnectionStateChanged);
     on<_CounterCountChanged>(_onCounterCountChanged);
@@ -22,13 +20,14 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
     on<CounterDecrementPressed>(_onCounterDecrementPressed);
   }
 
-  final CounterRepository _counterRepository;
+  final WsCounterRepository _counterRepository;
+  final WsManager _wsManager;
   StreamSubscription<int>? _countSubscription;
   StreamSubscription<ConnectionState>? _connectionSubscription;
 
   void _onCounterStarted(CounterStarted event, Emitter<CounterState> emit) {
-    _countSubscription = _counterRepository.count.listen((count) => add(_CounterCountChanged(count)));
-    _connectionSubscription = _counterRepository.connection.listen((state) {
+    _countSubscription = _counterRepository.countStream.listen((count) => add(_CounterCountChanged(count)));
+    _connectionSubscription = _wsManager.connection.listen((state) {
       add(_CounterConnectionStateChanged(state));
     });
   }

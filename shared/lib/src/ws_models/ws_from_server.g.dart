@@ -8,7 +8,7 @@ part of 'ws_from_server.dart';
 
 WsFromServer _$WsFromServerFromJson(Map<String, dynamic> json) => WsFromServer(
   eventType: $enumDecode(_$WsEventFromServerEnumMap, json['event']),
-  payload: json['payload'] as Map<String, dynamic>,
+  payload: json['payload'],
 );
 
 Map<String, dynamic> _$WsFromServerToJson(WsFromServer instance) =>
@@ -18,6 +18,8 @@ Map<String, dynamic> _$WsFromServerToJson(WsFromServer instance) =>
     };
 
 const _$WsEventFromServerEnumMap = {
+  WsEventFromServer.initial: 'initial',
   WsEventFromServer.messageCreated: 'messageCreated',
+  WsEventFromServer.messages: 'messages',
   WsEventFromServer.counter: 'counter',
 };

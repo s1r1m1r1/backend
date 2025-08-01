@@ -22,12 +22,12 @@ import 'package:frontend/features/auth/view/bloc/login/login_bloc.dart'
     as _i805;
 import 'package:frontend/features/auth/view/bloc/signup/signup_bloc.dart'
     as _i917;
+import 'package:frontend/features/letters/bloc/letters_bloc.dart' as _i861;
 import 'package:frontend/features/todo/domain/todo_repository.dart' as _i739;
 import 'package:frontend/features/todo/view/bloc/todo_bloc.dart' as _i955;
 import 'package:frontend/features/user/domain/user_repository.dart' as _i935;
 import 'package:frontend/features/ws_counter/domain/ws_client.dart' as _i83;
-import 'package:frontend/features/ws_counter/domain/ws_repository.dart'
-    as _i798;
+import 'package:frontend/features/ws_counter/domain/ws_manager.dart' as _i129;
 import 'package:frontend/features/ws_counter/view/bloc/counter_bloc.dart'
     as _i545;
 import 'package:get_it/get_it.dart' as _i174;
@@ -43,8 +43,15 @@ extension GetItInjectableX on _i174.GetIt {
     final dbClientModule = _$DbClientModule();
     final dioModule = _$DioModule();
     gh.factory<_i990.UserBloc>(() => _i990.UserBloc());
-    gh.lazySingleton<_i798.CounterRepository>(() => _i798.CounterRepository());
     gh.lazySingleton<_i83.WebSocketClient>(() => _i83.WebSocketClient());
+    gh.lazySingleton<_i129.WsCounterRepository>(
+      () => _i129.WsCounterRepository(),
+      dispose: (i) => i.dispose(),
+    );
+    gh.lazySingleton<_i129.WsLettersRepository>(
+      () => _i129.WsLettersRepository(),
+      dispose: (i) => i.dispose(),
+    );
     gh.lazySingleton<_i569.DbClient>(() => dbClientModule.dbClient);
     gh.lazySingleton<_i361.Dio>(
       () => dioModule.retryDio(),
@@ -54,13 +61,29 @@ extension GetItInjectableX on _i174.GetIt {
       () => dbClientModule.memoryDbClient,
       instanceName: 'Memory',
     );
+    gh.lazySingleton<_i129.WsManager>(
+      () => _i129.WsManager(
+        gh<_i129.WsCounterRepository>(),
+        gh<_i129.WsLettersRepository>(),
+      ),
+      dispose: (i) => i.dispose(),
+    );
     gh.lazySingleton<_i361.Dio>(
       () => dioModule.registrationDio(),
       instanceName: 'registration',
     );
     gh.lazySingleton<_i935.UserRepository>(() => _i935.UserRepositoryImpl());
+    gh.factory<_i861.LettersBloc>(
+      () => _i861.LettersBloc(
+        gh<_i129.WsLettersRepository>(),
+        gh<_i129.WsManager>(),
+      ),
+    );
     gh.factory<_i545.CounterBloc>(
-      () => _i545.CounterBloc(counterRepository: gh<_i798.CounterRepository>()),
+      () => _i545.CounterBloc(
+        gh<_i129.WsCounterRepository>(),
+        gh<_i129.WsManager>(),
+      ),
     );
     gh.lazySingleton<_i436.RegistrationApiService>(
       () => _i436.RegistrationApiService(

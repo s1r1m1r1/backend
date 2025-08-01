@@ -1,6 +1,8 @@
 // lib/payloads.dart
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../shared.dart';
+
 part 'payloads.g.dart';
 
 @JsonSerializable()
@@ -31,4 +33,14 @@ class CounterPayload {
 
   factory CounterPayload.fromJson(Map<String, dynamic> json) => _$CounterPayloadFromJson(json);
   Map<String, dynamic> toJson() => _$CounterPayloadToJson(this);
+}
+
+@JsonSerializable()
+class LettersPayload {
+  final Iterable<LetterDto> letters;
+
+  LettersPayload(this.letters);
+
+  factory LettersPayload.fromJson(Map<String, dynamic> json) => _$LettersPayloadFromJson(json);
+  Map<String, dynamic> toJson() => _$LettersPayloadToJson(this);
 }
