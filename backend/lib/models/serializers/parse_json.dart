@@ -26,12 +26,12 @@ Future<Json> parseJson(Request request) async {
         errors: [e.toString()], // Include the type error
       );
     }
-  } on ApiException catch (e) {
+  } on ApiException catch (_) {
     // Catch existing ApiExceptions thrown above and re-throw them directly.
     // This ensures that the specific ApiException (e.g., 'JSON body is empty')
     // and its associated status code and message are propagated.
     rethrow;
-  } on Object catch (e, stackTrace) {
+  } on Object catch (_) {
     // Catch any other unexpected errors during body reading or initial parsing
     // This is for truly unexpected internal server issues
     throw ApiException.internalServerError(message: 'Internal server error during JSON parsing.');

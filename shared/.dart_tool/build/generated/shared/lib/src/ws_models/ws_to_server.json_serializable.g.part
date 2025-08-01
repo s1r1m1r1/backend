@@ -18,4 +18,11 @@ const _$WsEventToServerEnumMap = {
   WsEventToServer.deleteMessage: 'deleteMessage',
   WsEventToServer.incrementCounter: 'incrementCounter',
   WsEventToServer.decrementCounter: 'decrementCounter',
+  WsEventToServer.deleteLetter: 'deleteLetter',
+  WsEventToServer.newLetter: 'newLetter',
+  WsEventToServer.joinRoom: 'joinRoom',
+  WsEventToServer.leaveRoom: 'leaveRoom',
+  WsEventToServer.listRooms: 'listRooms',
+  WsEventToServer.sendLetterToRoom: 'sendLetterToRoom',
+  WsEventToServer.fetchRoomHistory: 'fetchRoomHistory',
 };
