@@ -7,14 +7,16 @@ part of 'ws_to_server.dart';
 // **************************************************************************
 
 WsToServer _$WsToServerFromJson(Map<String, dynamic> json) => WsToServer(
+  roomId: json['room'] as String,
   eventType: $enumDecode(_$WsEventToServerEnumMap, json['event']),
-  payload: json['payload'] as Map<String, dynamic>,
+  payload: json['payload'],
 );
 
 Map<String, dynamic> _$WsToServerToJson(WsToServer instance) =>
     <String, dynamic>{
       'event': _$WsEventToServerEnumMap[instance.eventType]!,
       'payload': instance.payload,
+      'room': instance.roomId,
     };
 
 const _$WsEventToServerEnumMap = {

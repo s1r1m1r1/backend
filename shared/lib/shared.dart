@@ -14,5 +14,3 @@ export 'package:shared/src/ws_models/ws_event_to_server.dart';
 export 'package:shared/src/ws_models/ws_event_from_server.dart';
 export 'package:shared/src/ws_models/ws_from_server.dart';
 export 'package:shared/src/ws_models/payloads.dart';
-
-export 'package:shared/src/payload/initial_payload.dart';

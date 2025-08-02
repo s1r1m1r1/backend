@@ -1,23 +1,20 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:backend/chat/broadcast.dart';
 import 'package:backend/chat/counter_repository.dart';
 import 'package:backend/chat/letters_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:shared/shared.dart';
 
+const defaultChatRoomId = 'general-chat';
+const defaultCounter = 'general-chat';
+
 Future<Response> onRequest(RequestContext context) async {
-  final initialLetters = await context.read<LettersRepository>().fetchAllLetters();
-  final initialCounter = context.read<CounterRepository>().counter;
   final handler = webSocketHandler((channel, protocol) {
-    channel.sink.add(
-      jsonEncode(
-        WsFromServer(
-          eventType: WsEventFromServer.initial,
-          payload: InitialPayload(initialCounter, initialLetters).toJson(),
-        ).toJson(),
-      ),
-    );
+    final broadcast = context.read<Broadcast>();
+    broadcast.subscribe(defaultChatRoomId, channel);
 
     channel.stream.listen(
       (message) {
@@ -32,40 +29,23 @@ Future<Response> onRequest(RequestContext context) async {
         if (command != null) {
           command.execute(context, channel, request.payload);
         }
-
-        switch (request.eventType) {
-          case WsEventToServer.deleteLetter:
-            context
-                .read<LettersRepository>()
-                .deleteLetter(request.payload)
-                .then((letter) {
-                  // if (letter != null) {
-                  //   channel.sink.add(
-                  //     jsonEncode(WsFromServer(eventType: WsEventFromServer.letterCreated, payload: letter.toJson())),
-                  //   );
-                  // }
-                })
-                .catchError((err) {
-                  print('Something went wrong: $err');
-                });
-            break;
-          default:
-            break;
-        }
       },
       onDone: () {
+        // _broadcast.unsubscribe(defaultChatRoomId, channel);
         channel.sink.close();
       },
     );
   });
   return handler(context);
 }
+//------------------------------------------------------------------------------------------
 
 // This map is defined outside the stream listener, usually at the top of the file or in a separate file.
-final _commandHandlers = <WsEventToServer, Command>{
+final _commandHandlers = <WsEventToServer, WsCommand>{
   WsEventToServer.incrementCounter: IncrementCounterCommand(),
   WsEventToServer.decrementCounter: DecrementCounterCommand(),
   WsEventToServer.newLetter: NewLetterCommand(),
+  WsEventToServer.deleteLetter: DeleteLetterCommand(),
   WsEventToServer.joinRoom: JoinRoomCommand(),
   WsEventToServer.leaveRoom: LeaveRoomCommand(),
   WsEventToServer.listRooms: ListRoomsCommand(),
@@ -74,11 +54,11 @@ final _commandHandlers = <WsEventToServer, Command>{
   // ... and so on
 };
 
-abstract class Command {
-  void execute(RequestContext context, WebSocketChannel channel, dynamic payload);
+abstract class WsCommand {
+  FutureOr<void> execute(RequestContext context, WebSocketChannel channel, dynamic payload);
 }
 
-class IncrementCounterCommand implements Command {
+class IncrementCounterCommand implements WsCommand {
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
     context
@@ -87,7 +67,11 @@ class IncrementCounterCommand implements Command {
         .then((counter) {
           channel.sink.add(
             jsonEncode(
-              WsFromServer(eventType: WsEventFromServer.counter, payload: CounterPayload(counter).toJson()).toJson(),
+              WsFromServer(
+                roomId: 'counter',
+                eventType: WsEventFromServer.counter,
+                payload: CounterPayload(counter).toJson(),
+              ).toJson(),
             ),
           );
         })
@@ -97,7 +81,7 @@ class IncrementCounterCommand implements Command {
   }
 }
 
-class DecrementCounterCommand implements Command {
+class DecrementCounterCommand implements WsCommand {
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
     context
@@ -106,7 +90,11 @@ class DecrementCounterCommand implements Command {
         .then((counter) {
           channel.sink.add(
             jsonEncode(
-              WsFromServer(eventType: WsEventFromServer.counter, payload: CounterPayload(counter).toJson()).toJson(),
+              WsFromServer(
+                roomId: 'counter',
+                eventType: WsEventFromServer.counter,
+                payload: CounterPayload(counter).toJson(),
+              ).toJson(),
             ),
           );
         })
@@ -116,7 +104,7 @@ class DecrementCounterCommand implements Command {
   }
 }
 
-class NewLetterCommand implements Command {
+class NewLetterCommand implements WsCommand {
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
     context
@@ -125,7 +113,7 @@ class NewLetterCommand implements Command {
         .then((letter) {
           if (letter != null) {
             final encoded = jsonEncode(
-              WsFromServer(eventType: WsEventFromServer.letterCreated, payload: letter.toJson()),
+              WsFromServer(roomId: 'letters', eventType: WsEventFromServer.letterCreated, payload: letter.toJson()),
             );
             channel.sink.add(encoded);
           }
@@ -136,16 +124,44 @@ class NewLetterCommand implements Command {
   }
 }
 
-class JoinRoomCommand implements Command {
+class DeleteLetterCommand implements WsCommand {
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
-    // Implement join room logic using chat_room table
-    // Example: context.read<ChatRoomRepository>().joinRoom(payload['roomId'], userId)
-    // Send confirmation or error back to client
+    context
+        .read<LettersRepository>()
+        .deleteLetter(payload)
+        .then((letter) {
+          // if (letter != null) {
+          //   channel.sink.add(
+          //     jsonEncode(WsFromServer(eventType: WsEventFromServer.letterCreated, payload: letter.toJson())),
+          //   );
+          // }
+        })
+        .catchError((err) {
+          print('Something went wrong: $err');
+        });
   }
 }
 
-class LeaveRoomCommand implements Command {
+class JoinRoomCommand implements WsCommand {
+  @override
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) async {
+    final broadcast = context.read<Broadcast>();
+    if (payload != String) return;
+    final topicId = payload;
+    broadcast.subscribe(topicId, channel);
+    final letters = await context.read<LettersRepository>().fetchAllLetters();
+    channel.sink.add(
+      WsFromServer(
+        roomId: topicId,
+        eventType: WsEventFromServer.joinedChannel,
+        payload: LettersPayload(letters).toJson(),
+      ).toJson(),
+    );
+  }
+}
+
+class LeaveRoomCommand implements WsCommand {
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
     // Implement leave room logic using chat_room table
@@ -154,7 +170,7 @@ class LeaveRoomCommand implements Command {
   }
 }
 
-class ListRoomsCommand implements Command {
+class ListRoomsCommand implements WsCommand {
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
     // Implement list rooms logic using chat_room table
@@ -163,7 +179,7 @@ class ListRoomsCommand implements Command {
   }
 }
 
-class SendLetterToRoomCommand implements Command {
+class SendLetterToRoomCommand implements WsCommand {
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
     // Implement send letter to room logic using letters and chat_room tables
@@ -172,9 +188,11 @@ class SendLetterToRoomCommand implements Command {
   }
 }
 
-class FetchRoomHistoryCommand implements Command {
+class FetchRoomHistoryCommand implements WsCommand {
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+    final broadcast = context.read<Broadcast>();
+
     // Implement fetch room history logic using letters and chat_room tables
     // Example: context.read<LettersRepository>().fetchRoomHistory(payload['roomId'])
     // Send history back to client

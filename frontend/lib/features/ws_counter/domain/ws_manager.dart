@@ -9,6 +9,9 @@ import 'package:shared/shared.dart';
 
 import '../../../core/typedef.dart';
 
+String _counterChannel = 'counter';
+String _lettersChannel = 'letters';
+
 @lazySingleton
 class WsManager {
   final WsCounterRepository _counterRepository;
@@ -18,6 +21,7 @@ class WsManager {
     listen();
     _counterRepository.send = send;
     _lettersRepository.send = send;
+    _ws.send(jsonEncode(WsToServer(roomId: 'letters', eventType: WsEventToServer.joinRoom, payload: null).toJson()));
   }
 
   final WebSocket _ws;
@@ -25,6 +29,7 @@ class WsManager {
   /// Send an increment message to the server.
   void send(dynamic data) => _ws.send(data);
   StreamSubscription? _wsSubscription;
+
   void listen() {
     _wsSubscription = _ws.messages.listen((rawData) {
       final decoded = jsonDecode(rawData) as Map<String, dynamic>;
@@ -38,9 +43,12 @@ class WsManager {
           break;
         case WsEventFromServer.letters:
           break;
-        case WsEventFromServer.initial:
-          final payload = InitialPayload.fromJson(fromServer.payload as Json);
-          _counterRepository.setCount(payload.counter);
+        // final payload = InitialPayload.fromJson(fromServer.payload as Json);
+        // _counterRepository.setCount(payload.counter);
+        // _lettersRepository.setLetters(payload.letters.toList());
+
+        case WsEventFromServer.joinedChannel:
+          final payload = LettersPayload.fromJson(fromServer.payload as Json);
           _lettersRepository.setLetters(payload.letters.toList());
       }
     });
@@ -65,11 +73,13 @@ class WsCounterRepository {
   WsCounterRepository();
   WsCallback? send;
 
-  void increment() =>
-      send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.incrementCounter, payload: {}).toJson()));
+  void increment() => send?.call(
+    jsonEncode(WsToServer(roomId: _counterChannel, eventType: WsEventToServer.incrementCounter, payload: {}).toJson()),
+  );
 
-  void decrement() =>
-      send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.decrementCounter, payload: {}).toJson()));
+  void decrement() => send?.call(
+    jsonEncode(WsToServer(roomId: _counterChannel, eventType: WsEventToServer.decrementCounter, payload: {}).toJson()),
+  );
 
   final _counterSubj = BehaviorSubject<int>.seeded(0);
 
@@ -97,25 +107,40 @@ class WsLettersRepository {
   Stream<List<LetterDto>> get letters => _lettersSubj.stream;
 
   void newLetter(LetterDto letter) {
-    send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.newLetter, payload: letter.toJson()).toJson()));
+    send?.call(
+      jsonEncode(
+        WsToServer(roomId: _lettersChannel, eventType: WsEventToServer.newLetter, payload: letter.toJson()).toJson(),
+      ),
+    );
   }
 
   void joinRoom(String roomId) {
-    send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.joinRoom, payload: {'roomId': roomId}).toJson()));
+    send?.call(
+      jsonEncode(
+        WsToServer(roomId: _lettersChannel, eventType: WsEventToServer.joinRoom, payload: {'roomId': roomId}).toJson(),
+      ),
+    );
   }
 
   void leaveRoom(String roomId) {
-    send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.leaveRoom, payload: {'roomId': roomId}).toJson()));
+    send?.call(
+      jsonEncode(
+        WsToServer(roomId: _lettersChannel, eventType: WsEventToServer.leaveRoom, payload: {'roomId': roomId}).toJson(),
+      ),
+    );
   }
 
   void listRooms() {
-    send?.call(jsonEncode(WsToServer(eventType: WsEventToServer.listRooms, payload: {}).toJson()));
+    send?.call(
+      jsonEncode(WsToServer(roomId: _lettersChannel, eventType: WsEventToServer.listRooms, payload: {}).toJson()),
+    );
   }
 
   void sendLetterToRoom(String roomId, LetterDto letter) {
     send?.call(
       jsonEncode(
         WsToServer(
+          roomId: _lettersChannel,
           eventType: WsEventToServer.sendLetterToRoom,
           payload: {'roomId': roomId, 'letter': letter.toJson()},
         ).toJson(),
@@ -125,7 +150,13 @@ class WsLettersRepository {
 
   void fetchRoomHistory(String roomId) {
     send?.call(
-      jsonEncode(WsToServer(eventType: WsEventToServer.fetchRoomHistory, payload: {'roomId': roomId}).toJson()),
+      jsonEncode(
+        WsToServer(
+          roomId: _lettersChannel,
+          eventType: WsEventToServer.fetchRoomHistory,
+          payload: {'roomId': roomId},
+        ).toJson(),
+      ),
     );
   }
 
