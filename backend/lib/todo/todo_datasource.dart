@@ -10,20 +10,20 @@ import '../core/new_api_exceptions.dart';
 
 abstract class TodoDataSource {
   /// Returns a list of all todo items in the data source
-  Future<List<TodoDto>> getAllTodo(String userId);
+  Future<List<TodoDto>> getAllTodo(int userId);
 
   /// Returns a todo item with the given [id] from the data source
   /// If no todo item with the given [id] exists, returns `null`
-  Future<TodoDto> getTodoById(int todoId, String userId);
+  Future<TodoDto> getTodoById({required int todoId, required int userId});
 
   /// Creates a new todo item in the data source
-  Future<TodoDto> createTodo(CreateTodoDto todo, String userId);
+  Future<TodoDto> createTodo(CreateTodoDto todo, int userId);
 
   /// Updates an existing todo item in the data source
-  Future<TodoDto> updateTodo({required int todoId, required UpdateTodoDto todo, required String userId});
+  Future<TodoDto> updateTodo({required int todoId, required UpdateTodoDto todo, required int userId});
 
   /// Deletes a todo item with the given [id] from the data source
-  Future<int> deleteTodoById(int todoId, String userId);
+  Future<int> deleteTodoById({required int todoId, required int userId});
 }
 
 class TodoDataSourceImpl implements TodoDataSource {
@@ -31,7 +31,7 @@ class TodoDataSourceImpl implements TodoDataSource {
   final TodoDao _dao;
   // final User _user;
   @override
-  Future<TodoDto> createTodo(CreateTodoDto createTodo, String userId) async {
+  Future<TodoDto> createTodo(CreateTodoDto createTodo, int userId) async {
     try {
       // _dao.doWhenOpened();
       final result = await _dao.insertTodo(
@@ -61,12 +61,12 @@ class TodoDataSourceImpl implements TodoDataSource {
   }
 
   @override
-  Future<int> deleteTodoById(int todoId, String userId) async {
-    return await _dao.deleteTodoById(todoId, userId);
+  Future<int> deleteTodoById({required int todoId, required int userId}) async {
+    return await _dao.deleteTodoById(todoId: todoId, userId: userId);
   }
 
   @override
-  Future<List<TodoDto>> getAllTodo(String userId) async {
+  Future<List<TodoDto>> getAllTodo(int userId) async {
     final result = await _dao.getAllTodo(userId);
     return result
         .map(
@@ -82,17 +82,17 @@ class TodoDataSourceImpl implements TodoDataSource {
   }
 
   @override
-  Future<TodoDto> getTodoById(int todoId, String userId) async {
+  Future<TodoDto> getTodoById({required int todoId, required int userId}) async {
     // await _databaseConnection.connect();
-    final result = await _dao.getTodoById(todoId, userId);
+    final result = await _dao.getTodoById(todoId: todoId, userId: userId);
     return TodoDto(id: result.id, title: result.title, createdAt: result.createdAt);
   }
 
   @override
-  Future<TodoDto> updateTodo({required int todoId, required UpdateTodoDto todo, required String userId}) async {
+  Future<TodoDto> updateTodo({required int todoId, required UpdateTodoDto todo, required int userId}) async {
     stdout.writeln('datasource update ${todo.id} ${todo.completed} $userId');
     // this should be in repository
-    final hasPermission = await _dao.hasPermission(todoId, userId);
+    final hasPermission = await _dao.hasPermission(todoId: todoId, userId: userId);
     if (!hasPermission) {
       throw ApiException.unauthorized(message: 'Operation denied');
     }
@@ -111,7 +111,7 @@ class TodoDataSourceImpl implements TodoDataSource {
       throw ApiException.notFound(message: 'Todo not found');
     }
 
-    final updated = await _dao.getTodoById(todoId, userId);
+    final updated = await _dao.getTodoById(todoId: todoId, userId: userId);
 
     stdout.writeln('update ok $updated');
     return TodoDto(

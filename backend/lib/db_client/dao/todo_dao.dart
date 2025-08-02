@@ -21,7 +21,7 @@ class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
     return (update(todoTable)..where((t) => t.id.equals(companion.id.value))).write(companion);
   }
 
-  Future<bool> hasPermission(int todoId, String userId) async {
+  Future<bool> hasPermission({required int todoId, required int userId}) async {
     try {
       final result = await (select(todoTable)..where((t) => t.id.equals(todoId) & t.userId.equals(userId))).getSingle();
 
@@ -35,18 +35,18 @@ class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
     }
   }
 
-  Future<int> deleteTodoById(int todoId, String userId) async {
+  Future<int> deleteTodoById({required int todoId, required int userId}) async {
     return (delete(todoTable)..where((t) => t.id.equals(todoId) & t.userId.equals(userId))).go();
   }
 
-  Future<List<TodoEntry>> getAllTodo(String userId) async {
+  Future<List<TodoEntry>> getAllTodo(int userId) async {
     return (select(todoTable)
           ..where((t) => t.userId.equals(userId))
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
 
-  Future<TodoEntry> getTodoById(int todoId, String userId) async {
+  Future<TodoEntry> getTodoById({required int todoId, required int userId}) async {
     try {
       final result = await (select(todoTable)..where((t) => t.id.equals(todoId) & t.userId.equals(userId))).getSingle();
       return result;

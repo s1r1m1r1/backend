@@ -16,7 +16,7 @@ class Session extends Equatable {
   final String token;
 
   /// The user id.
-  final String userId;
+  final int userId;
 
   /// The session expiration date.
   final DateTime tokenExpiryDate;

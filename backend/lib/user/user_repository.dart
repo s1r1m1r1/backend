@@ -10,7 +10,7 @@ import 'password_hash_service.dart';
 import 'user_datasource.dart';
 
 abstract class UserRepository {
-  Future<User> getUserById(String userId);
+  Future<User?> getUser({int? userId, String? email});
 
   Future<User> createUser(CreateUserDto createUserDto);
 
@@ -25,15 +25,15 @@ class UserRepositoryImpl extends UserRepository {
   final PasswordHasherService passwordHasherService;
 
   @override
-  Future<User> getUserById(String userId) async {
-    final result = await _datasource.getUserById(userId);
+  Future<User?> getUser({int? userId, String? email}) async {
+    final result = await _datasource.getUser(userId: userId, email: email);
     return result;
   }
 
   @override
   Future<User> createUser(CreateUserDto createUserDto) async {
     stdout.writeln('createUser - email ${createUserDto.email}');
-    final userExist = await _datasource.getUserByEmail(createUserDto.email);
+    final userExist = await _datasource.getUser(email: createUserDto.email);
 
     if (userExist != null) {
       throw ApiException.unauthorized(message: 'Email already in use');
@@ -55,7 +55,7 @@ class UserRepositoryImpl extends UserRepository {
   Future<User> loginUser(LoginUserDto loginUserDto) async {
     stdout.writeln('loginUser email ${loginUserDto.email}');
     final email = loginUserDto.email;
-    User? user = await _datasource.getUserByEmail(email);
+    User? user = await _datasource.getUser(email: email);
 
     if (user == null) {
       stdout.writeln('$reset loginUser exception not userExits $reset');

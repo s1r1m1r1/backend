@@ -8,11 +8,10 @@ import '../db_client/dao/session_dao.dart';
 
 //--------------------------------------------------------------
 abstract class SessionDatasource {
-  FutureOr<Session?> sessionFromToken(String token);
-  FutureOr<Session?> sessionFromRefreshToken(String token);
+  FutureOr<Session?> getSession({String? token, String? refreshToken, int? userId});
   FutureOr<bool> insertSession(Session session);
   FutureOr<bool> updateSession(Session session);
-  FutureOr<bool> deleteSession(String userId);
+  FutureOr<bool> deleteSession(int userId);
 }
 
 //--------------------------------------------------------------
@@ -52,31 +51,15 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
   }
 
   @override
-  FutureOr<Session?> sessionFromToken(String token) async {
-    try {
-      final entry = await _dao.getSessionFromToken(token);
-      return Session(
-        createdAt: entry.createdAt,
-        token: entry.token,
-        userId: entry.userId,
-        tokenExpiryDate: entry.expiryDate,
-        refreshToken: entry.refreshToken,
-        refreshTokenExpiry: entry.refreshTokenExpiry,
-      );
-    } catch (_) {
-      return null;
-    }
-  }
-
-  @override
-  FutureOr<bool> deleteSession(String userId) {
-    _dao.softDeleteSessionByToken(userId);
+  FutureOr<bool> deleteSession(int userId) {
+    _dao.softDeleteSessionByUserId(userId);
     return true;
   }
 
   @override
-  FutureOr<Session?> sessionFromRefreshToken(String token) async {
-    final entry = await _dao.getSessionFromRefreshToken(token);
+  FutureOr<Session?> getSession({String? token, String? refreshToken, int? userId}) async {
+    final entry = await _dao.getSession(refreshToken: refreshToken, token: token, userId: userId);
+    if (entry == null) return null;
     return Session(
       createdAt: entry.createdAt,
       token: entry.token,

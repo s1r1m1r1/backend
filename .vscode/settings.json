@@ -9,7 +9,7 @@
         "**/*.freezed.*": true,
         "**/ios/*": true,
         "**/android/*": false,
-        "**/test/*": true,
+        "**/test/*": false,
         "**/.dart_tool": true,
         "**/.dart_frog": true,
         "**/pubspec.lock": true,

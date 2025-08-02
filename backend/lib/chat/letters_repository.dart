@@ -18,7 +18,7 @@ class LettersRepository {
     try {
       final entry = await _dao.insertRow(
         LetterTableCompanion(
-          chatRoomId: Value.absentIfNull(letter.chatRoomId),
+          chatRoomId: Value(0),
           content: Value(letter.content),
           senderId: Value(letter.senderId),
           createdAt: Value(DateTime.now()),
@@ -52,7 +52,7 @@ class LettersRepository {
 
   Future<Iterable<LetterDto>> fetchAllLetters() async {
     try {
-      final messages = await _dao.getLetters();
+      final messages = await _dao.getListLetter();
 
       return messages.map(
         (i) =>
@@ -65,7 +65,7 @@ class LettersRepository {
 
   Future<Iterable<LetterDto>> fetchMessages(String chatRoomId) async {
     try {
-      final messages = await _dao.getLetters();
+      final messages = await _dao.getListLetter();
 
       return messages.map(
         (i) =>

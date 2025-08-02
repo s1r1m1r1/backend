@@ -2,8 +2,6 @@ import 'package:backend/db_client/db_client.dart';
 import 'package:backend/db_client/tables/user_table.dart';
 import 'package:drift/drift.dart';
 
-import '../../core/new_api_exceptions.dart';
-
 part 'user_dao.g.dart';
 
 @DriftAccessor(tables: [UserTable])
@@ -16,33 +14,31 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
     return into(userTable).insertReturning(companion, mode: InsertMode.insertOrFail);
   }
 
-  Future<int> updateUser(String userId, UserTableCompanion companion) async {
-    return (update(userTable)..where((t) => t.id.equals(userId))).write(companion);
+  Future<int> updateUser(int userId, UserTableCompanion companion) async {
+    final query = update(userTable);
+    query.where((t) => t.id.equals(userId));
+    return query.write(companion);
   }
 
-  Future<int> deleteUserById(String userId) async {
-    return (delete(userTable)..where((t) => t.id.equals(userId))).go();
+  Future<int> deleteUser(int userId) async {
+    final query = delete(userTable);
+    query.where((t) => t.id.equals(userId));
+    return query.go();
   }
 
-  Future<List<UserEntry>> getAllUser() async {
-    return (select(userTable)..orderBy([(t) => OrderingTerm.desc(t.createdAt)])).get();
+  Future<List<UserEntry>> getListUser() async {
+    final query = select(userTable);
+    query.orderBy([(t) => OrderingTerm.desc(t.createdAt)]);
+    return query.get();
   }
 
-  Future<UserEntry> getUserById(String userId) async {
-    try {
-      final result = await (select(userTable)..where((t) => t.id.equals(userId))).getSingle();
-      return result;
-    } catch (e) {
-      throw ApiException.notFound(message: 'User with Id not found');
-    }
-  }
-
-  Future<UserEntry?> getUserByEmail(String email) async {
-    try {
-      final result = await (select(userTable)..where((t) => t.email.equals(email))).getSingle();
-      return result;
-    } catch (e) {
+  Future<UserEntry?> getUser({int? userId, String? email}) async {
+    if (userId == null && email == null) {
       return null;
     }
+    final query = userTable.select();
+    if (userId != null) query.where((t) => t.id.equals(userId));
+    if (email != null) query.where((t) => t.email.equals(email));
+    return query.getSingleOrNull();
   }
 }

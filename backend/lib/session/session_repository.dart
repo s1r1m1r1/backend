@@ -1,21 +1,18 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/session/hash_extension.dart';
 import 'package:backend/session/session_datasource.dart';
 
-import '../core/log_colors.dart';
 import 'session.dart';
 
 abstract class SessionRepository {
-  Future<Session> createSession(String userId);
+  Future<Session> createSession(int userId);
   Future<Session> updateSession(Session session);
 
-  Future<Session?> getSessionByToken(String token);
-  Future<Session?> getSessionByRefreshToken(String token);
+  Future<Session?> getSession({String? token, String? refreshToken, int? userId});
 
-  FutureOr<void> deleteSession(String userId);
+  FutureOr<void> deleteSession(int userId);
 }
 
 class SessionRepositoryImpl implements SessionRepository {
@@ -28,7 +25,7 @@ class SessionRepositoryImpl implements SessionRepository {
   final SessionDatasource sessionDatasource;
 
   /// Creates a new session for the user with the given [userId].
-  Future<Session> createSession(String userId) async {
+  Future<Session> createSession(int userId) async {
     final now = _now();
     final token = '${userId}_${now.toIso8601String()}'.hashValue;
     final refreshToken = '${userId}_refresh_${now.toIso8601String()}'.hashValue;
@@ -48,23 +45,9 @@ class SessionRepositoryImpl implements SessionRepository {
   /// Searches and return a session by its [token].
   ///
   /// If the session is not found or is expired, returns `null`.
-  Future<Session?> getSessionByToken(String token) async {
-    final session = await sessionDatasource.sessionFromToken(token);
-
-    if (session != null && session.tokenExpiryDate.isAfter(_now())) {
-      return session;
-    }
-
-    return null;
-  }
-
-  /// Searches and return a session by its [token].
-  ///
-  /// If the session is not found or is expired, returns `null`.
   @override
-  Future<Session?> getSessionByRefreshToken(String token) async {
-    stdout.writeln('$green getSessionByRefreshToken $reset $token');
-    final session = await sessionDatasource.sessionFromRefreshToken(token);
+  Future<Session?> getSession({String? token, String? refreshToken, int? userId}) async {
+    final session = await sessionDatasource.getSession(refreshToken: refreshToken, token: token, userId: userId);
 
     if (session != null && session.refreshTokenExpiry.isAfter(_now())) {
       return session;
@@ -76,7 +59,7 @@ class SessionRepositoryImpl implements SessionRepository {
   }
 
   @override
-  FutureOr<void> deleteSession(String userId) {
+  FutureOr<void> deleteSession(int userId) {
     sessionDatasource.deleteSession(userId);
   }
 
