@@ -33,8 +33,8 @@ class ChatRoomDao extends DatabaseAccessor<DbClient> with _$ChatRoomDaoMixin {
     return (select(chatMemberTable)..where((t) => t.chatRoomId.equals(chatRoomId))).get();
   }
 
-  Future<void> insertMember(ChatMemberTableCompanion companion) {
-    return into(chatMemberTable).insert(companion);
+  Future<ChatMemberEntry?> insertMember(ChatMemberTableCompanion companion) {
+    return into(chatMemberTable).insertReturningOrNull(companion);
   }
 
   Future<void> deleteMember(int chatRoomId, int userId) {

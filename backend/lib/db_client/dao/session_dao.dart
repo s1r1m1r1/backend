@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart';
 
@@ -11,11 +13,6 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
   // of this object.
   SessionDao(super.db);
 
-  Future<SessionEntry> getByUserId(int userId) async {
-    final result = await (select(sessionTable)..where((t) => t.userId.equals(userId))).getSingle();
-    return result;
-  }
-
   Future<int> insertRow(SessionTableCompanion toCompanion) {
     return into(sessionTable).insert(toCompanion);
   }
@@ -24,20 +21,15 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
     return into(sessionTable).insert(toCompanion, mode: InsertMode.replace);
   }
 
-  Future<SessionEntry> getSessionFromToken(String token) async {
-    final result = await (select(sessionTable)..where((t) => t.token.equals(token))).getSingle();
-    return result;
-  }
-
-  Future<SessionEntry> getSessionFromRefreshToken(String refresh) async {
-    final result = await (select(sessionTable)..where((t) => t.refreshToken.equals(refresh))).getSingle();
-    return result;
-  }
-
-  void softDeleteSessionByToken(String token) {
-    (update(
-      sessionTable,
-    )..where((t) => t.token.equals(token))).write(SessionTableCompanion(deletedAt: Value(DateTime.now())));
+  FutureOr<SessionEntry?> getSession({String? token, String? refreshToken, int? userId}) async {
+    if (token == null && refreshToken == null && userId == null) {
+      return null;
+    }
+    final query = select(sessionTable);
+    if (token != null) query.where((t) => t.token.equals(token));
+    if (refreshToken != null) query.where((t) => t.refreshToken.equals(refreshToken));
+    if (userId != null) query.where((t) => t.userId.equals(userId));
+    return query.getSingleOrNull();
   }
 
   void softDeleteSessionByUserId(int userId) {

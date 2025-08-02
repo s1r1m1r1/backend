@@ -1660,11 +1660,11 @@ class $LetterTableTable extends LetterTable
   late final GeneratedColumn<int> chatRoomId = GeneratedColumn<int>(
     'chat_room_id',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.int,
-    requiredDuringInsert: false,
+    requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES chat_room_table (id)',
+      'REFERENCES chat_room_table (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _senderIdMeta = const VerificationMeta(
@@ -1732,6 +1732,8 @@ class $LetterTableTable extends LetterTable
           _chatRoomIdMeta,
         ),
       );
+    } else if (isInserting) {
+      context.missing(_chatRoomIdMeta);
     }
     if (data.containsKey('sender_id')) {
       context.handle(
@@ -1771,7 +1773,7 @@ class $LetterTableTable extends LetterTable
       chatRoomId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}chat_room_id'],
-      ),
+      )!,
       senderId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}sender_id'],
@@ -1795,13 +1797,13 @@ class $LetterTableTable extends LetterTable
 
 class LetterEntry extends DataClass implements Insertable<LetterEntry> {
   final int id;
-  final int? chatRoomId;
+  final int chatRoomId;
   final int senderId;
   final String content;
   final DateTime createdAt;
   const LetterEntry({
     required this.id,
-    this.chatRoomId,
+    required this.chatRoomId,
     required this.senderId,
     required this.content,
     required this.createdAt,
@@ -1810,9 +1812,7 @@ class LetterEntry extends DataClass implements Insertable<LetterEntry> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    if (!nullToAbsent || chatRoomId != null) {
-      map['chat_room_id'] = Variable<int>(chatRoomId);
-    }
+    map['chat_room_id'] = Variable<int>(chatRoomId);
     map['sender_id'] = Variable<int>(senderId);
     map['content'] = Variable<String>(content);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -1822,9 +1822,7 @@ class LetterEntry extends DataClass implements Insertable<LetterEntry> {
   LetterTableCompanion toCompanion(bool nullToAbsent) {
     return LetterTableCompanion(
       id: Value(id),
-      chatRoomId: chatRoomId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(chatRoomId),
+      chatRoomId: Value(chatRoomId),
       senderId: Value(senderId),
       content: Value(content),
       createdAt: Value(createdAt),
@@ -1838,7 +1836,7 @@ class LetterEntry extends DataClass implements Insertable<LetterEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LetterEntry(
       id: serializer.fromJson<int>(json['id']),
-      chatRoomId: serializer.fromJson<int?>(json['chatRoomId']),
+      chatRoomId: serializer.fromJson<int>(json['chatRoomId']),
       senderId: serializer.fromJson<int>(json['senderId']),
       content: serializer.fromJson<String>(json['content']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1849,7 +1847,7 @@ class LetterEntry extends DataClass implements Insertable<LetterEntry> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'chatRoomId': serializer.toJson<int?>(chatRoomId),
+      'chatRoomId': serializer.toJson<int>(chatRoomId),
       'senderId': serializer.toJson<int>(senderId),
       'content': serializer.toJson<String>(content),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -1858,13 +1856,13 @@ class LetterEntry extends DataClass implements Insertable<LetterEntry> {
 
   LetterEntry copyWith({
     int? id,
-    Value<int?> chatRoomId = const Value.absent(),
+    int? chatRoomId,
     int? senderId,
     String? content,
     DateTime? createdAt,
   }) => LetterEntry(
     id: id ?? this.id,
-    chatRoomId: chatRoomId.present ? chatRoomId.value : this.chatRoomId,
+    chatRoomId: chatRoomId ?? this.chatRoomId,
     senderId: senderId ?? this.senderId,
     content: content ?? this.content,
     createdAt: createdAt ?? this.createdAt,
@@ -1908,7 +1906,7 @@ class LetterEntry extends DataClass implements Insertable<LetterEntry> {
 
 class LetterTableCompanion extends UpdateCompanion<LetterEntry> {
   final Value<int> id;
-  final Value<int?> chatRoomId;
+  final Value<int> chatRoomId;
   final Value<int> senderId;
   final Value<String> content;
   final Value<DateTime> createdAt;
@@ -1921,11 +1919,12 @@ class LetterTableCompanion extends UpdateCompanion<LetterEntry> {
   });
   LetterTableCompanion.insert({
     this.id = const Value.absent(),
-    this.chatRoomId = const Value.absent(),
+    required int chatRoomId,
     required int senderId,
     required String content,
     this.createdAt = const Value.absent(),
-  }) : senderId = Value(senderId),
+  }) : chatRoomId = Value(chatRoomId),
+       senderId = Value(senderId),
        content = Value(content);
   static Insertable<LetterEntry> custom({
     Expression<int>? id,
@@ -1945,7 +1944,7 @@ class LetterTableCompanion extends UpdateCompanion<LetterEntry> {
 
   LetterTableCompanion copyWith({
     Value<int>? id,
-    Value<int?>? chatRoomId,
+    Value<int>? chatRoomId,
     Value<int>? senderId,
     Value<String>? content,
     Value<DateTime>? createdAt,
@@ -2010,7 +2009,7 @@ class $ChatMemberTableTable extends ChatMemberTable
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES chat_room_table (id) ON UPDATE CASCADE ON DELETE CASCADE',
+      'REFERENCES chat_room_table (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
@@ -2022,7 +2021,7 @@ class $ChatMemberTableTable extends ChatMemberTable
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES user_table (id) ON UPDATE CASCADE ON DELETE CASCADE',
+      'REFERENCES user_table (id) ON DELETE CASCADE',
     ),
   );
   @override
@@ -2254,18 +2253,11 @@ abstract class _$DbClient extends GeneratedDatabase {
         'chat_room_table',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('chat_member_table', kind: UpdateKind.delete)],
+      result: [TableUpdate('letter_table', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'chat_room_table',
-        limitUpdateKind: UpdateKind.update,
-      ),
-      result: [TableUpdate('chat_member_table', kind: UpdateKind.update)],
-    ),
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'user_table',
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('chat_member_table', kind: UpdateKind.delete)],
@@ -2273,9 +2265,9 @@ abstract class _$DbClient extends GeneratedDatabase {
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'user_table',
-        limitUpdateKind: UpdateKind.update,
+        limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('chat_member_table', kind: UpdateKind.update)],
+      result: [TableUpdate('chat_member_table', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -3890,7 +3882,7 @@ typedef $$ChatRoomTableTableProcessedTableManager =
 typedef $$LetterTableTableCreateCompanionBuilder =
     LetterTableCompanion Function({
       Value<int> id,
-      Value<int?> chatRoomId,
+      required int chatRoomId,
       required int senderId,
       required String content,
       Value<DateTime> createdAt,
@@ -3898,7 +3890,7 @@ typedef $$LetterTableTableCreateCompanionBuilder =
 typedef $$LetterTableTableUpdateCompanionBuilder =
     LetterTableCompanion Function({
       Value<int> id,
-      Value<int?> chatRoomId,
+      Value<int> chatRoomId,
       Value<int> senderId,
       Value<String> content,
       Value<DateTime> createdAt,
@@ -3913,9 +3905,9 @@ final class $$LetterTableTableReferences
         $_aliasNameGenerator(db.letterTable.chatRoomId, db.chatRoomTable.id),
       );
 
-  $$ChatRoomTableTableProcessedTableManager? get chatRoomId {
-    final $_column = $_itemColumn<int>('chat_room_id');
-    if ($_column == null) return null;
+  $$ChatRoomTableTableProcessedTableManager get chatRoomId {
+    final $_column = $_itemColumn<int>('chat_room_id')!;
+
     final manager = $$ChatRoomTableTableTableManager(
       $_db,
       $_db.chatRoomTable,
@@ -4108,7 +4100,7 @@ class $$LetterTableTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<int?> chatRoomId = const Value.absent(),
+                Value<int> chatRoomId = const Value.absent(),
                 Value<int> senderId = const Value.absent(),
                 Value<String> content = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -4122,7 +4114,7 @@ class $$LetterTableTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<int?> chatRoomId = const Value.absent(),
+                required int chatRoomId,
                 required int senderId,
                 required String content,
                 Value<DateTime> createdAt = const Value.absent(),

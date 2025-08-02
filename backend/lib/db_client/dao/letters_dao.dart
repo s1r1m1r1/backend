@@ -13,12 +13,12 @@ class LettersDao extends DatabaseAccessor<DbClient> with _$LettersDaoMixin {
   // of this object.
   LettersDao(super.db);
 
-  Future<List<LetterEntry>> getLetters() {
-    return select(letterTable).get();
-  }
-
-  Future<List<LetterEntry>> getLettersByChannel(int chatRoomId) {
-    return (select(letterTable)..where((t) => t.chatRoomId.equals(chatRoomId))).get();
+  Future<List<LetterEntry>> getListLetter({int? chatRoomId}) {
+    final query = select(letterTable);
+    if (chatRoomId != null) {
+      query.where((t) => t.chatRoomId.equals(chatRoomId));
+    }
+    return query.get();
   }
 
   Future<LetterEntry?> insertRow(LetterTableCompanion toCompanion) {
@@ -30,5 +30,9 @@ class LettersDao extends DatabaseAccessor<DbClient> with _$LettersDaoMixin {
 
   Future<void> deleteLetter(int letterId) async {
     await (delete(letterTable)..where((t) => t.id.equals(letterId))).go();
+  }
+
+  Future<void> deleteLettersByChannel(int chatRoomId) async {
+    await (delete(letterTable)..where((t) => t.chatRoomId.equals(chatRoomId))).go();
   }
 }

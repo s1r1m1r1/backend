@@ -52,7 +52,7 @@ class LettersRepository {
 
   Future<Iterable<LetterDto>> fetchAllLetters() async {
     try {
-      final messages = await _dao.getLetters();
+      final messages = await _dao.getListLetter();
 
       return messages.map(
         (i) =>
@@ -65,7 +65,7 @@ class LettersRepository {
 
   Future<Iterable<LetterDto>> fetchMessages(String chatRoomId) async {
     try {
-      final messages = await _dao.getLetters();
+      final messages = await _dao.getListLetter();
 
       return messages.map(
         (i) =>

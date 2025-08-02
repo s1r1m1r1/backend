@@ -23,12 +23,16 @@ Handler sessionTodoMiddleware(Handler handler) {
       return Response.json(body: {'message': 'Session token must not be empty'}, statusCode: HttpStatus.unauthorized);
     }
     final sessionRepository = context.read<SessionRepository>();
-    final session = await sessionRepository.getSessionByToken(token);
+    final session = await sessionRepository.getSession(token: token);
     if (session == null) {
       stdout.writeln("session is null");
       return Response.json(body: {'message': 'Invalid or expired session token'}, statusCode: HttpStatus.unauthorized);
     }
-    final user = await context.read<UserRepository>().getUserById(session.userId);
+    final user = await context.read<UserRepository>().getUser(userId: session.userId);
+    if (user == null) {
+      stdout.writeln("user is null");
+      return Response.json(body: {'message': 'User not found'}, statusCode: HttpStatus.unauthorized);
+    }
     // Attach userId to context for downstream handlers
     var updatedContext = context.provide<Session>(() => session);
     updatedContext = _handleAuthDependencies(context, user);
