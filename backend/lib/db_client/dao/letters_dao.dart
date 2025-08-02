@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 
 import '../db_client.dart';
@@ -20,7 +22,10 @@ class LettersDao extends DatabaseAccessor<DbClient> with _$LettersDaoMixin {
   }
 
   Future<LetterEntry?> insertRow(LetterTableCompanion toCompanion) {
-    return into(letterTable).insertReturningOrNull(toCompanion);
+    return into(letterTable).insertReturningOrNull(toCompanion).onError((err, stack) {
+      stdout.writeln('Error inserting letter: $err,\n\n stack:$stack');
+      return null;
+    });
   }
 
   Future<void> deleteLetter(int letterId) async {

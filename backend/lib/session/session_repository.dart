@@ -9,13 +9,13 @@ import '../core/log_colors.dart';
 import 'session.dart';
 
 abstract class SessionRepository {
-  Future<Session> createSession(String userId);
+  Future<Session> createSession(int userId);
   Future<Session> updateSession(Session session);
 
   Future<Session?> getSessionByToken(String token);
   Future<Session?> getSessionByRefreshToken(String token);
 
-  FutureOr<void> deleteSession(String userId);
+  FutureOr<void> deleteSession(int userId);
 }
 
 class SessionRepositoryImpl implements SessionRepository {
@@ -28,7 +28,7 @@ class SessionRepositoryImpl implements SessionRepository {
   final SessionDatasource sessionDatasource;
 
   /// Creates a new session for the user with the given [userId].
-  Future<Session> createSession(String userId) async {
+  Future<Session> createSession(int userId) async {
     final now = _now();
     final token = '${userId}_${now.toIso8601String()}'.hashValue;
     final refreshToken = '${userId}_refresh_${now.toIso8601String()}'.hashValue;
@@ -76,7 +76,7 @@ class SessionRepositoryImpl implements SessionRepository {
   }
 
   @override
-  FutureOr<void> deleteSession(String userId) {
+  FutureOr<void> deleteSession(int userId) {
     sessionDatasource.deleteSession(userId);
   }
 

@@ -7,7 +7,7 @@ import '../models/create_user_dto.dart';
 import '../models/user.dart';
 
 abstract class UserDataSource {
-  Future<User> getUserById(String userId);
+  Future<User> getUserById(int userId);
 
   Future<User> createUser(CreateUserDto user);
 
@@ -45,7 +45,7 @@ class UserDataSourceImpl implements UserDataSource {
   }
 
   @override
-  Future<User> getUserById(String userId) async {
+  Future<User> getUserById(int userId) async {
     try {
       // await _databaseConnection.connect();
       final entry = await _userDao.getUserById(userId);

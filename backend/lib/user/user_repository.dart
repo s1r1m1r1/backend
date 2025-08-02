@@ -10,7 +10,7 @@ import 'password_hash_service.dart';
 import 'user_datasource.dart';
 
 abstract class UserRepository {
-  Future<User> getUserById(String userId);
+  Future<User> getUserById(int userId);
 
   Future<User> createUser(CreateUserDto createUserDto);
 
@@ -25,7 +25,7 @@ class UserRepositoryImpl extends UserRepository {
   final PasswordHasherService passwordHasherService;
 
   @override
-  Future<User> getUserById(String userId) async {
+  Future<User> getUserById(int userId) async {
     final result = await _datasource.getUserById(userId);
     return result;
   }

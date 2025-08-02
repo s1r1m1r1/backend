@@ -12,7 +12,7 @@ abstract class SessionDatasource {
   FutureOr<Session?> sessionFromRefreshToken(String token);
   FutureOr<bool> insertSession(Session session);
   FutureOr<bool> updateSession(Session session);
-  FutureOr<bool> deleteSession(String userId);
+  FutureOr<bool> deleteSession(int userId);
 }
 
 //--------------------------------------------------------------
@@ -69,8 +69,8 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
   }
 
   @override
-  FutureOr<bool> deleteSession(String userId) {
-    _dao.softDeleteSessionByToken(userId);
+  FutureOr<bool> deleteSession(int userId) {
+    _dao.softDeleteSessionByUserId(userId);
     return true;
   }
 

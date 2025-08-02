@@ -8,7 +8,7 @@ part 'user.g.dart';
 abstract class User with _$User {
   const User._();
   const factory User({
-    required String userId,
+    required int userId,
     required String email,
     @DateTimeConverter() required DateTime createdAt,
     @Default('') String password,
@@ -20,7 +20,7 @@ abstract class User with _$User {
 @Freezed(fromJson: true, toJson: true, equal: false)
 abstract class UserDto with _$UserDto {
   const UserDto._();
-  const factory UserDto({required String userId, required String email}) = _UserDto;
+  const factory UserDto({required int userId, required String email}) = _UserDto;
 
   factory UserDto.fromJson(Map<String, dynamic> json) => _$UserDtoFromJson(json);
 

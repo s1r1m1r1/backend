@@ -1,5 +1,5 @@
 import 'package:backend/chat/counter_repository.dart';
-import 'package:backend/chat/message_repository.dart';
+import 'package:backend/chat/letters_repository.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/services/jwt_service.dart';
 import 'package:backend/user/password_hash_service.dart';

@@ -18,7 +18,7 @@ class LettersRepository {
     try {
       final entry = await _dao.insertRow(
         LetterTableCompanion(
-          chatRoomId: Value.absentIfNull(letter.chatRoomId),
+          chatRoomId: Value(0),
           content: Value(letter.content),
           senderId: Value(letter.senderId),
           createdAt: Value(DateTime.now()),

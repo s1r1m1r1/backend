@@ -16,11 +16,11 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
     return into(userTable).insertReturning(companion, mode: InsertMode.insertOrFail);
   }
 
-  Future<int> updateUser(String userId, UserTableCompanion companion) async {
+  Future<int> updateUser(int userId, UserTableCompanion companion) async {
     return (update(userTable)..where((t) => t.id.equals(userId))).write(companion);
   }
 
-  Future<int> deleteUserById(String userId) async {
+  Future<int> deleteUserById(int userId) async {
     return (delete(userTable)..where((t) => t.id.equals(userId))).go();
   }
 
@@ -28,7 +28,7 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
     return (select(userTable)..orderBy([(t) => OrderingTerm.desc(t.createdAt)])).get();
   }
 
-  Future<UserEntry> getUserById(String userId) async {
+  Future<UserEntry> getUserById(int userId) async {
     try {
       final result = await (select(userTable)..where((t) => t.id.equals(userId))).getSingle();
       return result;

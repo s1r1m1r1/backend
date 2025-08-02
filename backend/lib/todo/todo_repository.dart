@@ -34,12 +34,12 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<int> deleteTodo(int todoId) async {
     // final result = await getTodoById(todoId);
-    return _datasource.deleteTodoById(todoId, user.userId);
+    return _datasource.deleteTodoById(todoId: todoId, userId: user.userId);
   }
 
   @override
   FutureOr<TodoDto> getTodoById(int todoId) async {
-    final res = await _datasource.getTodoById(todoId, user.userId);
+    final res = await _datasource.getTodoById(todoId: todoId, userId: user.userId);
     return res;
   }
 
