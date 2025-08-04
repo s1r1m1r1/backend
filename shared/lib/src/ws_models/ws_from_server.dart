@@ -11,7 +11,10 @@ class WsFromServer {
   @JsonKey(name: 'payload')
   final Object? payload;
 
-  WsFromServer({required this.eventType, required this.payload});
+  @JsonKey(name: 'room')
+  final String roomId;
+
+  WsFromServer({required this.roomId, required this.eventType, required this.payload});
 
   factory WsFromServer.fromJson(Map<String, dynamic> json) => _$WsFromServerFromJson(json);
   Map<String, dynamic> toJson() => _$WsFromServerToJson(this);

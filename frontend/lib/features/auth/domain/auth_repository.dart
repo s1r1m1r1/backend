@@ -6,8 +6,12 @@ import 'package:frontend/db/db_client.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../app/logger/log_colors.dart';
 import '../data/request_email_credential_dto.dart';
 import 'auth_status.dart';
+
+const _tokenKey = '__tokenK__';
+const _refreshTokenK = '__refreshTokenK__';
 
 abstract class AuthRepository {
   Future<void> init();
@@ -38,10 +42,11 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<void> init() async {
     try {
-      final token = await _client.getKeyValue('accessToken');
-      final refreshToken = await _client.getKeyValue('refreshAccessToken');
+      final token = await _client.getKeyValue(_tokenKey);
+      final refreshToken = await _client.getKeyValue(_refreshTokenK);
+      debugPrint('$green LOADED token: $token ,refresh: $refreshToken $reset');
       _tokenSubj.add(token);
-      _tokenSubj.add(refreshToken);
+      _refreshTokenSubj.add(refreshToken);
       _authStatusSbj.add(token != null ? AuthStatus.loggedIn : AuthStatus.loggedOut);
     } catch (e) {
       debugPrint(e.toString());
@@ -78,14 +83,15 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   void onTokenExpired() {
-    unawaited(_client.deleteKeyValue('accessToken'));
+    debugPrint('$red onTokenExpired $reset');
+    unawaited(_client.deleteKeyValue(_tokenKey));
     _tokenSubj.add(null);
     _authStatusSbj.add(AuthStatus.loggedOut);
   }
 
   @override
   void onRefreshTokenExpired() {
-    unawaited(_client.deleteKeyValue('refreshAccessToken'));
+    unawaited(_client.deleteKeyValue(_refreshTokenK));
     _tokenSubj.add(null);
     _authStatusSbj.add(AuthStatus.loggedOut);
   }
@@ -107,7 +113,8 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<void> signup(String email, String password) async {
     final response = await _api.signup(RequestEmailCredentialDto(email: email, password: password));
-    await _client.saveKeyValue('accessToken', response.accessToken);
+    await _client.saveKeyValue(_tokenKey, response.accessToken);
+    await _client.saveKeyValue(_refreshTokenK, response.refreshToken);
     _authStatusSbj.add(AuthStatus.loggedIn);
     _refreshTokenSubj.add(response.refreshToken);
     _tokenSubj.add(response.accessToken);
@@ -121,8 +128,8 @@ class AuthRepositoryImpl extends AuthRepository {
     }
     try {
       final tokens = await _api.refresh(_refreshTokenSubj.value!);
-      await _client.saveKeyValue('accessToken', tokens.accessToken);
-      await _client.saveKeyValue('refreshAccessToken', tokens.refreshToken);
+      await _client.saveKeyValue(_tokenKey, tokens.accessToken);
+      await _client.saveKeyValue(_refreshTokenK, tokens.refreshToken);
       _refreshTokenSubj.add(tokens.refreshToken);
       _tokenSubj.add(tokens.accessToken);
       _authStatusSbj.add(AuthStatus.loggedIn);

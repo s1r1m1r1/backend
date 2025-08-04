@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:backend/core/log_colors.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/session/session.dart';
 import 'package:drift/drift.dart' show Value;
@@ -59,7 +61,11 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
   @override
   FutureOr<Session?> getSession({String? token, String? refreshToken, int? userId}) async {
     final entry = await _dao.getSession(refreshToken: refreshToken, token: token, userId: userId);
-    if (entry == null) return null;
+    if (entry == null) {
+      stdout.writeln('$red getSession: entry is null $reset');
+      return null;
+    }
+    ;
     return Session(
       createdAt: entry.createdAt,
       token: entry.token,

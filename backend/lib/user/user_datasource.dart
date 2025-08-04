@@ -1,4 +1,7 @@
-import 'package:backend/db_client/db_client.dart';
+import 'dart:io';
+
+import 'package:backend/core/log_colors.dart';
+import 'package:backend/db_client/db_client.dart' show UserTableCompanion;
 import 'package:drift/drift.dart';
 
 import '../db_client/dao/user_dao.dart';
@@ -18,12 +21,13 @@ class UserDataSourceImpl implements UserDataSource {
   final UserDao _userDao;
   Future<User> createUser(CreateUserDto user) async {
     try {
+      stdout.writeln('$magenta createUser email ${user.email} p: ${user.password} $reset');
       // await _databaseConnection.connect();
       final entry = await _userDao.insert(
         UserTableCompanion(email: Value(user.email), password: Value(user.password), createdAt: Value(DateTime.now())),
       );
       // count rows
-      return User(userId: entry.id, email: entry.email, createdAt: entry.createdAt);
+      return User(userId: entry.id, email: entry.email, createdAt: entry.createdAt, role: entry.role);
     } on Object catch (e, stack) {
       throw ApiException.internalServerError(message: 'SQLite error with ${e.runtimeType}');
     } finally {
@@ -37,6 +41,6 @@ class UserDataSourceImpl implements UserDataSource {
     // await _databaseConnection.connect();
     final entry = await _userDao.getUser(userId: userId, email: email);
     if (entry == null) return null;
-    return User(userId: entry.id, email: entry.email, createdAt: entry.createdAt);
+    return User(userId: entry.id, email: entry.email, createdAt: entry.createdAt, role: entry.role);
   }
 }

@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart';
 
+import '../../core/log_colors.dart';
 import '../tables/session_table.dart';
 
 part 'session_dao.g.dart';
@@ -23,8 +25,11 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
 
   FutureOr<SessionEntry?> getSession({String? token, String? refreshToken, int? userId}) async {
     if (token == null && refreshToken == null && userId == null) {
+      stdout.writeln('$red getSession: token, refreshToken, userId are null $reset');
       return null;
     }
+
+    stdout.writeln('$red getSession: token: $token, refreshToken: $refreshToken, userId: userId  $reset');
     final query = select(sessionTable);
     if (token != null) query.where((t) => t.token.equals(token));
     if (refreshToken != null) query.where((t) => t.refreshToken.equals(refreshToken));

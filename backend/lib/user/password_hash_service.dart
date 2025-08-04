@@ -1,13 +1,22 @@
+import 'package:backend/core/new_api_exceptions.dart';
 import 'package:bcrypt/bcrypt.dart';
 
 class PasswordHasherService {
   const PasswordHasherService();
 
   String hashPassword(String password) {
-    return BCrypt.hashpw(password, BCrypt.gensalt());
+    try {
+      return BCrypt.hashpw(password, BCrypt.gensalt());
+    } catch (e) {
+      throw ApiException.internalServerError(message: 'hashing password failed');
+    }
   }
 
   bool checkPassword({required String password, required String hashedPassword}) {
-    return BCrypt.checkpw(password, hashedPassword);
+    try {
+      return BCrypt.checkpw(password, hashedPassword);
+    } catch (e) {
+      throw ApiException.internalServerError(message: 'check failed');
+    }
   }
 }

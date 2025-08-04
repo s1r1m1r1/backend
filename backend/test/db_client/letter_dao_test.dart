@@ -1,5 +1,6 @@
 import 'package:backend/db_client/dao/letters_dao.dart';
 import 'package:backend/db_client/db_client.dart';
+import 'package:backend/models/enums.dart';
 import 'package:drift/native.dart';
 import 'package:test/test.dart';
 
@@ -27,12 +28,12 @@ void main() {
 
   test('insertRow inserts and returns the letter', () async {
     final user = await db.userDao.insert(UserTableCompanion.insert(email: 'name@name.net', password: '123'));
-    final room = await db.chatRoomDao.insertRoom(ChatRoomTableCompanion.insert(name: 'Test Room'));
+    final room = await db.roomDao.insertRoom(RoomTableCompanion.insert(name: 'Test Room', type: RoomType.chat));
     if (room == null) {
       fail('Failed to create user or chat room');
     }
-    final userInRoom = await db.chatRoomDao.insertMember(
-      ChatMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id),
+    final userInRoom = await db.roomDao.insertMember(
+      RoomMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id),
     );
     if (userInRoom == null) {
       fail('Failed to add user to chat room');
@@ -44,12 +45,12 @@ void main() {
 
   test('getLetters returns all inserted letters', () async {
     final user = await db.userDao.insert(UserTableCompanion.insert(email: 'name@name.net', password: '123'));
-    final room = await db.chatRoomDao.insertRoom(ChatRoomTableCompanion.insert(name: 'Test Room'));
+    final room = await db.roomDao.insertRoom(RoomTableCompanion.insert(name: 'Test Room', type: RoomType.chat));
     if (room == null) {
       fail('Failed to create user or chat room');
     }
-    final userInRoom = await db.chatRoomDao.insertMember(
-      ChatMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id),
+    final userInRoom = await db.roomDao.insertMember(
+      RoomMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id),
     );
     if (userInRoom == null) {
       fail('Failed to add user to chat room');
@@ -63,16 +64,16 @@ void main() {
 
   test('getLettersByChannel returns only letters for the given channel', () async {
     final user = await db.userDao.insert(UserTableCompanion.insert(email: 'name@name.net', password: '123'));
-    final room1 = await db.chatRoomDao.insertRoom(ChatRoomTableCompanion.insert(name: 'Test Room 1'));
-    final room2 = await db.chatRoomDao.insertRoom(ChatRoomTableCompanion.insert(name: 'Test Room 2'));
+    final room1 = await db.roomDao.insertRoom(RoomTableCompanion.insert(name: 'Test Room 1', type: RoomType.chat));
+    final room2 = await db.roomDao.insertRoom(RoomTableCompanion.insert(name: 'Test Room 2', type: RoomType.chat));
     if (room1 == null || room2 == null) {
       fail('Failed to create user or chat room');
     }
-    final userInRoom1 = await db.chatRoomDao.insertMember(
-      ChatMemberTableCompanion.insert(chatRoomId: room1.id, userId: user.id),
+    final userInRoom1 = await db.roomDao.insertMember(
+      RoomMemberTableCompanion.insert(chatRoomId: room1.id, userId: user.id),
     );
-    final userInRoom2 = await db.chatRoomDao.insertMember(
-      ChatMemberTableCompanion.insert(chatRoomId: room2.id, userId: user.id),
+    final userInRoom2 = await db.roomDao.insertMember(
+      RoomMemberTableCompanion.insert(chatRoomId: room2.id, userId: user.id),
     );
     if (userInRoom1 == null || userInRoom2 == null) {
       fail('Failed to add user to chat room');
@@ -86,12 +87,12 @@ void main() {
 
   test('deleteLetter removes the letter with the given id', () async {
     final user = await db.userDao.insert(UserTableCompanion.insert(email: 'name@name.net', password: '123'));
-    final room = await db.chatRoomDao.insertRoom(ChatRoomTableCompanion.insert(name: 'Test Room'));
+    final room = await db.roomDao.insertRoom(RoomTableCompanion.insert(name: 'Test Room', type: RoomType.chat));
     if (room == null) {
       fail('Failed to create user or chat room');
     }
-    final userInRoom = await db.chatRoomDao.insertMember(
-      ChatMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id),
+    final userInRoom = await db.roomDao.insertMember(
+      RoomMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id),
     );
     if (userInRoom == null) {
       fail('Failed to add user to chat room');
@@ -107,16 +108,16 @@ void main() {
 
   test('deleteLettersByChannel removes all letters for the given channel', () async {
     final user = await db.userDao.insert(UserTableCompanion.insert(email: 'name@name.net', password: '123'));
-    final room1 = await db.chatRoomDao.insertRoom(ChatRoomTableCompanion.insert(name: 'Test Room 1'));
-    final room2 = await db.chatRoomDao.insertRoom(ChatRoomTableCompanion.insert(name: 'Test Room 2'));
+    final room1 = await db.roomDao.insertRoom(RoomTableCompanion.insert(name: 'Test Room 1', type: RoomType.chat));
+    final room2 = await db.roomDao.insertRoom(RoomTableCompanion.insert(name: 'Test Room 2', type: RoomType.chat));
     if (room1 == null || room2 == null) {
       fail('Failed to create user or chat room');
     }
-    final userInRoom1 = await db.chatRoomDao.insertMember(
-      ChatMemberTableCompanion.insert(chatRoomId: room1.id, userId: user.id),
+    final userInRoom1 = await db.roomDao.insertMember(
+      RoomMemberTableCompanion.insert(chatRoomId: room1.id, userId: user.id),
     );
-    final userInRoom2 = await db.chatRoomDao.insertMember(
-      ChatMemberTableCompanion.insert(chatRoomId: room2.id, userId: user.id),
+    final userInRoom2 = await db.roomDao.insertMember(
+      RoomMemberTableCompanion.insert(chatRoomId: room2.id, userId: user.id),
     );
     if (userInRoom1 == null || userInRoom2 == null) {
       fail('Failed to add user to chat room');

@@ -56,22 +56,24 @@ class TodoListScreen extends StatelessWidget {
   }
 
   void _showAddTodoDialog(BuildContext context) {
-    final TextEditingController _todoTitleController = TextEditingController();
+    final TextEditingController todoTitleController = TextEditingController();
+    // Remove the underscore from variable name to follow Dart conventions
+    
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Add New Todo'),
           content: TextField(
-            controller: _todoTitleController,
+            controller: todoTitleController,
             decoration: const InputDecoration(hintText: 'Todo title'),
           ),
           actions: [
             TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
             ElevatedButton(
               onPressed: () {
-                if (_todoTitleController.text.isNotEmpty) {
-                  final newTodo = CreateTodo(title: _todoTitleController.text);
+                if (todoTitleController.text.isNotEmpty) {
+                  final newTodo = CreateTodo(title: todoTitleController.text);
                   BlocProvider.of<TodoBloc>(context).add(AddTodoEvent(newTodo));
                   Navigator.of(context).pop();
                 }
@@ -81,6 +83,6 @@ class TodoListScreen extends StatelessWidget {
           ],
         );
       },
-    );
+    ).then((_) => todoTitleController.dispose()); // Dispose controller when dialog is closed
   }
 }

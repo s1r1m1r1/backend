@@ -10,9 +10,12 @@ class WsToServer {
   final WsEventToServer eventType;
 
   @JsonKey(name: 'payload')
-  final Map<String, dynamic> payload;
+  final Object? payload;
 
-  WsToServer({required this.eventType, required this.payload});
+  @JsonKey(name: 'room')
+  final String roomId;
+
+  WsToServer({required this.roomId, required this.eventType, required this.payload});
 
   factory WsToServer.fromJson(Map<String, dynamic> json) => _$WsToServerFromJson(json); // вызывает фронт
 

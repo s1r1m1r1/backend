@@ -1,13 +1,25 @@
-class CounterRepository {
-  int _counter = 0;
-  int get counter => _counter;
-  Future<int> incrementCounter(Map<String, dynamic> payload) async {
-    _counter++;
-    return _counter;
+class Counter {
+  int _value = 0;
+  int get value => _value;
+  int increment() {
+    _value++;
+    return _value;
   }
 
-  Future<int> decrementCounter(Map<String, dynamic> payload) async {
-    _counter--;
-    return _counter;
+  int decrement() {
+    _value--;
+    return _value;
+  }
+}
+
+class CounterRepository {
+  final _counters = <String, Counter>{};
+
+  void putCounter(String roomId) {
+    _counters[roomId] = Counter();
+  }
+
+  Counter? counter(String roomId) {
+    return _counters[roomId];
   }
 }

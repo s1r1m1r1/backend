@@ -22,10 +22,7 @@ class LettersDao extends DatabaseAccessor<DbClient> with _$LettersDaoMixin {
   }
 
   Future<LetterEntry?> insertRow(LetterTableCompanion toCompanion) {
-    return into(letterTable).insertReturningOrNull(toCompanion).onError((err, stack) {
-      stdout.writeln('Error inserting letter: $err,\n\n stack:$stack');
-      return null;
-    });
+    return into(letterTable).insertReturningOrNull(toCompanion);
   }
 
   Future<void> deleteLetter(int letterId) async {

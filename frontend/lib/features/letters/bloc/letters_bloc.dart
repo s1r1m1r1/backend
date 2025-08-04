@@ -2,40 +2,56 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:frontend/features/ws_counter/domain/ws_manager.dart';
+import 'package:frontend/core/network/ws_manager.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/shared.dart';
 import 'package:web_socket_client/web_socket_client.dart' show ConnectionState, Connected, Reconnected;
+
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../../ws_counter/domain/ws_config_repository.dart';
 part 'letters_event.dart';
 part 'letters_state.dart';
+part 'letters_bloc.freezed.dart';
 
 @injectable
 class LettersBloc extends Bloc<LettersEvent, LettersState> {
   final WsLettersRepository _lettersRepository;
+  final WsConfigRepository _wsConfigRepository;
   final WsManager _wsManager;
+  String? _roomId;
   StreamSubscription? _lettersSubscription;
   StreamSubscription<ConnectionState>? _connectionSubscription;
-  LettersBloc(this._lettersRepository, this._wsManager) : super(const LettersState()) {
+  LettersBloc(this._lettersRepository, this._wsManager, this._wsConfigRepository) : super(const LettersState()) {
     on<LettersStarted>(_onStarted);
     on<LettersNewPressed>(_onNew);
     on<LettersCorrectLetterPressed>(_onCorrectLetter);
     on<LettersDeleteMessagePressed>(_onDeleteLetter);
-    on<_LetterOnNewLetters>(_onNewLetters);
-    on<_LetterOnUpdateLetters>(onUpdateLetters);
-    on<_LettersConnectionStateChanged>(_onConnectionStateChanged);
+    on<LetterOnNewLetters>(_onNewLetters);
+    on<LetterOnUpdateLetters>(onUpdateLetters);
+    on<LettersConnectionStateChanged>(_onConnectionStateChanged);
   }
 
-  FutureOr<void> _onStarted(LettersStarted event, Emitter<LettersState> emit) {
-    _lettersSubscription = _lettersRepository.letters.listen((letters) => add(_LetterOnNewLetters(letters)));
+  FutureOr<void> _onStarted(LettersStarted event, Emitter<LettersState> emit) async {
+    final config = await _wsConfigRepository.getConfig();
+    if (config == null) {
+      return;
+    }
+    _roomId = config.lettersRoom;
+    _lettersRepository.joinRoom(_roomId!);
+    _lettersSubscription = _lettersRepository.letters.listen((letters) => add(LetterOnNewLetters(letters)));
     _connectionSubscription = _wsManager.connection.listen((state) {
-      add(_LettersConnectionStateChanged(state));
+      add(LettersConnectionStateChanged(state));
     });
   }
 
-  FutureOr<void> _onNew(LettersNewPressed event, Emitter<LettersState> emit) {
-    print('_onNew');
+  FutureOr<void> _onNew(LettersNewPressed event, Emitter<LettersState> emit) async {
+    if (_roomId == null) {
+      return;
+    }
     _lettersRepository.newLetter(
-      LetterDto(chatRoomId: 0, senderId: 0, content: event.message, createdAt: DateTime.now()),
+      _roomId!,
+      LetterDto(chatRoomId: 1, senderId: 0, content: event.message, createdAt: DateTime.now()),
     );
   }
 
@@ -43,13 +59,19 @@ class LettersBloc extends Bloc<LettersEvent, LettersState> {
 
   FutureOr<void> _onDeleteLetter(LettersDeleteMessagePressed event, Emitter<LettersState> emit) {}
 
-  FutureOr<void> _onNewLetters(_LetterOnNewLetters event, Emitter<LettersState> emit) {
+  FutureOr<void> _onNewLetters(LetterOnNewLetters event, Emitter<LettersState> emit) async {
+    if (_roomId == null) {
+      return;
+    }
     emit(state.copyWith(letters: event.letters));
   }
 
-  FutureOr<void> onUpdateLetters(_LetterOnUpdateLetters event, Emitter<LettersState> emit) {}
+  FutureOr<void> onUpdateLetters(LetterOnUpdateLetters event, Emitter<LettersState> emit) {}
 
-  FutureOr<void> _onConnectionStateChanged(_LettersConnectionStateChanged event, Emitter<LettersState> emit) {
+  FutureOr<void> _onConnectionStateChanged(LettersConnectionStateChanged event, Emitter<LettersState> emit) async {
+    if (_roomId == null) {
+      return;
+    }
     emit(state.copyWith(status: event.state.toStatus()));
   }
 

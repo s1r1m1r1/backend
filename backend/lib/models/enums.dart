@@ -1,0 +1,1 @@
+enum RoomType { chat, counter }

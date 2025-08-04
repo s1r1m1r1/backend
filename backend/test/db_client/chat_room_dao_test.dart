@@ -1,5 +1,6 @@
-import 'package:backend/db_client/dao/chat_room_dao.dart';
+import 'package:backend/db_client/dao/room_dao.dart';
 import 'package:backend/db_client/db_client.dart';
+import 'package:backend/models/enums.dart';
 import 'package:drift/native.dart';
 import 'package:test/test.dart';
 
@@ -9,11 +10,11 @@ class TestDbClient extends DbClient {
 
 void main() {
   late TestDbClient db;
-  late ChatRoomDao dao;
+  late RoomDao dao;
 
   setUp(() async {
     db = TestDbClient();
-    dao = ChatRoomDao(db);
+    dao = RoomDao(db);
     // Ensure tables are created
     await db.customStatement('PRAGMA foreign_keys = ON');
   });
@@ -27,10 +28,10 @@ void main() {
     final user = await dao
         .into(db.userTable)
         .insertReturning(UserTableCompanion.insert(email: 'alice@mail.com', password: '123456'));
-    final room = await dao.insertRoom(ChatRoomTableCompanion.insert(name: 'test1'));
+    final room = await dao.insertRoom(RoomTableCompanion.insert(name: 'test1', type: RoomType.chat));
     expect(room, isNotNull);
     // Insert a chat_room_user
-    await dao.insertMember(ChatMemberTableCompanion.insert(chatRoomId: room!.id, userId: user.id));
+    await dao.insertMember(RoomMemberTableCompanion.insert(chatRoomId: room!.id, userId: user.id));
 
     final usersBefore = await dao.getListMember(room.id);
     expect(usersBefore.length, 1);
@@ -48,10 +49,12 @@ void main() {
     final user = await db
         .into(db.userTable)
         .insertReturning(UserTableCompanion.insert(email: 'bob@mail.net', password: '123456'));
-    final room = await db.into(db.chatRoomTable).insertReturning(ChatRoomTableCompanion.insert(name: 'test1'));
+    final room = await db
+        .into(db.roomTable)
+        .insertReturning(RoomTableCompanion.insert(name: 'test1', type: RoomType.chat));
 
     // Insert a chat_room_user
-    await db.into(db.chatMemberTable).insert(ChatMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id));
+    await db.into(db.roomMemberTable).insert(RoomMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id));
 
     final usersBefore = await dao.getListMember(room.id);
     expect(usersBefore.length, 1);
@@ -72,10 +75,12 @@ void main() {
         .insertReturning(UserTableCompanion.insert(email: 'bob@mail.net', password: '123456'));
 
     // Insert a chat room
-    final chatRoom = await db.into(db.chatRoomTable).insertReturning(ChatRoomTableCompanion.insert(name: 'Room 2'));
+    final chatRoom = await db
+        .into(db.roomTable)
+        .insertReturning(RoomTableCompanion.insert(name: 'Room 2', type: RoomType.chat));
 
     // Insert a chat_room_user
-    await db.into(db.chatMemberTable).insert(ChatMemberTableCompanion.insert(chatRoomId: chatRoom.id, userId: user.id));
+    await db.into(db.roomMemberTable).insert(RoomMemberTableCompanion.insert(chatRoomId: chatRoom.id, userId: user.id));
 
     // Delete the chat_room_user
     await dao.deleteMember(chatRoom.id, user.id);

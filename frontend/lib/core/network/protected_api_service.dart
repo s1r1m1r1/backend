@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:injectable/injectable.dart';
 import 'package:shared/shared.dart';
+
+import '../../app/logger/log_colors.dart';
 
 @lazySingleton
 class ProtectedApiService {
@@ -46,6 +49,15 @@ class ProtectedApiService {
       return true;
     }
     return false;
+  }
+
+  Future<WsConfigDto> getWsConfig() async {
+    final response = await _client.get('/config');
+    if (response.statusCode == 200) {
+      return WsConfigDto.fromJson(response.data);
+    } else {
+      throw Exception('Failed to get ws config');
+    }
   }
 
   Future<TodoDto> fetchTodoById(String id) async {

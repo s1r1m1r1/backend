@@ -42,6 +42,16 @@ class $UserTableTable extends UserTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  @override
+  late final GeneratedColumnWithTypeConverter<Role, String> role =
+      GeneratedColumn<String>(
+        'role',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('user'),
+      ).withConverter<Role>($UserTableTable.$converterrole);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -70,6 +80,7 @@ class $UserTableTable extends UserTable
     id,
     email,
     password,
+    role,
     createdAt,
     deletedAt,
   ];
@@ -137,6 +148,12 @@ class $UserTableTable extends UserTable
         DriftSqlType.string,
         data['${effectivePrefix}password'],
       )!,
+      role: $UserTableTable.$converterrole.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}role'],
+        )!,
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -152,18 +169,23 @@ class $UserTableTable extends UserTable
   $UserTableTable createAlias(String alias) {
     return $UserTableTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<Role, String, String> $converterrole =
+      const EnumNameConverter<Role>(Role.values);
 }
 
 class UserEntry extends DataClass implements Insertable<UserEntry> {
   final int id;
   final String email;
   final String password;
+  final Role role;
   final DateTime createdAt;
   final DateTime? deletedAt;
   const UserEntry({
     required this.id,
     required this.email,
     required this.password,
+    required this.role,
     required this.createdAt,
     this.deletedAt,
   });
@@ -173,6 +195,11 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
     map['id'] = Variable<int>(id);
     map['email'] = Variable<String>(email);
     map['password'] = Variable<String>(password);
+    {
+      map['role'] = Variable<String>(
+        $UserTableTable.$converterrole.toSql(role),
+      );
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || deletedAt != null) {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
@@ -185,6 +212,7 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
       id: Value(id),
       email: Value(email),
       password: Value(password),
+      role: Value(role),
       createdAt: Value(createdAt),
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
@@ -201,6 +229,9 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
       id: serializer.fromJson<int>(json['id']),
       email: serializer.fromJson<String>(json['email']),
       password: serializer.fromJson<String>(json['password']),
+      role: $UserTableTable.$converterrole.fromJson(
+        serializer.fromJson<String>(json['role']),
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
@@ -212,6 +243,9 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
       'id': serializer.toJson<int>(id),
       'email': serializer.toJson<String>(email),
       'password': serializer.toJson<String>(password),
+      'role': serializer.toJson<String>(
+        $UserTableTable.$converterrole.toJson(role),
+      ),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
@@ -221,12 +255,14 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
     int? id,
     String? email,
     String? password,
+    Role? role,
     DateTime? createdAt,
     Value<DateTime?> deletedAt = const Value.absent(),
   }) => UserEntry(
     id: id ?? this.id,
     email: email ?? this.email,
     password: password ?? this.password,
+    role: role ?? this.role,
     createdAt: createdAt ?? this.createdAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
   );
@@ -235,6 +271,7 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
       id: data.id.present ? data.id.value : this.id,
       email: data.email.present ? data.email.value : this.email,
       password: data.password.present ? data.password.value : this.password,
+      role: data.role.present ? data.role.value : this.role,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
@@ -246,6 +283,7 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
           ..write('id: $id, ')
           ..write('email: $email, ')
           ..write('password: $password, ')
+          ..write('role: $role, ')
           ..write('createdAt: $createdAt, ')
           ..write('deletedAt: $deletedAt')
           ..write(')'))
@@ -253,7 +291,8 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
   }
 
   @override
-  int get hashCode => Object.hash(id, email, password, createdAt, deletedAt);
+  int get hashCode =>
+      Object.hash(id, email, password, role, createdAt, deletedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -261,6 +300,7 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
           other.id == this.id &&
           other.email == this.email &&
           other.password == this.password &&
+          other.role == this.role &&
           other.createdAt == this.createdAt &&
           other.deletedAt == this.deletedAt);
 }
@@ -269,12 +309,14 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
   final Value<int> id;
   final Value<String> email;
   final Value<String> password;
+  final Value<Role> role;
   final Value<DateTime> createdAt;
   final Value<DateTime?> deletedAt;
   const UserTableCompanion({
     this.id = const Value.absent(),
     this.email = const Value.absent(),
     this.password = const Value.absent(),
+    this.role = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
   });
@@ -282,6 +324,7 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     this.id = const Value.absent(),
     required String email,
     required String password,
+    this.role = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
   }) : email = Value(email),
@@ -290,6 +333,7 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     Expression<int>? id,
     Expression<String>? email,
     Expression<String>? password,
+    Expression<String>? role,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? deletedAt,
   }) {
@@ -297,6 +341,7 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
       if (id != null) 'id': id,
       if (email != null) 'email': email,
       if (password != null) 'password': password,
+      if (role != null) 'role': role,
       if (createdAt != null) 'created_at': createdAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
     });
@@ -306,6 +351,7 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     Value<int>? id,
     Value<String>? email,
     Value<String>? password,
+    Value<Role>? role,
     Value<DateTime>? createdAt,
     Value<DateTime?>? deletedAt,
   }) {
@@ -313,6 +359,7 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
       id: id ?? this.id,
       email: email ?? this.email,
       password: password ?? this.password,
+      role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       deletedAt: deletedAt ?? this.deletedAt,
     );
@@ -330,6 +377,11 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     if (password.present) {
       map['password'] = Variable<String>(password.value);
     }
+    if (role.present) {
+      map['role'] = Variable<String>(
+        $UserTableTable.$converterrole.toSql(role.value),
+      );
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -345,6 +397,7 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
           ..write('id: $id, ')
           ..write('email: $email, ')
           ..write('password: $password, ')
+          ..write('role: $role, ')
           ..write('createdAt: $createdAt, ')
           ..write('deletedAt: $deletedAt')
           ..write(')'))
@@ -1381,12 +1434,12 @@ class SessionTableCompanion extends UpdateCompanion<SessionEntry> {
   }
 }
 
-class $ChatRoomTableTable extends ChatRoomTable
-    with TableInfo<$ChatRoomTableTable, ChatRoomEntry> {
+class $RoomTableTable extends RoomTable
+    with TableInfo<$RoomTableTable, RoomEntry> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ChatRoomTableTable(this.attachedDatabase, [this._alias]);
+  $RoomTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -1425,15 +1478,24 @@ class $ChatRoomTableTable extends ChatRoomTable
     requiredDuringInsert: false,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, name, deletedAt];
+  late final GeneratedColumnWithTypeConverter<RoomType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<RoomType>($RoomTableTable.$convertertype);
+  @override
+  List<GeneratedColumn> get $columns => [id, name, deletedAt, type];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'chat_room_table';
+  static const String $name = 'room_table';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ChatRoomEntry> instance, {
+    Insertable<RoomEntry> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1461,9 +1523,9 @@ class $ChatRoomTableTable extends ChatRoomTable
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ChatRoomEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+  RoomEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ChatRoomEntry(
+    return RoomEntry(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -1476,20 +1538,35 @@ class $ChatRoomTableTable extends ChatRoomTable
         DriftSqlType.dateTime,
         data['${effectivePrefix}deleted_at'],
       ),
+      type: $RoomTableTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
     );
   }
 
   @override
-  $ChatRoomTableTable createAlias(String alias) {
-    return $ChatRoomTableTable(attachedDatabase, alias);
+  $RoomTableTable createAlias(String alias) {
+    return $RoomTableTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<RoomType, String, String> $convertertype =
+      const EnumNameConverter<RoomType>(RoomType.values);
 }
 
-class ChatRoomEntry extends DataClass implements Insertable<ChatRoomEntry> {
+class RoomEntry extends DataClass implements Insertable<RoomEntry> {
   final int id;
   final String name;
   final DateTime? deletedAt;
-  const ChatRoomEntry({required this.id, required this.name, this.deletedAt});
+  final RoomType type;
+  const RoomEntry({
+    required this.id,
+    required this.name,
+    this.deletedAt,
+    required this.type,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1498,28 +1575,37 @@ class ChatRoomEntry extends DataClass implements Insertable<ChatRoomEntry> {
     if (!nullToAbsent || deletedAt != null) {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
+    {
+      map['type'] = Variable<String>(
+        $RoomTableTable.$convertertype.toSql(type),
+      );
+    }
     return map;
   }
 
-  ChatRoomTableCompanion toCompanion(bool nullToAbsent) {
-    return ChatRoomTableCompanion(
+  RoomTableCompanion toCompanion(bool nullToAbsent) {
+    return RoomTableCompanion(
       id: Value(id),
       name: Value(name),
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(deletedAt),
+      type: Value(type),
     );
   }
 
-  factory ChatRoomEntry.fromJson(
+  factory RoomEntry.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ChatRoomEntry(
+    return RoomEntry(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      type: $RoomTableTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
+      ),
     );
   }
   @override
@@ -1529,82 +1615,98 @@ class ChatRoomEntry extends DataClass implements Insertable<ChatRoomEntry> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'type': serializer.toJson<String>(
+        $RoomTableTable.$convertertype.toJson(type),
+      ),
     };
   }
 
-  ChatRoomEntry copyWith({
+  RoomEntry copyWith({
     int? id,
     String? name,
     Value<DateTime?> deletedAt = const Value.absent(),
-  }) => ChatRoomEntry(
+    RoomType? type,
+  }) => RoomEntry(
     id: id ?? this.id,
     name: name ?? this.name,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    type: type ?? this.type,
   );
-  ChatRoomEntry copyWithCompanion(ChatRoomTableCompanion data) {
-    return ChatRoomEntry(
+  RoomEntry copyWithCompanion(RoomTableCompanion data) {
+    return RoomEntry(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      type: data.type.present ? data.type.value : this.type,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('ChatRoomEntry(')
+    return (StringBuffer('RoomEntry(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('type: $type')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, deletedAt);
+  int get hashCode => Object.hash(id, name, deletedAt, type);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ChatRoomEntry &&
+      (other is RoomEntry &&
           other.id == this.id &&
           other.name == this.name &&
-          other.deletedAt == this.deletedAt);
+          other.deletedAt == this.deletedAt &&
+          other.type == this.type);
 }
 
-class ChatRoomTableCompanion extends UpdateCompanion<ChatRoomEntry> {
+class RoomTableCompanion extends UpdateCompanion<RoomEntry> {
   final Value<int> id;
   final Value<String> name;
   final Value<DateTime?> deletedAt;
-  const ChatRoomTableCompanion({
+  final Value<RoomType> type;
+  const RoomTableCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.type = const Value.absent(),
   });
-  ChatRoomTableCompanion.insert({
+  RoomTableCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.deletedAt = const Value.absent(),
-  }) : name = Value(name);
-  static Insertable<ChatRoomEntry> custom({
+    required RoomType type,
+  }) : name = Value(name),
+       type = Value(type);
+  static Insertable<RoomEntry> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<DateTime>? deletedAt,
+    Expression<String>? type,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (deletedAt != null) 'deleted_at': deletedAt,
+      if (type != null) 'type': type,
     });
   }
 
-  ChatRoomTableCompanion copyWith({
+  RoomTableCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
     Value<DateTime?>? deletedAt,
+    Value<RoomType>? type,
   }) {
-    return ChatRoomTableCompanion(
+    return RoomTableCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       deletedAt: deletedAt ?? this.deletedAt,
+      type: type ?? this.type,
     );
   }
 
@@ -1620,15 +1722,21 @@ class ChatRoomTableCompanion extends UpdateCompanion<ChatRoomEntry> {
     if (deletedAt.present) {
       map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
+    if (type.present) {
+      map['type'] = Variable<String>(
+        $RoomTableTable.$convertertype.toSql(type.value),
+      );
+    }
     return map;
   }
 
   @override
   String toString() {
-    return (StringBuffer('ChatRoomTableCompanion(')
+    return (StringBuffer('RoomTableCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('type: $type')
           ..write(')'))
         .toString();
   }
@@ -1664,7 +1772,7 @@ class $LetterTableTable extends LetterTable
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES chat_room_table (id) ON DELETE CASCADE',
+      'REFERENCES room_table (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _senderIdMeta = const VerificationMeta(
@@ -1992,12 +2100,12 @@ class LetterTableCompanion extends UpdateCompanion<LetterEntry> {
   }
 }
 
-class $ChatMemberTableTable extends ChatMemberTable
-    with TableInfo<$ChatMemberTableTable, ChatMemberEntry> {
+class $RoomMemberTableTable extends RoomMemberTable
+    with TableInfo<$RoomMemberTableTable, RoomMemberEntry> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ChatMemberTableTable(this.attachedDatabase, [this._alias]);
+  $RoomMemberTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _chatRoomIdMeta = const VerificationMeta(
     'chatRoomId',
   );
@@ -2009,7 +2117,7 @@ class $ChatMemberTableTable extends ChatMemberTable
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES chat_room_table (id) ON DELETE CASCADE',
+      'REFERENCES room_table (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
@@ -2030,10 +2138,10 @@ class $ChatMemberTableTable extends ChatMemberTable
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'chat_member_table';
+  static const String $name = 'room_member_table';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ChatMemberEntry> instance, {
+    Insertable<RoomMemberEntry> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2063,9 +2171,9 @@ class $ChatMemberTableTable extends ChatMemberTable
   @override
   Set<GeneratedColumn> get $primaryKey => {chatRoomId, userId};
   @override
-  ChatMemberEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+  RoomMemberEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ChatMemberEntry(
+    return RoomMemberEntry(
       chatRoomId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}chat_room_id'],
@@ -2078,15 +2186,15 @@ class $ChatMemberTableTable extends ChatMemberTable
   }
 
   @override
-  $ChatMemberTableTable createAlias(String alias) {
-    return $ChatMemberTableTable(attachedDatabase, alias);
+  $RoomMemberTableTable createAlias(String alias) {
+    return $RoomMemberTableTable(attachedDatabase, alias);
   }
 }
 
-class ChatMemberEntry extends DataClass implements Insertable<ChatMemberEntry> {
+class RoomMemberEntry extends DataClass implements Insertable<RoomMemberEntry> {
   final int chatRoomId;
   final int userId;
-  const ChatMemberEntry({required this.chatRoomId, required this.userId});
+  const RoomMemberEntry({required this.chatRoomId, required this.userId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2095,19 +2203,19 @@ class ChatMemberEntry extends DataClass implements Insertable<ChatMemberEntry> {
     return map;
   }
 
-  ChatMemberTableCompanion toCompanion(bool nullToAbsent) {
-    return ChatMemberTableCompanion(
+  RoomMemberTableCompanion toCompanion(bool nullToAbsent) {
+    return RoomMemberTableCompanion(
       chatRoomId: Value(chatRoomId),
       userId: Value(userId),
     );
   }
 
-  factory ChatMemberEntry.fromJson(
+  factory RoomMemberEntry.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ChatMemberEntry(
+    return RoomMemberEntry(
       chatRoomId: serializer.fromJson<int>(json['chatRoomId']),
       userId: serializer.fromJson<int>(json['userId']),
     );
@@ -2121,12 +2229,12 @@ class ChatMemberEntry extends DataClass implements Insertable<ChatMemberEntry> {
     };
   }
 
-  ChatMemberEntry copyWith({int? chatRoomId, int? userId}) => ChatMemberEntry(
+  RoomMemberEntry copyWith({int? chatRoomId, int? userId}) => RoomMemberEntry(
     chatRoomId: chatRoomId ?? this.chatRoomId,
     userId: userId ?? this.userId,
   );
-  ChatMemberEntry copyWithCompanion(ChatMemberTableCompanion data) {
-    return ChatMemberEntry(
+  RoomMemberEntry copyWithCompanion(RoomMemberTableCompanion data) {
+    return RoomMemberEntry(
       chatRoomId: data.chatRoomId.present
           ? data.chatRoomId.value
           : this.chatRoomId,
@@ -2136,7 +2244,7 @@ class ChatMemberEntry extends DataClass implements Insertable<ChatMemberEntry> {
 
   @override
   String toString() {
-    return (StringBuffer('ChatMemberEntry(')
+    return (StringBuffer('RoomMemberEntry(')
           ..write('chatRoomId: $chatRoomId, ')
           ..write('userId: $userId')
           ..write(')'))
@@ -2148,27 +2256,27 @@ class ChatMemberEntry extends DataClass implements Insertable<ChatMemberEntry> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ChatMemberEntry &&
+      (other is RoomMemberEntry &&
           other.chatRoomId == this.chatRoomId &&
           other.userId == this.userId);
 }
 
-class ChatMemberTableCompanion extends UpdateCompanion<ChatMemberEntry> {
+class RoomMemberTableCompanion extends UpdateCompanion<RoomMemberEntry> {
   final Value<int> chatRoomId;
   final Value<int> userId;
   final Value<int> rowid;
-  const ChatMemberTableCompanion({
+  const RoomMemberTableCompanion({
     this.chatRoomId = const Value.absent(),
     this.userId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  ChatMemberTableCompanion.insert({
+  RoomMemberTableCompanion.insert({
     required int chatRoomId,
     required int userId,
     this.rowid = const Value.absent(),
   }) : chatRoomId = Value(chatRoomId),
        userId = Value(userId);
-  static Insertable<ChatMemberEntry> custom({
+  static Insertable<RoomMemberEntry> custom({
     Expression<int>? chatRoomId,
     Expression<int>? userId,
     Expression<int>? rowid,
@@ -2180,12 +2288,12 @@ class ChatMemberTableCompanion extends UpdateCompanion<ChatMemberEntry> {
     });
   }
 
-  ChatMemberTableCompanion copyWith({
+  RoomMemberTableCompanion copyWith({
     Value<int>? chatRoomId,
     Value<int>? userId,
     Value<int>? rowid,
   }) {
-    return ChatMemberTableCompanion(
+    return RoomMemberTableCompanion(
       chatRoomId: chatRoomId ?? this.chatRoomId,
       userId: userId ?? this.userId,
       rowid: rowid ?? this.rowid,
@@ -2209,10 +2317,420 @@ class ChatMemberTableCompanion extends UpdateCompanion<ChatMemberEntry> {
 
   @override
   String toString() {
-    return (StringBuffer('ChatMemberTableCompanion(')
+    return (StringBuffer('RoomMemberTableCompanion(')
           ..write('chatRoomId: $chatRoomId, ')
           ..write('userId: $userId, ')
           ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WsConfigTableTable extends WsConfigTable
+    with TableInfo<$WsConfigTableTable, WsConfigEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WsConfigTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Role, String> role =
+      GeneratedColumn<String>(
+        'role',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('user'),
+      ).withConverter<Role>($WsConfigTableTable.$converterrole);
+  static const VerificationMeta _letterRoomMeta = const VerificationMeta(
+    'letterRoom',
+  );
+  @override
+  late final GeneratedColumn<String> letterRoom = GeneratedColumn<String>(
+    'letter_room',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _counterRoomMeta = const VerificationMeta(
+    'counterRoom',
+  );
+  @override
+  late final GeneratedColumn<String> counterRoom = GeneratedColumn<String>(
+    'counter_room',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    role,
+    letterRoom,
+    counterRoom,
+    version,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ws_config_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WsConfigEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('letter_room')) {
+      context.handle(
+        _letterRoomMeta,
+        letterRoom.isAcceptableOrUnknown(data['letter_room']!, _letterRoomMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_letterRoomMeta);
+    }
+    if (data.containsKey('counter_room')) {
+      context.handle(
+        _counterRoomMeta,
+        counterRoom.isAcceptableOrUnknown(
+          data['counter_room']!,
+          _counterRoomMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_counterRoomMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WsConfigEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WsConfigEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      role: $WsConfigTableTable.$converterrole.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}role'],
+        )!,
+      ),
+      letterRoom: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}letter_room'],
+      )!,
+      counterRoom: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}counter_room'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+    );
+  }
+
+  @override
+  $WsConfigTableTable createAlias(String alias) {
+    return $WsConfigTableTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<Role, String, String> $converterrole =
+      const EnumNameConverter<Role>(Role.values);
+}
+
+class WsConfigEntry extends DataClass implements Insertable<WsConfigEntry> {
+  final int id;
+  final String name;
+  final Role role;
+  final String letterRoom;
+  final String counterRoom;
+  final int version;
+  const WsConfigEntry({
+    required this.id,
+    required this.name,
+    required this.role,
+    required this.letterRoom,
+    required this.counterRoom,
+    required this.version,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    {
+      map['role'] = Variable<String>(
+        $WsConfigTableTable.$converterrole.toSql(role),
+      );
+    }
+    map['letter_room'] = Variable<String>(letterRoom);
+    map['counter_room'] = Variable<String>(counterRoom);
+    map['version'] = Variable<int>(version);
+    return map;
+  }
+
+  WsConfigTableCompanion toCompanion(bool nullToAbsent) {
+    return WsConfigTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      role: Value(role),
+      letterRoom: Value(letterRoom),
+      counterRoom: Value(counterRoom),
+      version: Value(version),
+    );
+  }
+
+  factory WsConfigEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WsConfigEntry(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      role: $WsConfigTableTable.$converterrole.fromJson(
+        serializer.fromJson<String>(json['role']),
+      ),
+      letterRoom: serializer.fromJson<String>(json['letterRoom']),
+      counterRoom: serializer.fromJson<String>(json['counterRoom']),
+      version: serializer.fromJson<int>(json['version']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'role': serializer.toJson<String>(
+        $WsConfigTableTable.$converterrole.toJson(role),
+      ),
+      'letterRoom': serializer.toJson<String>(letterRoom),
+      'counterRoom': serializer.toJson<String>(counterRoom),
+      'version': serializer.toJson<int>(version),
+    };
+  }
+
+  WsConfigEntry copyWith({
+    int? id,
+    String? name,
+    Role? role,
+    String? letterRoom,
+    String? counterRoom,
+    int? version,
+  }) => WsConfigEntry(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    role: role ?? this.role,
+    letterRoom: letterRoom ?? this.letterRoom,
+    counterRoom: counterRoom ?? this.counterRoom,
+    version: version ?? this.version,
+  );
+  WsConfigEntry copyWithCompanion(WsConfigTableCompanion data) {
+    return WsConfigEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      role: data.role.present ? data.role.value : this.role,
+      letterRoom: data.letterRoom.present
+          ? data.letterRoom.value
+          : this.letterRoom,
+      counterRoom: data.counterRoom.present
+          ? data.counterRoom.value
+          : this.counterRoom,
+      version: data.version.present ? data.version.value : this.version,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WsConfigEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('role: $role, ')
+          ..write('letterRoom: $letterRoom, ')
+          ..write('counterRoom: $counterRoom, ')
+          ..write('version: $version')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, role, letterRoom, counterRoom, version);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WsConfigEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.role == this.role &&
+          other.letterRoom == this.letterRoom &&
+          other.counterRoom == this.counterRoom &&
+          other.version == this.version);
+}
+
+class WsConfigTableCompanion extends UpdateCompanion<WsConfigEntry> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<Role> role;
+  final Value<String> letterRoom;
+  final Value<String> counterRoom;
+  final Value<int> version;
+  const WsConfigTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.role = const Value.absent(),
+    this.letterRoom = const Value.absent(),
+    this.counterRoom = const Value.absent(),
+    this.version = const Value.absent(),
+  });
+  WsConfigTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.role = const Value.absent(),
+    required String letterRoom,
+    required String counterRoom,
+    required int version,
+  }) : name = Value(name),
+       letterRoom = Value(letterRoom),
+       counterRoom = Value(counterRoom),
+       version = Value(version);
+  static Insertable<WsConfigEntry> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? role,
+    Expression<String>? letterRoom,
+    Expression<String>? counterRoom,
+    Expression<int>? version,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (role != null) 'role': role,
+      if (letterRoom != null) 'letter_room': letterRoom,
+      if (counterRoom != null) 'counter_room': counterRoom,
+      if (version != null) 'version': version,
+    });
+  }
+
+  WsConfigTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<Role>? role,
+    Value<String>? letterRoom,
+    Value<String>? counterRoom,
+    Value<int>? version,
+  }) {
+    return WsConfigTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      role: role ?? this.role,
+      letterRoom: letterRoom ?? this.letterRoom,
+      counterRoom: counterRoom ?? this.counterRoom,
+      version: version ?? this.version,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (role.present) {
+      map['role'] = Variable<String>(
+        $WsConfigTableTable.$converterrole.toSql(role.value),
+      );
+    }
+    if (letterRoom.present) {
+      map['letter_room'] = Variable<String>(letterRoom.value);
+    }
+    if (counterRoom.present) {
+      map['counter_room'] = Variable<String>(counterRoom.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WsConfigTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('role: $role, ')
+          ..write('letterRoom: $letterRoom, ')
+          ..write('counterRoom: $counterRoom, ')
+          ..write('version: $version')
           ..write(')'))
         .toString();
   }
@@ -2224,16 +2742,18 @@ abstract class _$DbClient extends GeneratedDatabase {
   late final $UserTableTable userTable = $UserTableTable(this);
   late final $TodoTableTable todoTable = $TodoTableTable(this);
   late final $SessionTableTable sessionTable = $SessionTableTable(this);
-  late final $ChatRoomTableTable chatRoomTable = $ChatRoomTableTable(this);
+  late final $RoomTableTable roomTable = $RoomTableTable(this);
   late final $LetterTableTable letterTable = $LetterTableTable(this);
-  late final $ChatMemberTableTable chatMemberTable = $ChatMemberTableTable(
+  late final $RoomMemberTableTable roomMemberTable = $RoomMemberTableTable(
     this,
   );
+  late final $WsConfigTableTable wsConfigTable = $WsConfigTableTable(this);
   late final TodoDao todoDao = TodoDao(this as DbClient);
   late final UserDao userDao = UserDao(this as DbClient);
   late final SessionDao sessionDao = SessionDao(this as DbClient);
   late final LettersDao lettersDao = LettersDao(this as DbClient);
-  late final ChatRoomDao chatRoomDao = ChatRoomDao(this as DbClient);
+  late final RoomDao roomDao = RoomDao(this as DbClient);
+  late final ConfigDao configDao = ConfigDao(this as DbClient);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2242,32 +2762,33 @@ abstract class _$DbClient extends GeneratedDatabase {
     userTable,
     todoTable,
     sessionTable,
-    chatRoomTable,
+    roomTable,
     letterTable,
-    chatMemberTable,
+    roomMemberTable,
+    wsConfigTable,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
     WritePropagation(
       on: TableUpdateQuery.onTableName(
-        'chat_room_table',
+        'room_table',
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('letter_table', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
-        'chat_room_table',
+        'room_table',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('chat_member_table', kind: UpdateKind.delete)],
+      result: [TableUpdate('room_member_table', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'user_table',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('chat_member_table', kind: UpdateKind.delete)],
+      result: [TableUpdate('room_member_table', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -2277,6 +2798,7 @@ typedef $$UserTableTableCreateCompanionBuilder =
       Value<int> id,
       required String email,
       required String password,
+      Value<Role> role,
       Value<DateTime> createdAt,
       Value<DateTime?> deletedAt,
     });
@@ -2285,6 +2807,7 @@ typedef $$UserTableTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> email,
       Value<String> password,
+      Value<Role> role,
       Value<DateTime> createdAt,
       Value<DateTime?> deletedAt,
     });
@@ -2329,20 +2852,20 @@ final class $$UserTableTableReferences
     );
   }
 
-  static MultiTypedResultKey<$ChatMemberTableTable, List<ChatMemberEntry>>
-  _chatMemberTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
-    db.chatMemberTable,
-    aliasName: $_aliasNameGenerator(db.userTable.id, db.chatMemberTable.userId),
+  static MultiTypedResultKey<$RoomMemberTableTable, List<RoomMemberEntry>>
+  _roomMemberTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
+    db.roomMemberTable,
+    aliasName: $_aliasNameGenerator(db.userTable.id, db.roomMemberTable.userId),
   );
 
-  $$ChatMemberTableTableProcessedTableManager get chatMemberTableRefs {
-    final manager = $$ChatMemberTableTableTableManager(
+  $$RoomMemberTableTableProcessedTableManager get roomMemberTableRefs {
+    final manager = $$RoomMemberTableTableTableManager(
       $_db,
-      $_db.chatMemberTable,
+      $_db.roomMemberTable,
     ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(
-      _chatMemberTableRefsTable($_db),
+      _roomMemberTableRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -2373,6 +2896,12 @@ class $$UserTableTableFilterComposer
     column: $table.password,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnWithTypeConverterFilters<Role, Role, String> get role =>
+      $composableBuilder(
+        column: $table.role,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
@@ -2434,22 +2963,22 @@ class $$UserTableTableFilterComposer
     return f(composer);
   }
 
-  Expression<bool> chatMemberTableRefs(
-    Expression<bool> Function($$ChatMemberTableTableFilterComposer f) f,
+  Expression<bool> roomMemberTableRefs(
+    Expression<bool> Function($$RoomMemberTableTableFilterComposer f) f,
   ) {
-    final $$ChatMemberTableTableFilterComposer composer = $composerBuilder(
+    final $$RoomMemberTableTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.chatMemberTable,
+      referencedTable: $db.roomMemberTable,
       getReferencedColumn: (t) => t.userId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatMemberTableTableFilterComposer(
+          }) => $$RoomMemberTableTableFilterComposer(
             $db: $db,
-            $table: $db.chatMemberTable,
+            $table: $db.roomMemberTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2484,6 +3013,11 @@ class $$UserTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -2512,6 +3046,9 @@ class $$UserTableTableAnnotationComposer
 
   GeneratedColumn<String> get password =>
       $composableBuilder(column: $table.password, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Role, String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -2569,22 +3106,22 @@ class $$UserTableTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> chatMemberTableRefs<T extends Object>(
-    Expression<T> Function($$ChatMemberTableTableAnnotationComposer a) f,
+  Expression<T> roomMemberTableRefs<T extends Object>(
+    Expression<T> Function($$RoomMemberTableTableAnnotationComposer a) f,
   ) {
-    final $$ChatMemberTableTableAnnotationComposer composer = $composerBuilder(
+    final $$RoomMemberTableTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.chatMemberTable,
+      referencedTable: $db.roomMemberTable,
       getReferencedColumn: (t) => t.userId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatMemberTableTableAnnotationComposer(
+          }) => $$RoomMemberTableTableAnnotationComposer(
             $db: $db,
-            $table: $db.chatMemberTable,
+            $table: $db.roomMemberTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2611,7 +3148,7 @@ class $$UserTableTableTableManager
           PrefetchHooks Function({
             bool todoTableRefs,
             bool sessionTableRefs,
-            bool chatMemberTableRefs,
+            bool roomMemberTableRefs,
           })
         > {
   $$UserTableTableTableManager(_$DbClient db, $UserTableTable table)
@@ -2630,12 +3167,14 @@ class $$UserTableTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> email = const Value.absent(),
                 Value<String> password = const Value.absent(),
+                Value<Role> role = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
               }) => UserTableCompanion(
                 id: id,
                 email: email,
                 password: password,
+                role: role,
                 createdAt: createdAt,
                 deletedAt: deletedAt,
               ),
@@ -2644,12 +3183,14 @@ class $$UserTableTableTableManager
                 Value<int> id = const Value.absent(),
                 required String email,
                 required String password,
+                Value<Role> role = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
               }) => UserTableCompanion.insert(
                 id: id,
                 email: email,
                 password: password,
+                role: role,
                 createdAt: createdAt,
                 deletedAt: deletedAt,
               ),
@@ -2665,14 +3206,14 @@ class $$UserTableTableTableManager
               ({
                 todoTableRefs = false,
                 sessionTableRefs = false,
-                chatMemberTableRefs = false,
+                roomMemberTableRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (todoTableRefs) db.todoTable,
                     if (sessionTableRefs) db.sessionTable,
-                    if (chatMemberTableRefs) db.chatMemberTable,
+                    if (roomMemberTableRefs) db.roomMemberTable,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -2719,21 +3260,21 @@ class $$UserTableTableTableManager
                               ),
                           typedResults: items,
                         ),
-                      if (chatMemberTableRefs)
+                      if (roomMemberTableRefs)
                         await $_getPrefetchedData<
                           UserEntry,
                           $UserTableTable,
-                          ChatMemberEntry
+                          RoomMemberEntry
                         >(
                           currentTable: table,
                           referencedTable: $$UserTableTableReferences
-                              ._chatMemberTableRefsTable(db),
+                              ._roomMemberTableRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$UserTableTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).chatMemberTableRefs,
+                              ).roomMemberTableRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.userId == item.id,
@@ -2763,7 +3304,7 @@ typedef $$UserTableTableProcessedTableManager =
       PrefetchHooks Function({
         bool todoTableRefs,
         bool sessionTableRefs,
-        bool chatMemberTableRefs,
+        bool roomMemberTableRefs,
       })
     >;
 typedef $$TodoTableTableCreateCompanionBuilder =
@@ -3512,34 +4053,29 @@ typedef $$SessionTableTableProcessedTableManager =
       SessionEntry,
       PrefetchHooks Function({bool userId})
     >;
-typedef $$ChatRoomTableTableCreateCompanionBuilder =
-    ChatRoomTableCompanion Function({
+typedef $$RoomTableTableCreateCompanionBuilder =
+    RoomTableCompanion Function({
       Value<int> id,
       required String name,
       Value<DateTime?> deletedAt,
+      required RoomType type,
     });
-typedef $$ChatRoomTableTableUpdateCompanionBuilder =
-    ChatRoomTableCompanion Function({
+typedef $$RoomTableTableUpdateCompanionBuilder =
+    RoomTableCompanion Function({
       Value<int> id,
       Value<String> name,
       Value<DateTime?> deletedAt,
+      Value<RoomType> type,
     });
 
-final class $$ChatRoomTableTableReferences
-    extends BaseReferences<_$DbClient, $ChatRoomTableTable, ChatRoomEntry> {
-  $$ChatRoomTableTableReferences(
-    super.$_db,
-    super.$_table,
-    super.$_typedResult,
-  );
+final class $$RoomTableTableReferences
+    extends BaseReferences<_$DbClient, $RoomTableTable, RoomEntry> {
+  $$RoomTableTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$LetterTableTable, List<LetterEntry>>
   _letterTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
     db.letterTable,
-    aliasName: $_aliasNameGenerator(
-      db.chatRoomTable.id,
-      db.letterTable.chatRoomId,
-    ),
+    aliasName: $_aliasNameGenerator(db.roomTable.id, db.letterTable.chatRoomId),
   );
 
   $$LetterTableTableProcessedTableManager get letterTableRefs {
@@ -3554,23 +4090,23 @@ final class $$ChatRoomTableTableReferences
     );
   }
 
-  static MultiTypedResultKey<$ChatMemberTableTable, List<ChatMemberEntry>>
-  _chatMemberTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
-    db.chatMemberTable,
+  static MultiTypedResultKey<$RoomMemberTableTable, List<RoomMemberEntry>>
+  _roomMemberTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
+    db.roomMemberTable,
     aliasName: $_aliasNameGenerator(
-      db.chatRoomTable.id,
-      db.chatMemberTable.chatRoomId,
+      db.roomTable.id,
+      db.roomMemberTable.chatRoomId,
     ),
   );
 
-  $$ChatMemberTableTableProcessedTableManager get chatMemberTableRefs {
-    final manager = $$ChatMemberTableTableTableManager(
+  $$RoomMemberTableTableProcessedTableManager get roomMemberTableRefs {
+    final manager = $$RoomMemberTableTableTableManager(
       $_db,
-      $_db.chatMemberTable,
+      $_db.roomMemberTable,
     ).filter((f) => f.chatRoomId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(
-      _chatMemberTableRefsTable($_db),
+      _roomMemberTableRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -3578,9 +4114,9 @@ final class $$ChatRoomTableTableReferences
   }
 }
 
-class $$ChatRoomTableTableFilterComposer
-    extends Composer<_$DbClient, $ChatRoomTableTable> {
-  $$ChatRoomTableTableFilterComposer({
+class $$RoomTableTableFilterComposer
+    extends Composer<_$DbClient, $RoomTableTable> {
+  $$RoomTableTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3601,6 +4137,12 @@ class $$ChatRoomTableTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnWithTypeConverterFilters<RoomType, RoomType, String> get type =>
+      $composableBuilder(
+        column: $table.type,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
   Expression<bool> letterTableRefs(
     Expression<bool> Function($$LetterTableTableFilterComposer f) f,
@@ -3627,22 +4169,22 @@ class $$ChatRoomTableTableFilterComposer
     return f(composer);
   }
 
-  Expression<bool> chatMemberTableRefs(
-    Expression<bool> Function($$ChatMemberTableTableFilterComposer f) f,
+  Expression<bool> roomMemberTableRefs(
+    Expression<bool> Function($$RoomMemberTableTableFilterComposer f) f,
   ) {
-    final $$ChatMemberTableTableFilterComposer composer = $composerBuilder(
+    final $$RoomMemberTableTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.chatMemberTable,
+      referencedTable: $db.roomMemberTable,
       getReferencedColumn: (t) => t.chatRoomId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatMemberTableTableFilterComposer(
+          }) => $$RoomMemberTableTableFilterComposer(
             $db: $db,
-            $table: $db.chatMemberTable,
+            $table: $db.roomMemberTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3653,9 +4195,9 @@ class $$ChatRoomTableTableFilterComposer
   }
 }
 
-class $$ChatRoomTableTableOrderingComposer
-    extends Composer<_$DbClient, $ChatRoomTableTable> {
-  $$ChatRoomTableTableOrderingComposer({
+class $$RoomTableTableOrderingComposer
+    extends Composer<_$DbClient, $RoomTableTable> {
+  $$RoomTableTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3676,11 +4218,16 @@ class $$ChatRoomTableTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
-class $$ChatRoomTableTableAnnotationComposer
-    extends Composer<_$DbClient, $ChatRoomTableTable> {
-  $$ChatRoomTableTableAnnotationComposer({
+class $$RoomTableTableAnnotationComposer
+    extends Composer<_$DbClient, $RoomTableTable> {
+  $$RoomTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3695,6 +4242,9 @@ class $$ChatRoomTableTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<RoomType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
 
   Expression<T> letterTableRefs<T extends Object>(
     Expression<T> Function($$LetterTableTableAnnotationComposer a) f,
@@ -3721,22 +4271,22 @@ class $$ChatRoomTableTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> chatMemberTableRefs<T extends Object>(
-    Expression<T> Function($$ChatMemberTableTableAnnotationComposer a) f,
+  Expression<T> roomMemberTableRefs<T extends Object>(
+    Expression<T> Function($$RoomMemberTableTableAnnotationComposer a) f,
   ) {
-    final $$ChatMemberTableTableAnnotationComposer composer = $composerBuilder(
+    final $$RoomMemberTableTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.chatMemberTable,
+      referencedTable: $db.roomMemberTable,
       getReferencedColumn: (t) => t.chatRoomId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatMemberTableTableAnnotationComposer(
+          }) => $$RoomMemberTableTableAnnotationComposer(
             $db: $db,
-            $table: $db.chatMemberTable,
+            $table: $db.roomMemberTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3747,85 +4297,89 @@ class $$ChatRoomTableTableAnnotationComposer
   }
 }
 
-class $$ChatRoomTableTableTableManager
+class $$RoomTableTableTableManager
     extends
         RootTableManager<
           _$DbClient,
-          $ChatRoomTableTable,
-          ChatRoomEntry,
-          $$ChatRoomTableTableFilterComposer,
-          $$ChatRoomTableTableOrderingComposer,
-          $$ChatRoomTableTableAnnotationComposer,
-          $$ChatRoomTableTableCreateCompanionBuilder,
-          $$ChatRoomTableTableUpdateCompanionBuilder,
-          (ChatRoomEntry, $$ChatRoomTableTableReferences),
-          ChatRoomEntry,
+          $RoomTableTable,
+          RoomEntry,
+          $$RoomTableTableFilterComposer,
+          $$RoomTableTableOrderingComposer,
+          $$RoomTableTableAnnotationComposer,
+          $$RoomTableTableCreateCompanionBuilder,
+          $$RoomTableTableUpdateCompanionBuilder,
+          (RoomEntry, $$RoomTableTableReferences),
+          RoomEntry,
           PrefetchHooks Function({
             bool letterTableRefs,
-            bool chatMemberTableRefs,
+            bool roomMemberTableRefs,
           })
         > {
-  $$ChatRoomTableTableTableManager(_$DbClient db, $ChatRoomTableTable table)
+  $$RoomTableTableTableManager(_$DbClient db, $RoomTableTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$ChatRoomTableTableFilterComposer($db: db, $table: table),
+              $$RoomTableTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$ChatRoomTableTableOrderingComposer($db: db, $table: table),
+              $$RoomTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$ChatRoomTableTableAnnotationComposer($db: db, $table: table),
+              $$RoomTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
-              }) => ChatRoomTableCompanion(
+                Value<RoomType> type = const Value.absent(),
+              }) => RoomTableCompanion(
                 id: id,
                 name: name,
                 deletedAt: deletedAt,
+                type: type,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String name,
                 Value<DateTime?> deletedAt = const Value.absent(),
-              }) => ChatRoomTableCompanion.insert(
+                required RoomType type,
+              }) => RoomTableCompanion.insert(
                 id: id,
                 name: name,
                 deletedAt: deletedAt,
+                type: type,
               ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
                   e.readTable(table),
-                  $$ChatRoomTableTableReferences(db, table, e),
+                  $$RoomTableTableReferences(db, table, e),
                 ),
               )
               .toList(),
           prefetchHooksCallback:
-              ({letterTableRefs = false, chatMemberTableRefs = false}) {
+              ({letterTableRefs = false, roomMemberTableRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (letterTableRefs) db.letterTable,
-                    if (chatMemberTableRefs) db.chatMemberTable,
+                    if (roomMemberTableRefs) db.roomMemberTable,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (letterTableRefs)
                         await $_getPrefetchedData<
-                          ChatRoomEntry,
-                          $ChatRoomTableTable,
+                          RoomEntry,
+                          $RoomTableTable,
                           LetterEntry
                         >(
                           currentTable: table,
-                          referencedTable: $$ChatRoomTableTableReferences
+                          referencedTable: $$RoomTableTableReferences
                               ._letterTableRefsTable(db),
                           managerFromTypedResult: (p0) =>
-                              $$ChatRoomTableTableReferences(
+                              $$RoomTableTableReferences(
                                 db,
                                 table,
                                 p0,
@@ -3836,21 +4390,21 @@ class $$ChatRoomTableTableTableManager
                               ),
                           typedResults: items,
                         ),
-                      if (chatMemberTableRefs)
+                      if (roomMemberTableRefs)
                         await $_getPrefetchedData<
-                          ChatRoomEntry,
-                          $ChatRoomTableTable,
-                          ChatMemberEntry
+                          RoomEntry,
+                          $RoomTableTable,
+                          RoomMemberEntry
                         >(
                           currentTable: table,
-                          referencedTable: $$ChatRoomTableTableReferences
-                              ._chatMemberTableRefsTable(db),
+                          referencedTable: $$RoomTableTableReferences
+                              ._roomMemberTableRefsTable(db),
                           managerFromTypedResult: (p0) =>
-                              $$ChatRoomTableTableReferences(
+                              $$RoomTableTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).chatMemberTableRefs,
+                              ).roomMemberTableRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.chatRoomId == item.id,
@@ -3865,19 +4419,19 @@ class $$ChatRoomTableTableTableManager
       );
 }
 
-typedef $$ChatRoomTableTableProcessedTableManager =
+typedef $$RoomTableTableProcessedTableManager =
     ProcessedTableManager<
       _$DbClient,
-      $ChatRoomTableTable,
-      ChatRoomEntry,
-      $$ChatRoomTableTableFilterComposer,
-      $$ChatRoomTableTableOrderingComposer,
-      $$ChatRoomTableTableAnnotationComposer,
-      $$ChatRoomTableTableCreateCompanionBuilder,
-      $$ChatRoomTableTableUpdateCompanionBuilder,
-      (ChatRoomEntry, $$ChatRoomTableTableReferences),
-      ChatRoomEntry,
-      PrefetchHooks Function({bool letterTableRefs, bool chatMemberTableRefs})
+      $RoomTableTable,
+      RoomEntry,
+      $$RoomTableTableFilterComposer,
+      $$RoomTableTableOrderingComposer,
+      $$RoomTableTableAnnotationComposer,
+      $$RoomTableTableCreateCompanionBuilder,
+      $$RoomTableTableUpdateCompanionBuilder,
+      (RoomEntry, $$RoomTableTableReferences),
+      RoomEntry,
+      PrefetchHooks Function({bool letterTableRefs, bool roomMemberTableRefs})
     >;
 typedef $$LetterTableTableCreateCompanionBuilder =
     LetterTableCompanion Function({
@@ -3900,17 +4454,17 @@ final class $$LetterTableTableReferences
     extends BaseReferences<_$DbClient, $LetterTableTable, LetterEntry> {
   $$LetterTableTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $ChatRoomTableTable _chatRoomIdTable(_$DbClient db) =>
-      db.chatRoomTable.createAlias(
-        $_aliasNameGenerator(db.letterTable.chatRoomId, db.chatRoomTable.id),
+  static $RoomTableTable _chatRoomIdTable(_$DbClient db) =>
+      db.roomTable.createAlias(
+        $_aliasNameGenerator(db.letterTable.chatRoomId, db.roomTable.id),
       );
 
-  $$ChatRoomTableTableProcessedTableManager get chatRoomId {
+  $$RoomTableTableProcessedTableManager get chatRoomId {
     final $_column = $_itemColumn<int>('chat_room_id')!;
 
-    final manager = $$ChatRoomTableTableTableManager(
+    final manager = $$RoomTableTableTableManager(
       $_db,
-      $_db.chatRoomTable,
+      $_db.roomTable,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_chatRoomIdTable($_db));
     if (item == null) return manager;
@@ -3949,20 +4503,20 @@ class $$LetterTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  $$ChatRoomTableTableFilterComposer get chatRoomId {
-    final $$ChatRoomTableTableFilterComposer composer = $composerBuilder(
+  $$RoomTableTableFilterComposer get chatRoomId {
+    final $$RoomTableTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.chatRoomId,
-      referencedTable: $db.chatRoomTable,
+      referencedTable: $db.roomTable,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatRoomTableTableFilterComposer(
+          }) => $$RoomTableTableFilterComposer(
             $db: $db,
-            $table: $db.chatRoomTable,
+            $table: $db.roomTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4002,20 +4556,20 @@ class $$LetterTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  $$ChatRoomTableTableOrderingComposer get chatRoomId {
-    final $$ChatRoomTableTableOrderingComposer composer = $composerBuilder(
+  $$RoomTableTableOrderingComposer get chatRoomId {
+    final $$RoomTableTableOrderingComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.chatRoomId,
-      referencedTable: $db.chatRoomTable,
+      referencedTable: $db.roomTable,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatRoomTableTableOrderingComposer(
+          }) => $$RoomTableTableOrderingComposer(
             $db: $db,
-            $table: $db.chatRoomTable,
+            $table: $db.roomTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4047,20 +4601,20 @@ class $$LetterTableTableAnnotationComposer
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  $$ChatRoomTableTableAnnotationComposer get chatRoomId {
-    final $$ChatRoomTableTableAnnotationComposer composer = $composerBuilder(
+  $$RoomTableTableAnnotationComposer get chatRoomId {
+    final $$RoomTableTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.chatRoomId,
-      referencedTable: $db.chatRoomTable,
+      referencedTable: $db.roomTable,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatRoomTableTableAnnotationComposer(
+          }) => $$RoomTableTableAnnotationComposer(
             $db: $db,
-            $table: $db.chatRoomTable,
+            $table: $db.roomTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4192,41 +4746,38 @@ typedef $$LetterTableTableProcessedTableManager =
       LetterEntry,
       PrefetchHooks Function({bool chatRoomId})
     >;
-typedef $$ChatMemberTableTableCreateCompanionBuilder =
-    ChatMemberTableCompanion Function({
+typedef $$RoomMemberTableTableCreateCompanionBuilder =
+    RoomMemberTableCompanion Function({
       required int chatRoomId,
       required int userId,
       Value<int> rowid,
     });
-typedef $$ChatMemberTableTableUpdateCompanionBuilder =
-    ChatMemberTableCompanion Function({
+typedef $$RoomMemberTableTableUpdateCompanionBuilder =
+    RoomMemberTableCompanion Function({
       Value<int> chatRoomId,
       Value<int> userId,
       Value<int> rowid,
     });
 
-final class $$ChatMemberTableTableReferences
-    extends BaseReferences<_$DbClient, $ChatMemberTableTable, ChatMemberEntry> {
-  $$ChatMemberTableTableReferences(
+final class $$RoomMemberTableTableReferences
+    extends BaseReferences<_$DbClient, $RoomMemberTableTable, RoomMemberEntry> {
+  $$RoomMemberTableTableReferences(
     super.$_db,
     super.$_table,
     super.$_typedResult,
   );
 
-  static $ChatRoomTableTable _chatRoomIdTable(_$DbClient db) =>
-      db.chatRoomTable.createAlias(
-        $_aliasNameGenerator(
-          db.chatMemberTable.chatRoomId,
-          db.chatRoomTable.id,
-        ),
+  static $RoomTableTable _chatRoomIdTable(_$DbClient db) =>
+      db.roomTable.createAlias(
+        $_aliasNameGenerator(db.roomMemberTable.chatRoomId, db.roomTable.id),
       );
 
-  $$ChatRoomTableTableProcessedTableManager get chatRoomId {
+  $$RoomTableTableProcessedTableManager get chatRoomId {
     final $_column = $_itemColumn<int>('chat_room_id')!;
 
-    final manager = $$ChatRoomTableTableTableManager(
+    final manager = $$RoomTableTableTableManager(
       $_db,
-      $_db.chatRoomTable,
+      $_db.roomTable,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_chatRoomIdTable($_db));
     if (item == null) return manager;
@@ -4237,7 +4788,7 @@ final class $$ChatMemberTableTableReferences
 
   static $UserTableTable _userIdTable(_$DbClient db) =>
       db.userTable.createAlias(
-        $_aliasNameGenerator(db.chatMemberTable.userId, db.userTable.id),
+        $_aliasNameGenerator(db.roomMemberTable.userId, db.userTable.id),
       );
 
   $$UserTableTableProcessedTableManager get userId {
@@ -4255,29 +4806,29 @@ final class $$ChatMemberTableTableReferences
   }
 }
 
-class $$ChatMemberTableTableFilterComposer
-    extends Composer<_$DbClient, $ChatMemberTableTable> {
-  $$ChatMemberTableTableFilterComposer({
+class $$RoomMemberTableTableFilterComposer
+    extends Composer<_$DbClient, $RoomMemberTableTable> {
+  $$RoomMemberTableTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$ChatRoomTableTableFilterComposer get chatRoomId {
-    final $$ChatRoomTableTableFilterComposer composer = $composerBuilder(
+  $$RoomTableTableFilterComposer get chatRoomId {
+    final $$RoomTableTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.chatRoomId,
-      referencedTable: $db.chatRoomTable,
+      referencedTable: $db.roomTable,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatRoomTableTableFilterComposer(
+          }) => $$RoomTableTableFilterComposer(
             $db: $db,
-            $table: $db.chatRoomTable,
+            $table: $db.roomTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4311,29 +4862,29 @@ class $$ChatMemberTableTableFilterComposer
   }
 }
 
-class $$ChatMemberTableTableOrderingComposer
-    extends Composer<_$DbClient, $ChatMemberTableTable> {
-  $$ChatMemberTableTableOrderingComposer({
+class $$RoomMemberTableTableOrderingComposer
+    extends Composer<_$DbClient, $RoomMemberTableTable> {
+  $$RoomMemberTableTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$ChatRoomTableTableOrderingComposer get chatRoomId {
-    final $$ChatRoomTableTableOrderingComposer composer = $composerBuilder(
+  $$RoomTableTableOrderingComposer get chatRoomId {
+    final $$RoomTableTableOrderingComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.chatRoomId,
-      referencedTable: $db.chatRoomTable,
+      referencedTable: $db.roomTable,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatRoomTableTableOrderingComposer(
+          }) => $$RoomTableTableOrderingComposer(
             $db: $db,
-            $table: $db.chatRoomTable,
+            $table: $db.roomTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4367,29 +4918,29 @@ class $$ChatMemberTableTableOrderingComposer
   }
 }
 
-class $$ChatMemberTableTableAnnotationComposer
-    extends Composer<_$DbClient, $ChatMemberTableTable> {
-  $$ChatMemberTableTableAnnotationComposer({
+class $$RoomMemberTableTableAnnotationComposer
+    extends Composer<_$DbClient, $RoomMemberTableTable> {
+  $$RoomMemberTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$ChatRoomTableTableAnnotationComposer get chatRoomId {
-    final $$ChatRoomTableTableAnnotationComposer composer = $composerBuilder(
+  $$RoomTableTableAnnotationComposer get chatRoomId {
+    final $$RoomTableTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.chatRoomId,
-      referencedTable: $db.chatRoomTable,
+      referencedTable: $db.roomTable,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ChatRoomTableTableAnnotationComposer(
+          }) => $$RoomTableTableAnnotationComposer(
             $db: $db,
-            $table: $db.chatRoomTable,
+            $table: $db.roomTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4423,38 +4974,38 @@ class $$ChatMemberTableTableAnnotationComposer
   }
 }
 
-class $$ChatMemberTableTableTableManager
+class $$RoomMemberTableTableTableManager
     extends
         RootTableManager<
           _$DbClient,
-          $ChatMemberTableTable,
-          ChatMemberEntry,
-          $$ChatMemberTableTableFilterComposer,
-          $$ChatMemberTableTableOrderingComposer,
-          $$ChatMemberTableTableAnnotationComposer,
-          $$ChatMemberTableTableCreateCompanionBuilder,
-          $$ChatMemberTableTableUpdateCompanionBuilder,
-          (ChatMemberEntry, $$ChatMemberTableTableReferences),
-          ChatMemberEntry,
+          $RoomMemberTableTable,
+          RoomMemberEntry,
+          $$RoomMemberTableTableFilterComposer,
+          $$RoomMemberTableTableOrderingComposer,
+          $$RoomMemberTableTableAnnotationComposer,
+          $$RoomMemberTableTableCreateCompanionBuilder,
+          $$RoomMemberTableTableUpdateCompanionBuilder,
+          (RoomMemberEntry, $$RoomMemberTableTableReferences),
+          RoomMemberEntry,
           PrefetchHooks Function({bool chatRoomId, bool userId})
         > {
-  $$ChatMemberTableTableTableManager(_$DbClient db, $ChatMemberTableTable table)
+  $$RoomMemberTableTableTableManager(_$DbClient db, $RoomMemberTableTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$ChatMemberTableTableFilterComposer($db: db, $table: table),
+              $$RoomMemberTableTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$ChatMemberTableTableOrderingComposer($db: db, $table: table),
+              $$RoomMemberTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$ChatMemberTableTableAnnotationComposer($db: db, $table: table),
+              $$RoomMemberTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> chatRoomId = const Value.absent(),
                 Value<int> userId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => ChatMemberTableCompanion(
+              }) => RoomMemberTableCompanion(
                 chatRoomId: chatRoomId,
                 userId: userId,
                 rowid: rowid,
@@ -4464,7 +5015,7 @@ class $$ChatMemberTableTableTableManager
                 required int chatRoomId,
                 required int userId,
                 Value<int> rowid = const Value.absent(),
-              }) => ChatMemberTableCompanion.insert(
+              }) => RoomMemberTableCompanion.insert(
                 chatRoomId: chatRoomId,
                 userId: userId,
                 rowid: rowid,
@@ -4473,7 +5024,7 @@ class $$ChatMemberTableTableTableManager
               .map(
                 (e) => (
                   e.readTable(table),
-                  $$ChatMemberTableTableReferences(db, table, e),
+                  $$RoomMemberTableTableReferences(db, table, e),
                 ),
               )
               .toList(),
@@ -4503,10 +5054,10 @@ class $$ChatMemberTableTableTableManager
                                 currentTable: table,
                                 currentColumn: table.chatRoomId,
                                 referencedTable:
-                                    $$ChatMemberTableTableReferences
+                                    $$RoomMemberTableTableReferences
                                         ._chatRoomIdTable(db),
                                 referencedColumn:
-                                    $$ChatMemberTableTableReferences
+                                    $$RoomMemberTableTableReferences
                                         ._chatRoomIdTable(db)
                                         .id,
                               )
@@ -4518,10 +5069,10 @@ class $$ChatMemberTableTableTableManager
                                 currentTable: table,
                                 currentColumn: table.userId,
                                 referencedTable:
-                                    $$ChatMemberTableTableReferences
+                                    $$RoomMemberTableTableReferences
                                         ._userIdTable(db),
                                 referencedColumn:
-                                    $$ChatMemberTableTableReferences
+                                    $$RoomMemberTableTableReferences
                                         ._userIdTable(db)
                                         .id,
                               )
@@ -4539,19 +5090,237 @@ class $$ChatMemberTableTableTableManager
       );
 }
 
-typedef $$ChatMemberTableTableProcessedTableManager =
+typedef $$RoomMemberTableTableProcessedTableManager =
     ProcessedTableManager<
       _$DbClient,
-      $ChatMemberTableTable,
-      ChatMemberEntry,
-      $$ChatMemberTableTableFilterComposer,
-      $$ChatMemberTableTableOrderingComposer,
-      $$ChatMemberTableTableAnnotationComposer,
-      $$ChatMemberTableTableCreateCompanionBuilder,
-      $$ChatMemberTableTableUpdateCompanionBuilder,
-      (ChatMemberEntry, $$ChatMemberTableTableReferences),
-      ChatMemberEntry,
+      $RoomMemberTableTable,
+      RoomMemberEntry,
+      $$RoomMemberTableTableFilterComposer,
+      $$RoomMemberTableTableOrderingComposer,
+      $$RoomMemberTableTableAnnotationComposer,
+      $$RoomMemberTableTableCreateCompanionBuilder,
+      $$RoomMemberTableTableUpdateCompanionBuilder,
+      (RoomMemberEntry, $$RoomMemberTableTableReferences),
+      RoomMemberEntry,
       PrefetchHooks Function({bool chatRoomId, bool userId})
+    >;
+typedef $$WsConfigTableTableCreateCompanionBuilder =
+    WsConfigTableCompanion Function({
+      Value<int> id,
+      required String name,
+      Value<Role> role,
+      required String letterRoom,
+      required String counterRoom,
+      required int version,
+    });
+typedef $$WsConfigTableTableUpdateCompanionBuilder =
+    WsConfigTableCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<Role> role,
+      Value<String> letterRoom,
+      Value<String> counterRoom,
+      Value<int> version,
+    });
+
+class $$WsConfigTableTableFilterComposer
+    extends Composer<_$DbClient, $WsConfigTableTable> {
+  $$WsConfigTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Role, Role, String> get role =>
+      $composableBuilder(
+        column: $table.role,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get letterRoom => $composableBuilder(
+    column: $table.letterRoom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get counterRoom => $composableBuilder(
+    column: $table.counterRoom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WsConfigTableTableOrderingComposer
+    extends Composer<_$DbClient, $WsConfigTableTable> {
+  $$WsConfigTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get role => $composableBuilder(
+    column: $table.role,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get letterRoom => $composableBuilder(
+    column: $table.letterRoom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get counterRoom => $composableBuilder(
+    column: $table.counterRoom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WsConfigTableTableAnnotationComposer
+    extends Composer<_$DbClient, $WsConfigTableTable> {
+  $$WsConfigTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Role, String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
+
+  GeneratedColumn<String> get letterRoom => $composableBuilder(
+    column: $table.letterRoom,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get counterRoom => $composableBuilder(
+    column: $table.counterRoom,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+}
+
+class $$WsConfigTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $WsConfigTableTable,
+          WsConfigEntry,
+          $$WsConfigTableTableFilterComposer,
+          $$WsConfigTableTableOrderingComposer,
+          $$WsConfigTableTableAnnotationComposer,
+          $$WsConfigTableTableCreateCompanionBuilder,
+          $$WsConfigTableTableUpdateCompanionBuilder,
+          (
+            WsConfigEntry,
+            BaseReferences<_$DbClient, $WsConfigTableTable, WsConfigEntry>,
+          ),
+          WsConfigEntry,
+          PrefetchHooks Function()
+        > {
+  $$WsConfigTableTableTableManager(_$DbClient db, $WsConfigTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WsConfigTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WsConfigTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WsConfigTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<Role> role = const Value.absent(),
+                Value<String> letterRoom = const Value.absent(),
+                Value<String> counterRoom = const Value.absent(),
+                Value<int> version = const Value.absent(),
+              }) => WsConfigTableCompanion(
+                id: id,
+                name: name,
+                role: role,
+                letterRoom: letterRoom,
+                counterRoom: counterRoom,
+                version: version,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                Value<Role> role = const Value.absent(),
+                required String letterRoom,
+                required String counterRoom,
+                required int version,
+              }) => WsConfigTableCompanion.insert(
+                id: id,
+                name: name,
+                role: role,
+                letterRoom: letterRoom,
+                counterRoom: counterRoom,
+                version: version,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WsConfigTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $WsConfigTableTable,
+      WsConfigEntry,
+      $$WsConfigTableTableFilterComposer,
+      $$WsConfigTableTableOrderingComposer,
+      $$WsConfigTableTableAnnotationComposer,
+      $$WsConfigTableTableCreateCompanionBuilder,
+      $$WsConfigTableTableUpdateCompanionBuilder,
+      (
+        WsConfigEntry,
+        BaseReferences<_$DbClient, $WsConfigTableTable, WsConfigEntry>,
+      ),
+      WsConfigEntry,
+      PrefetchHooks Function()
     >;
 
 class $DbClientManager {
@@ -4563,10 +5332,12 @@ class $DbClientManager {
       $$TodoTableTableTableManager(_db, _db.todoTable);
   $$SessionTableTableTableManager get sessionTable =>
       $$SessionTableTableTableManager(_db, _db.sessionTable);
-  $$ChatRoomTableTableTableManager get chatRoomTable =>
-      $$ChatRoomTableTableTableManager(_db, _db.chatRoomTable);
+  $$RoomTableTableTableManager get roomTable =>
+      $$RoomTableTableTableManager(_db, _db.roomTable);
   $$LetterTableTableTableManager get letterTable =>
       $$LetterTableTableTableManager(_db, _db.letterTable);
-  $$ChatMemberTableTableTableManager get chatMemberTable =>
-      $$ChatMemberTableTableTableManager(_db, _db.chatMemberTable);
+  $$RoomMemberTableTableTableManager get roomMemberTable =>
+      $$RoomMemberTableTableTableManager(_db, _db.roomMemberTable);
+  $$WsConfigTableTableTableManager get wsConfigTable =>
+      $$WsConfigTableTableTableManager(_db, _db.wsConfigTable);
 }

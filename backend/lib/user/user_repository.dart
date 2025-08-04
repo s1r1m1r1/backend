@@ -44,7 +44,7 @@ class UserRepositoryImpl extends UserRepository {
     // we will hash the password here
     final hashedPassword = passwordHasherService.hashPassword(createUserDto.password);
 
-    stdout.writeln('createUser email next 2');
+    stdout.writeln('createUser email next 2 $hashedPassword');
     final user = await _datasource.createUser(createUserDto.copyWith(password: hashedPassword));
 
     stdout.writeln('createUser email next 3');
@@ -63,6 +63,7 @@ class UserRepositoryImpl extends UserRepository {
     }
     final password = loginUserDto.password;
 
+    stdout.writeln('$reset loginUser ${password}, h: ${user.password} $reset');
     final isPasswordCorrect = passwordHasherService.checkPassword(password: password, hashedPassword: user.password);
     if (!isPasswordCorrect) {
       stdout.writeln('loginUser Fail check passw incorrect');

@@ -7,21 +7,25 @@ import 'package:drift_dev/api/migrations_native.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
+import 'package:shared/shared.dart';
 import 'package:sqlite3/sqlite3.dart';
 // import 'package:uuid/uuid.dart';
-import 'dao/chat_room_dao.dart';
+import 'dao/config_dao.dart';
+import 'dao/room_dao.dart';
 import 'dao/user_dao.dart';
-import 'tables/chat_room_table.dart';
-import 'tables/chat_member_table.dart';
+import 'tables/ws_config_table.dart';
+import 'tables/room_table.dart';
+import 'tables/room_member_table.dart';
 import 'tables/letter_table.dart';
 import 'tables/session_table.dart';
 import 'tables/user_table.dart';
+import '../models/enums.dart';
 
 part 'db_client.g.dart';
 
 @DriftDatabase(
-  tables: [TodoTable, UserTable, SessionTable, LetterTable, ChatRoomTable, ChatMemberTable],
-  daos: [TodoDao, UserDao, SessionDao, LettersDao, ChatRoomDao],
+  tables: [TodoTable, UserTable, SessionTable, LetterTable, RoomTable, RoomMemberTable, WsConfigTable],
+  daos: [TodoDao, UserDao, SessionDao, LettersDao, RoomDao, ConfigDao],
 )
 class DbClient extends _$DbClient {
   DbClient(super.e);
@@ -76,12 +80,36 @@ class DbClient extends _$DbClient {
         if (details.wasCreated) {
           // Create a bunch of default values so the app doesn't look too empty
           // on the first start.
-          await batch((b) {
-            b.insertAll(chatRoomTable, [
-              ChatRoomTableCompanion.insert(name: 'dev'),
-              ChatRoomTableCompanion.insert(name: 'test'),
-            ]);
-          });
+          final devChat = await into(
+            roomTable,
+          ).insertReturning(RoomTableCompanion.insert(name: 'dev-chat', type: RoomType.chat));
+          final testChat = await into(
+            roomTable,
+          ).insertReturning(RoomTableCompanion.insert(name: 'test-chat', type: RoomType.chat));
+          final devCounter = await into(
+            roomTable,
+          ).insertReturning(RoomTableCompanion.insert(name: 'dev-counter', type: RoomType.counter));
+          final testCounter = await into(
+            roomTable,
+          ).insertReturning(RoomTableCompanion.insert(name: 'test-counter', type: RoomType.counter));
+          await into(wsConfigTable).insert(
+            WsConfigTableCompanion.insert(
+              name: 'dev',
+              role: Value(Role.user),
+              letterRoom: devChat.name,
+              counterRoom: devCounter.name,
+              version: 1,
+            ),
+          );
+          await into(wsConfigTable).insert(
+            WsConfigTableCompanion.insert(
+              name: 'test',
+              role: Value(Role.user),
+              letterRoom: testChat.name,
+              counterRoom: testCounter.name,
+              version: 1,
+            ),
+          );
         }
 
         // This follows the recommendation to validate that the database schema

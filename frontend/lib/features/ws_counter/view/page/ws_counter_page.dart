@@ -16,7 +16,7 @@ class CounterPage extends StatelessWidget {
         // via a dependency injection system or pass it from a parent widget.
         lazy: false,
         create: (_) =>
-            getIt<CounterBloc>()..add(const CounterStarted()), // Dispatch CounterStarted when the BLoC is created
+            getIt<CounterBloc>()..add(CounterEvent.started()), // Dispatch CounterStarted when the BLoC is created
         child: const CounterView(),
       ),
     );
@@ -67,12 +67,12 @@ class CounterView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 FloatingActionButton(
-                  onPressed: () => counterBloc.add(const CounterDecrementPressed()),
+                  onPressed: () => counterBloc.add(const CounterEvent.decrementPressed()),
                   heroTag: 'decrement', // Unique tag for hero animation
                   child: const Icon(Icons.remove),
                 ),
                 FloatingActionButton(
-                  onPressed: () => counterBloc.add(const CounterIncrementPressed()),
+                  onPressed: () => counterBloc.add(const CounterEvent.incrementPressed()),
                   heroTag: 'increment', // Unique tag for hero animation
                   child: const Icon(Icons.add),
                 ),
