@@ -56,12 +56,12 @@ class TodoListScreen extends StatelessWidget {
   }
 
   void _showAddTodoDialog(BuildContext context) {
-    final TextEditingController todoTitleController = TextEditingController();
     // Remove the underscore from variable name to follow Dart conventions
-    
+
     showDialog(
       context: context,
       builder: (context) {
+        final TextEditingController todoTitleController = TextEditingController();
         return AlertDialog(
           title: const Text('Add New Todo'),
           content: TextField(
@@ -83,6 +83,6 @@ class TodoListScreen extends StatelessWidget {
           ],
         );
       },
-    ).then((_) => todoTitleController.dispose()); // Dispose controller when dialog is closed
+    ); // Dispose controller when dialog is closed
   }
 }
