@@ -6,6 +6,7 @@ import 'package:backend/chat/broadcast.dart';
 import 'package:backend/chat/counter_repository.dart';
 import 'package:backend/chat/letters_repository.dart';
 import 'package:backend/core/log_colors.dart';
+import 'package:backend/models/user.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:shared/shared.dart';
@@ -163,11 +164,15 @@ class JoinLettersCommand implements WsCommand {
 class JoinCounterCommand implements WsCommand {
   @override
   void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) async {
-    stdout.writeln('$green JoinCounterCommand:start ${payload.runtimeType} ${payload.toString()} $reset');
+    stdout.writeln('$green JoinCounterCommand:start ${roomId} } $reset');
     final broadcast = context.read<Broadcast>();
+    // final user = context.read<User>();
     final counter = context.read<CounterRepository>().counter(roomId);
     // todo send error
+
+    stdout.writeln('$green JoinCounterCommand: $counter  $reset');
     if (counter == null) return;
+    stdout.writeln('$green JoinCounterCommand:hasCounter } $reset');
     broadcast.subscribe(roomId, channel);
     channel.sink.add(
       WsFromServer(

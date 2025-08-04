@@ -1,11 +1,14 @@
 import 'package:backend/db_client/tables/room_table.dart';
 import 'package:drift/drift.dart';
+import 'package:injectable/injectable.dart';
 
+import '../../inject/inject.dart';
 import '../db_client.dart';
 import '../tables/room_member_table.dart';
 
 part 'room_dao.g.dart';
 
+@LazySingleton(scope: BackendScope.name)
 @DriftAccessor(tables: [RoomTable, RoomMemberTable])
 class RoomDao extends DatabaseAccessor<DbClient> with _$RoomDaoMixin {
   // this constructor is required so that the main database can create an instance

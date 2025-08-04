@@ -219,7 +219,7 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.8.1",
+  "generatorVersion": "3.9.0-333.2.beta",
   "flutterRoot": "file:///Users/today/.asdf/installs/flutter/3.32.4-stable",
   "flutterVersion": "3.32.4",
   "pubCache": "file:///Users/today/.pub-cache"

@@ -94,7 +94,7 @@ class DbClient extends _$DbClient {
           ).insertReturning(RoomTableCompanion.insert(name: 'test-counter', type: RoomType.counter));
           await into(wsConfigTable).insert(
             WsConfigTableCompanion.insert(
-              name: 'dev',
+              name: 'user',
               role: Value(Role.user),
               letterRoom: devChat.name,
               counterRoom: devCounter.name,
@@ -104,7 +104,7 @@ class DbClient extends _$DbClient {
           await into(wsConfigTable).insert(
             WsConfigTableCompanion.insert(
               name: 'test',
-              role: Value(Role.user),
+              role: Value(Role.tester),
               letterRoom: testChat.name,
               counterRoom: testCounter.name,
               version: 1,
