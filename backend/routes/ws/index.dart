@@ -6,18 +6,13 @@ import 'package:backend/chat/broadcast.dart';
 import 'package:backend/chat/counter_repository.dart';
 import 'package:backend/chat/letters_repository.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/models/user.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:shared/shared.dart';
 
-const defaultChatRoomId = 'general-chat';
-const defaultCounter = 'general-chat';
-
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
     final broadcast = context.read<Broadcast>();
-    broadcast.subscribe(defaultChatRoomId, channel);
     stdout.writeln('$green onEvent $reset');
     channel.stream.listen(
       (message) {
@@ -34,7 +29,7 @@ Future<Response> onRequest(RequestContext context) async {
         }
       },
       onDone: () {
-        // _broadcast.unsubscribe(defaultChatRoomId, channel);
+        broadcast.unsubscribeAll(channel);
         channel.sink.close();
       },
     );
@@ -86,7 +81,7 @@ class DecrementCounterCommand implements WsCommand {
   void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
     final counter = context.read<CounterRepository>().counter(roomId);
     if (counter == null) return;
-    final count = counter.increment();
+    final count = counter.decrement();
 
     channel.sink.add(
       jsonEncode(
