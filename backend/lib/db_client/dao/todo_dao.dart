@@ -2,9 +2,13 @@ import 'package:backend/db_client/db_client.dart';
 import 'package:backend/db_client/tables/todo_table.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:drift/drift.dart';
+import 'package:injectable/injectable.dart';
+
+import '../../inject/inject.dart';
 
 part 'todo_dao.g.dart';
 
+@LazySingleton(scope: BackendScope.name)
 @DriftAccessor(tables: [TodoTable])
 class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
   // this constructor is required so that the main database can create an instance

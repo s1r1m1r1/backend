@@ -21,16 +21,12 @@ Future<Response> onRequest(RequestContext context) async {
 
 FutureOr<Response> getConfig(RequestContext context) async {
   try {
-    stdout.writeln('getConfig 1');
     final user = context.read<User>();
 
-    stdout.writeln('getConfig 2');
     final configRepo = context.read<WsConfigRepository>();
 
-    stdout.writeln('getConfig 3');
     final config = await configRepo.getConfig(user.role);
 
-    stdout.writeln('getConfig 4');
     return Response.json(body: config.toJson());
   } catch (e) {
     stdout.writeln('getConfig err $e');

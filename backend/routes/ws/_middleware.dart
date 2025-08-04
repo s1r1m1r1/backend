@@ -1,14 +1,17 @@
 import 'package:backend/chat/broadcast.dart';
 import 'package:backend/chat/counter_repository.dart';
+import 'package:backend/inject/inject.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 // for all users , create one for all
 var _broadcast = Broadcast();
-var _counterRepository = CounterRepository();
-
+//
+// Todo
+// check token for user once for init connection
+//
 Handler middleware(Handler handler) {
   return handler
       .use(requestLogger())
       .use(provider<Broadcast>((_) => _broadcast))
-      .use(provider<CounterRepository>((_) => _counterRepository));
+      .use(provider<CounterRepository>((_) => getIt<CounterRepository>()));
 }

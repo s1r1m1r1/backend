@@ -4,13 +4,18 @@ import 'dart:io';
 import 'package:backend/config/ws_config_datasource.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
+import 'package:injectable/injectable.dart';
 import 'package:shared/shared.dart';
+
+import '../inject/inject.dart';
 
 abstract class WsConfigRepository {
   FutureOr<void> init();
   FutureOr<WsConfigDto> getConfig(Role role);
+  Map<Role, WsConfigDto> get configs;
 }
 
+@LazySingleton(as: WsConfigRepository, scope: BackendScope.name)
 class WsConfigRepositoryImpl implements WsConfigRepository {
   final WsConfigDatasource _datasource;
 
@@ -23,7 +28,9 @@ class WsConfigRepositoryImpl implements WsConfigRepository {
     final entries = await _datasource.getListConfig();
     stdout.writeln('$magenta init count ${entries.length}$reset');
     for (final entry in entries) {
-      stdout.writeln('$magenta init role ${entry.role}$reset');
+      stdout.writeln(
+        '$magenta init name: ${entry.name},letterRoom: ${entry.lettersRoom},counterRoom: ${entry.counterRoom} role: ${entry.role}$reset',
+      );
       _configs[entry.role] = entry;
     }
   }
@@ -35,4 +42,7 @@ class WsConfigRepositoryImpl implements WsConfigRepository {
     if (dto == null) throw ApiException.notFound(message: 'ws not found config for role $role');
     return dto;
   }
+
+  @override
+  Map<Role, WsConfigDto> get configs => _configs;
 }

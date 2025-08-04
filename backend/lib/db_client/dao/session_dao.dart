@@ -3,12 +3,15 @@ import 'dart:io';
 
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart';
+import 'package:injectable/injectable.dart';
 
 import '../../core/log_colors.dart';
+import '../../inject/inject.dart';
 import '../tables/session_table.dart';
 
 part 'session_dao.g.dart';
 
+@LazySingleton(scope: BackendScope.name)
 @DriftAccessor(tables: [SessionTable])
 class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
   // this constructor is required so that the main database can create an instance
