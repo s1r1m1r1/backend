@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shared/shared.dart';
 
-import 'serializers/datetime_converter.dart';
 part 'user.freezed.dart';
 part 'user.g.dart';
 
@@ -10,7 +10,8 @@ abstract class User with _$User {
   const factory User({
     required int userId,
     required String email,
-    @DateTimeConverter() required DateTime createdAt,
+    required Role role,
+    required DateTime createdAt,
     @Default('') String password,
   }) = _User;
 

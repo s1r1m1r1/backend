@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../app/logger/log_colors.dart';
 import '../../features/auth/domain/auth_repository.dart';
 
 class AuthInterceptor extends Interceptor {
@@ -14,10 +15,10 @@ class AuthInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final token = _authRepository.getToken(); // Retrieve token from secure storage
     if (token != null) {
-      debugPrint('with Bearer $token');
+      debugPrint('$green with Bearer $token $reset');
       options.headers['Authorization'] = 'Bearer $token';
     } else {
-      debugPrint('No token found, proceeding without Authorization header');
+      debugPrint('$red No token found, proceeding without Authorization header$reset');
     }
     super.onRequest(options, handler);
   }
@@ -32,7 +33,7 @@ class AuthInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // Handle token refresh logic here if needed (e.g., 401 Unauthorized)
     if (err.response?.statusCode == 401) {
-      debugPrint('Unauthorized. Attempting to refresh token...');
+      debugPrint('$red Unauthorized. Attempting to refresh token... $reset');
       _authRepository.onTokenExpired();
       // Potentially attempt to refresh token and retry the request
 
@@ -52,7 +53,7 @@ class AuthInterceptor extends Interceptor {
           handler.resolve(response); // Resolve with the new response
           return; // Important: prevent further handling
         } on DioException catch (retryErr) {
-          debugPrint('Retry failed: $retryErr');
+          debugPrint('$reset Retry failed: $retryErr $reset');
           _authRepository.onTokenExpired(); // Force re-login if retry fails
           handler.next(retryErr); // Pass the retry error down
           return;

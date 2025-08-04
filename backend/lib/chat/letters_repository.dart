@@ -18,7 +18,7 @@ class LettersRepository {
     try {
       final entry = await _dao.insertRow(
         LetterTableCompanion(
-          chatRoomId: Value(0),
+          chatRoomId: Value(letter.chatRoomId),
           content: Value(letter.content),
           senderId: Value(letter.senderId),
           createdAt: Value(DateTime.now()),
@@ -30,7 +30,7 @@ class LettersRepository {
       stdout.writeln('Creating letter: success');
       return LetterDto(
         id: entry!.id,
-        chatRoomId: entry.chatRoomId!,
+        chatRoomId: entry.chatRoomId,
         senderId: entry.senderId,
         content: entry.content,
         createdAt: entry.createdAt,
@@ -55,8 +55,7 @@ class LettersRepository {
       final messages = await _dao.getListLetter();
 
       return messages.map(
-        (i) =>
-            LetterDto(chatRoomId: i.chatRoomId ?? 0, content: i.content, senderId: i.senderId, createdAt: i.createdAt),
+        (i) => LetterDto(chatRoomId: i.chatRoomId, content: i.content, senderId: i.senderId, createdAt: i.createdAt),
       );
     } catch (err) {
       throw Exception(err);
@@ -68,8 +67,7 @@ class LettersRepository {
       final messages = await _dao.getListLetter();
 
       return messages.map(
-        (i) =>
-            LetterDto(chatRoomId: i.chatRoomId ?? 0, content: i.content, senderId: i.senderId, createdAt: i.createdAt),
+        (i) => LetterDto(chatRoomId: i.chatRoomId, content: i.content, senderId: i.senderId, createdAt: i.createdAt),
       );
     } catch (err) {
       throw Exception(err);

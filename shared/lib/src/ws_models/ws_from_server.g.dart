@@ -23,5 +23,6 @@ const _$WsEventFromServerEnumMap = {
   WsEventFromServer.letters: 'letters',
   WsEventFromServer.counter: 'counter',
   WsEventFromServer.letterCreated: 'letterCreated',
-  WsEventFromServer.joinedChannel: 'joinedChannel',
+  WsEventFromServer.joinedCounter: 'joinedCounter',
+  WsEventFromServer.joinedLetters: 'joinedLetters',
 };

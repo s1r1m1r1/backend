@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- int get userId; String get email;@DateTimeConverter() DateTime get createdAt; String get password;
+ int get userId; String get email; Role get role; DateTime get createdAt; String get password;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,7 +30,7 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 String toString() {
-  return 'User(userId: $userId, email: $email, createdAt: $createdAt, password: $password)';
+  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, password: $password)';
 }
 
 
@@ -41,7 +41,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- int userId, String email,@DateTimeConverter() DateTime createdAt, String password
+ int userId, String email, Role role, DateTime createdAt, String password
 });
 
 
@@ -58,11 +58,12 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? email = null,Object? createdAt = null,Object? password = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? email = null,Object? role = null,Object? createdAt = null,Object? password = null,}) {
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as int,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as Role,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -149,10 +150,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int userId,  String email, @DateTimeConverter()  DateTime createdAt,  String password)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int userId,  String email,  Role role,  DateTime createdAt,  String password)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.userId,_that.email,_that.createdAt,_that.password);case _:
+return $default(_that.userId,_that.email,_that.role,_that.createdAt,_that.password);case _:
   return orElse();
 
 }
@@ -170,10 +171,10 @@ return $default(_that.userId,_that.email,_that.createdAt,_that.password);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int userId,  String email, @DateTimeConverter()  DateTime createdAt,  String password)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int userId,  String email,  Role role,  DateTime createdAt,  String password)  $default,) {final _that = this;
 switch (_that) {
 case _User():
-return $default(_that.userId,_that.email,_that.createdAt,_that.password);case _:
+return $default(_that.userId,_that.email,_that.role,_that.createdAt,_that.password);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -190,10 +191,10 @@ return $default(_that.userId,_that.email,_that.createdAt,_that.password);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int userId,  String email, @DateTimeConverter()  DateTime createdAt,  String password)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int userId,  String email,  Role role,  DateTime createdAt,  String password)?  $default,) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.userId,_that.email,_that.createdAt,_that.password);case _:
+return $default(_that.userId,_that.email,_that.role,_that.createdAt,_that.password);case _:
   return null;
 
 }
@@ -205,12 +206,13 @@ return $default(_that.userId,_that.email,_that.createdAt,_that.password);case _:
 @JsonSerializable()
 
 class _User extends User {
-  const _User({required this.userId, required this.email, @DateTimeConverter() required this.createdAt, this.password = ''}): super._();
+  const _User({required this.userId, required this.email, required this.role, required this.createdAt, this.password = ''}): super._();
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  int userId;
 @override final  String email;
-@override@DateTimeConverter() final  DateTime createdAt;
+@override final  Role role;
+@override final  DateTime createdAt;
 @override@JsonKey() final  String password;
 
 /// Create a copy of User
@@ -228,7 +230,7 @@ Map<String, dynamic> toJson() {
 
 @override
 String toString() {
-  return 'User(userId: $userId, email: $email, createdAt: $createdAt, password: $password)';
+  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, password: $password)';
 }
 
 
@@ -239,7 +241,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- int userId, String email,@DateTimeConverter() DateTime createdAt, String password
+ int userId, String email, Role role, DateTime createdAt, String password
 });
 
 
@@ -256,11 +258,12 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? email = null,Object? createdAt = null,Object? password = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? email = null,Object? role = null,Object? createdAt = null,Object? password = null,}) {
   return _then(_User(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as int,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as Role,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,
   ));

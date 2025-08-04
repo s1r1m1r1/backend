@@ -1,5 +1,3 @@
-import 'package:drift/native.dart';
-
 import 'db_client.dart';
 import 'package:injectable/injectable.dart';
 
@@ -7,8 +5,4 @@ import 'package:injectable/injectable.dart';
 abstract class DbClientModule {
   @lazySingleton
   DbClient get dbClient => DbClient();
-
-  @Named("Memory")
-  @lazySingleton
-  DbClient get memoryDbClient => DbClient(NativeDatabase.memory());
 }

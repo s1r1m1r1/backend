@@ -7,6 +7,7 @@ import 'package:frontend/features/auth/data/request_email_credential_dto.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/shared.dart';
 
+import '../../app/logger/log_colors.dart';
 import '../../models/user.dart';
 
 @lazySingleton
@@ -41,11 +42,11 @@ class RegistrationApiService {
   }
 
   Future<TokenDto> login(RequestEmailCredentialDto dto) async {
+    debugPrint('$green Login start $reset ');
     final response = await _client.post('/users/login', data: dto.toJson());
     if (response.statusCode == HttpStatus.accepted) {
       final decoded = response.data; // Assuming it returns some user data/token
-
-      debugPrint('Login  response: $decoded');
+      debugPrint('$green Login response: $reset $decoded');
       return TokenDto.fromJson(decoded);
     } else {
       throw Exception('Failed to log in');
@@ -53,6 +54,7 @@ class RegistrationApiService {
   }
 
   Future<TokenDto> refresh(String refreshToken) async {
+    debugPrint('$green refresh start $reset ');
     final response = await _client.post(
       '/users/refresh',
       data: RefreshDto(refreshToken).toJson(),
@@ -61,7 +63,7 @@ class RegistrationApiService {
 
     if (response.statusCode == HttpStatus.accepted) {
       final decoded = response.data; // Assuming it returns some user data/token
-      debugPrint('Refresh token response: $decoded');
+      debugPrint('$green Refresh token $reset response: $decoded');
       return TokenDto.fromJson(decoded);
     } else {
       throw Exception('Failed to refresh token');

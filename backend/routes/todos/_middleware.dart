@@ -28,6 +28,12 @@ Handler sessionTodoMiddleware(Handler handler) {
       stdout.writeln("session is null");
       return Response.json(body: {'message': 'Invalid or expired session token'}, statusCode: HttpStatus.unauthorized);
     }
+    final isTokenValid = sessionRepository.validateToken(session);
+    if (!isTokenValid) {
+      stdout.writeln("token is not valid");
+      return Response.json(body: {'message': 'Invalid or expired session token'}, statusCode: HttpStatus.unauthorized);
+    }
+
     final user = await context.read<UserRepository>().getUser(userId: session.userId);
     if (user == null) {
       stdout.writeln("user is null");
@@ -35,19 +41,20 @@ Handler sessionTodoMiddleware(Handler handler) {
     }
     // Attach userId to context for downstream handlers
     var updatedContext = context.provide<Session>(() => session);
-    updatedContext = _handleAuthDependencies(context, user);
+    updatedContext = updatedContext.provide<User>(() => user);
+    updatedContext = _handleAuthDependencies(updatedContext);
     return handler(updatedContext);
   };
 }
 
-RequestContext _handleAuthDependencies(RequestContext context, User user) {
+RequestContext _handleAuthDependencies(RequestContext context) {
   final db = context.read<DbClient>();
   final todoDao = db.todoDao;
   final todoDs = TodoDataSourceImpl(todoDao);
+  final user = context.read<User>();
   final todoRepo = TodoRepositoryImpl(todoDs, user);
   late RequestContext updatedContext;
-  updatedContext = context.provide<User>(() => user);
-  updatedContext = updatedContext.provide<TodoRepository>(() => todoRepo);
+  updatedContext = context.provide<TodoRepository>(() => todoRepo);
   updatedContext = updatedContext.provide<TodoDataSource>(() => todoDs);
 
   return updatedContext;

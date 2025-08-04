@@ -12,6 +12,8 @@ abstract class SessionRepository {
 
   Future<Session?> getSession({String? token, String? refreshToken, int? userId});
 
+  bool validateToken(Session session);
+
   FutureOr<void> deleteSession(int userId);
 }
 
@@ -48,14 +50,7 @@ class SessionRepositoryImpl implements SessionRepository {
   @override
   Future<Session?> getSession({String? token, String? refreshToken, int? userId}) async {
     final session = await sessionDatasource.getSession(refreshToken: refreshToken, token: token, userId: userId);
-
-    if (session != null && session.refreshTokenExpiry.isAfter(_now())) {
-      return session;
-    } else if (session != null) {
-      await sessionDatasource.deleteSession(session.userId);
-    }
-
-    return null;
+    return session;
   }
 
   @override
@@ -77,5 +72,10 @@ class SessionRepositoryImpl implements SessionRepository {
     final isOk = await sessionDatasource.insertSession(updated);
     if (isOk) return updated;
     throw ApiException.internalServerError();
+  }
+
+  @override
+  bool validateToken(Session session) {
+    return session.tokenExpiryDate.isAfter(_now());
   }
 }

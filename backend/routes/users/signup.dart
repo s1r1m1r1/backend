@@ -10,6 +10,7 @@ import 'package:backend/user/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart' as frog;
 import 'package:dart_frog/dart_frog.dart';
 import 'package:shared/shared.dart';
+import 'package:stack_trace/stack_trace.dart';
 
 FutureOr<frog.Response> onRequest(frog.RequestContext context) {
   return switch (context.request.method) {
@@ -21,14 +22,20 @@ FutureOr<frog.Response> onRequest(frog.RequestContext context) {
 FutureOr<Response> signup(RequestContext context) async {
   try {
     final body = await parseJson(context.request);
+    stdout.writeln('$magenta signup 1$reset');
     final createUser = CreateUserDto.validated(body);
 
+    stdout.writeln('$magenta signup 2$reset');
     final userRepository = context.read<UserRepository>();
+
+    stdout.writeln('$magenta signup 3$reset');
     final user = await userRepository.createUser(createUser);
 
+    stdout.writeln('$magenta signup 4$reset');
     final sessionRepository = context.read<SessionRepository>();
     final session = await sessionRepository.createSession(user.userId);
 
+    stdout.writeln('$magenta signup return ${session.token} ${session.refreshToken} $reset');
     return Response.json(
       body: TokenDto(accessToken: session.token, refreshToken: session.refreshToken).toJson(),
       statusCode: HttpStatus.created,
@@ -37,7 +44,7 @@ FutureOr<Response> signup(RequestContext context) async {
     stdout.writeln('$red signup err $reset ${stack}');
     return Response.json(body: {'message': e.message, 'errors': e.errors}, statusCode: e.statusCode);
   } catch (e, stack) {
-    stdout.writeln('$magenta signup UNKNOWN ERROR $reset ${stack}');
+    stdout.writeln('$magenta signup UNKNOWN ERROR $reset ${Chain.forTrace(stack)}');
     return Response.json(
       body: {'message': 'An unexpected error occurred. Please try again later'},
       statusCode: HttpStatus.internalServerError,

@@ -1,0 +1,26 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+WsConfigDto _$WsConfigDtoFromJson(Map<String, dynamic> json) => WsConfigDto(
+  name: json['name'] as String,
+  role: $enumDecode(_$RoleEnumMap, json['role']),
+  lettersRoom: json['lettersRoom'] as String,
+  counterRoom: json['counterRoom'] as String,
+  version: (json['version'] as num).toInt(),
+);
+
+Map<String, dynamic> _$WsConfigDtoToJson(WsConfigDto instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'role': _$RoleEnumMap[instance.role]!,
+      'lettersRoom': instance.lettersRoom,
+      'counterRoom': instance.counterRoom,
+      'version': instance.version,
+    };
+
+const _$RoleEnumMap = {
+  Role.admin: 'admin',
+  Role.user: 'user',
+  Role.tester: 'tester',
+};
