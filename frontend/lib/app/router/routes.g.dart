@@ -13,6 +13,7 @@ List<RouteBase> get $appRoutes => [
   $todoListRoute,
   $wSCounterRoute,
   $lettersRoute,
+  $adminRoute,
 ];
 
 RouteBase get $homeRoute =>
@@ -142,6 +143,29 @@ mixin _$LettersRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/letters');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $adminRoute =>
+    GoRouteData.$route(path: '/admin', factory: _$AdminRoute._fromState);
+
+mixin _$AdminRoute on GoRouteData {
+  static AdminRoute _fromState(GoRouterState state) => const AdminRoute();
+
+  @override
+  String get location => GoRouteData.$location('/admin');
 
   @override
   void go(BuildContext context) => context.go(location);

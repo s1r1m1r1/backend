@@ -11,4 +11,5 @@ enum WsEventToServer {
   listRooms,
   sendLetterToRoom,
   fetchRoomHistory,
+  joinAdmin,
 }

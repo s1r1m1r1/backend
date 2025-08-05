@@ -6,17 +6,20 @@ import 'package:rxdart/rxdart.dart';
 import 'package:web_socket_client/web_socket_client.dart';
 import 'package:shared/shared.dart';
 
+import '../../features/admin/_domain/admin_repository.dart';
 import '../typedef.dart';
 
 @lazySingleton
 class WsManager {
   final WsCounterRepository _counterRepository;
   final WsLettersRepository _lettersRepository;
+  final AdminRepository _adminRepository;
 
   final WebSocket _ws;
-  WsManager(this._counterRepository, this._lettersRepository, this._ws) {
+  WsManager(this._counterRepository, this._lettersRepository, this._ws, this._adminRepository) {
     _counterRepository.send = send;
     _lettersRepository.send = send;
+    _adminRepository.send = send;
 
     _listen();
   }
@@ -46,6 +49,9 @@ class WsManager {
         case WsEventFromServer.joinedLetters:
           final payload = LettersPayload.fromJson(fromServer.payload as Json);
           _lettersRepository.setLetters(payload.letters.toList());
+        case WsEventFromServer.adminInfo:
+          final payload = IdPayload.fromJson(fromServer.payload as Json);
+          _adminRepository.setInfo(payload.id);
       }
     });
   }

@@ -1,1 +1,1 @@
-enum WsEventFromServer { letters, counter, letterCreated, joinedCounter, joinedLetters }
+enum WsEventFromServer { letters, counter, letterCreated, joinedCounter, joinedLetters, adminInfo }

@@ -15,6 +15,7 @@ export 'package:shared/src/ws_models/ws_event_to_server.dart';
 export 'package:shared/src/ws_models/ws_event_from_server.dart';
 export 'package:shared/src/ws_models/ws_from_server.dart';
 export 'package:shared/src/ws_models/payloads.dart';
+export 'package:shared/src/payload/id_payload.dart';
 
 // export 'package:shared/src/models/room_dto.dart';
 // export 'package:shared/src/models/room_member_dto.dart';

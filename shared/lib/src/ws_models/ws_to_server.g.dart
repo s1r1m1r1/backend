@@ -32,4 +32,5 @@ const _$WsEventToServerEnumMap = {
   WsEventToServer.listRooms: 'listRooms',
   WsEventToServer.sendLetterToRoom: 'sendLetterToRoom',
   WsEventToServer.fetchRoomHistory: 'fetchRoomHistory',
+  WsEventToServer.joinAdmin: 'joinAdmin',
 };

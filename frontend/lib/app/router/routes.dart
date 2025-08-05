@@ -4,9 +4,10 @@ import 'package:frontend/features/todo/view/page/todo_list_screen.dart';
 import 'package:frontend/features/ws_counter/view/page/ws_counter_page.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/admin/view/admin_page.dart';
 import '../../features/auth/view/pages/signup_screen.dart';
 import '../../features/letters/view/letters_page.dart';
-import '../../screens/home_screen.dart';
+import '../../features/screens/home_screen.dart';
 
 part 'routes.g.dart';
 
@@ -16,7 +17,7 @@ class HomeRoute extends GoRouteData with _$HomeRoute {
   static const path = '/home';
 
   @override
-  Widget build(context, state) => const HomeScreen();
+  Widget build(_, _) => const HomeScreen();
 }
 
 @TypedGoRoute<LoginRoute>(path: LoginRoute.path)
@@ -25,7 +26,7 @@ class LoginRoute extends GoRouteData with _$LoginRoute {
   const LoginRoute();
 
   @override
-  Widget build(context, state) => LoginScreen();
+  Widget build(_, _) => LoginScreen();
 }
 
 @TypedGoRoute<SignupRoute>(path: SignupRoute.path)
@@ -34,7 +35,7 @@ class SignupRoute extends GoRouteData with _$SignupRoute {
   const SignupRoute();
 
   @override
-  Widget build(context, state) => SignupScreen();
+  Widget build(_, _) => SignupScreen();
 }
 
 @TypedGoRoute<TodoListRoute>(path: TodoListRoute.path)
@@ -43,7 +44,7 @@ class TodoListRoute extends GoRouteData with _$TodoListRoute {
   const TodoListRoute();
 
   @override
-  Widget build(context, state) => TodoListScreen();
+  Widget build(_, _) => TodoListScreen();
 }
 
 @TypedGoRoute<WSCounterRoute>(path: WSCounterRoute.path)
@@ -52,7 +53,7 @@ class WSCounterRoute extends GoRouteData with _$WSCounterRoute {
   const WSCounterRoute();
 
   @override
-  Widget build(context, state) => CounterPage();
+  Widget build(_, _) => CounterPage();
 }
 
 @TypedGoRoute<LettersRoute>(path: LettersRoute.path)
@@ -61,5 +62,14 @@ class LettersRoute extends GoRouteData with _$LettersRoute {
   const LettersRoute();
 
   @override
-  Widget build(context, state) => LettersPage();
+  Widget build(_, _) => LettersPage();
+}
+
+@TypedGoRoute<AdminRoute>(path: AdminRoute.path)
+class AdminRoute extends GoRouteData with _$AdminRoute {
+  static const path = '/admin';
+  const AdminRoute();
+
+  @override
+  Widget build(_, _) => AdminPage();
 }
