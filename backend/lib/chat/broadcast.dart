@@ -18,6 +18,8 @@ class Broadcast {
   /// A lock to prevent concurrent modifications to the maps.
   final _lock = Lock();
 
+  int get count => _channelsByTopic.length;
+
   /// Broadcasts a message to all channels subscribed to a specific topic.
   ///
   /// The [topicId] is the identifier for the group (e.g., a chat room ID).
@@ -80,6 +82,7 @@ class Broadcast {
       // Clean up the reverse-lookup map if the channel has no more subscriptions.
       if (_topicsByChannel[channel]?.isEmpty ?? false) {
         _topicsByChannel.remove(channel);
+        channel.sink.close();
       }
     });
   }

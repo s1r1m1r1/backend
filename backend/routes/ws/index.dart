@@ -17,15 +17,20 @@ Future<Response> onRequest(RequestContext context) async {
     channel.stream.listen(
       (message) {
         if (message is! String) {
+          stdout.writeln('$green onEvent not string $reset');
           channel.sink.add('Invalid message');
           return;
         }
 
         Map<String, dynamic> decoded = jsonDecode(message);
+        stdout.writeln('$green onEvent $decoded $reset');
         final request = WsToServer.fromJson(decoded);
         final command = _commandHandlers[request.eventType];
         if (command != null) {
+          stdout.writeln('$red command has  $reset');
           command.execute(context, request.roomId, channel, request.payload);
+        } else {
+          stdout.writeln('$red command not found $reset');
         }
       },
       onDone: () {
@@ -40,6 +45,7 @@ Future<Response> onRequest(RequestContext context) async {
 
 // This map is defined outside the stream listener, usually at the top of the file or in a separate file.
 final _commandHandlers = <WsEventToServer, WsCommand>{
+  WsEventToServer.joinAdmin: JoinAdminCommand(),
   WsEventToServer.incrementCounter: IncrementCounterCommand(),
   WsEventToServer.decrementCounter: DecrementCounterCommand(),
   WsEventToServer.newLetter: NewLetterCommand(),
@@ -147,11 +153,13 @@ class JoinLettersCommand implements WsCommand {
     broadcast.subscribe(topicId, channel);
     final letters = await context.read<LettersRepository>().fetchAllLetters();
     channel.sink.add(
-      WsFromServer(
-        roomId: topicId,
-        eventType: WsEventFromServer.joinedLetters,
-        payload: LettersPayload(letters).toJson(),
-      ).toJson(),
+      jsonEncode(
+        WsFromServer(
+          roomId: topicId,
+          eventType: WsEventFromServer.joinedLetters,
+          payload: LettersPayload(letters).toJson(),
+        ).toJson(),
+      ),
     );
   }
 }
@@ -169,12 +177,47 @@ class JoinCounterCommand implements WsCommand {
     if (counter == null) return;
     stdout.writeln('$green JoinCounterCommand:hasCounter } $reset');
     broadcast.subscribe(roomId, channel);
+    broadcast.broadcast(
+      'admin',
+      jsonEncode(
+        WsFromServer(
+          roomId: 'admin',
+          eventType: WsEventFromServer.adminInfo,
+          payload: IdPayload(broadcast.count).toJson(),
+        ).toJson(),
+      ),
+    );
     channel.sink.add(
-      WsFromServer(
-        roomId: roomId,
-        eventType: WsEventFromServer.joinedCounter,
-        payload: CounterPayload(counter.value).toJson(),
-      ).toJson(),
+      jsonEncode(
+        WsFromServer(
+          roomId: roomId,
+          eventType: WsEventFromServer.joinedCounter,
+          payload: CounterPayload(counter.value).toJson(),
+        ).toJson(),
+      ),
+    );
+  }
+}
+
+class JoinAdminCommand implements WsCommand {
+  @override
+  void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) async {
+    stdout.writeln('$magenta JoinAdminCommand:start ${roomId} } $reset');
+    final broadcast = context.read<Broadcast>();
+    // final user = context.read<User>();
+    // todo send error
+
+    stdout.writeln('$green JoinAdminCommand:hasCounter } $reset');
+    broadcast.subscribe(roomId, channel);
+    broadcast.broadcast(
+      'admin',
+      jsonEncode(
+        WsFromServer(
+          roomId: 'admin',
+          eventType: WsEventFromServer.adminInfo,
+          payload: IdPayload(broadcast.count).toJson(),
+        ).toJson(),
+      ),
     );
   }
 }

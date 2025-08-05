@@ -18,6 +18,8 @@ import 'package:frontend/core/network/ws_manager.dart' as _i684;
 import 'package:frontend/core/network/ws_socket_module.dart' as _i558;
 import 'package:frontend/db/db_client.dart' as _i569;
 import 'package:frontend/db/db_modulte.dart' as _i788;
+import 'package:frontend/features/admin/bloc/admin_bloc.dart' as _i91;
+import 'package:frontend/features/admin/_domain/admin_repository.dart' as _i730;
 import 'package:frontend/features/auth/domain/auth_repository.dart' as _i887;
 import 'package:frontend/features/auth/view/bloc/auth_cubit.dart' as _i1034;
 import 'package:frontend/features/auth/view/bloc/login/login_bloc.dart'
@@ -44,8 +46,8 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    final dbClientModule = _$DbClientModule();
     final wsSocketModule = _$WsSocketModule();
+    final dbClientModule = _$DbClientModule();
     final dioModule = _$DioModule();
     gh.factory<_i990.UserBloc>(() => _i990.UserBloc());
     gh.lazySingleton<_i684.WsCounterRepository>(
@@ -56,9 +58,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i684.WsLettersRepository(),
       dispose: (i) => i.dispose(),
     );
+    gh.lazySingleton<_i948.WebSocket>(() => wsSocketModule.wsWithToken);
     gh.lazySingleton<_i83.WebSocketClient>(() => _i83.WebSocketClient());
     gh.lazySingleton<_i569.DbClient>(() => dbClientModule.dbClient);
-    gh.lazySingleton<_i948.WebSocket>(() => wsSocketModule.wsWithToken);
     gh.lazySingleton<_i361.Dio>(
       () => dioModule.retryDio(),
       instanceName: 'retryDio',
@@ -68,11 +70,16 @@ extension GetItInjectableX on _i174.GetIt {
       instanceName: 'registration',
     );
     gh.lazySingleton<_i935.UserRepository>(() => _i935.UserRepositoryImpl());
+    gh.lazySingleton<_i730.AdminRepository>(() => _i730.AdminRepositoryImpl());
+    gh.factory<_i91.AdminBloc>(
+      () => _i91.AdminBloc(gh<_i730.AdminRepository>()),
+    );
     gh.lazySingleton<_i684.WsManager>(
       () => _i684.WsManager(
         gh<_i684.WsCounterRepository>(),
         gh<_i684.WsLettersRepository>(),
         gh<_i948.WebSocket>(),
+        gh<_i730.AdminRepository>(),
       ),
       dispose: (i) => i.dispose(),
     );
@@ -134,8 +141,8 @@ extension GetItInjectableX on _i174.GetIt {
   }
 }
 
-class _$DbClientModule extends _i788.DbClientModule {}
-
 class _$WsSocketModule extends _i558.WsSocketModule {}
+
+class _$DbClientModule extends _i788.DbClientModule {}
 
 class _$DioModule extends _i339.DioModule {}
