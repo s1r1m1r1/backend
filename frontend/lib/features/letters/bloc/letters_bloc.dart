@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:frontend/core/network/ws_manager.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 import 'package:web_socket_client/web_socket_client.dart' show ConnectionState, Connected, Reconnected;
 
 import 'package:freezed_annotation/freezed_annotation.dart';

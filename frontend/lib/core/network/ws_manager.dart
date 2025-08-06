@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:web_socket_client/web_socket_client.dart';
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 import '../../features/admin/_domain/admin_repository.dart';
 import '../typedef.dart';

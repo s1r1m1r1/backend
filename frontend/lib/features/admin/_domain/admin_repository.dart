@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:injectable/injectable.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 import '../../../core/network/ws_manager.dart';
 

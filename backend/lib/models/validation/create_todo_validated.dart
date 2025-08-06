@@ -1,4 +1,4 @@
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 import '../../core/new_api_exceptions.dart';
 

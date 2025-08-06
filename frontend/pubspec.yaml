@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.8.1 <4.0.0'
+  sdk: ">=3.8.1 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -57,8 +57,8 @@ dependencies:
   path: ^1.9.0 # For path manipulation
   drift_dev: ^2.14.0
   rxdart: ^0.28.0
-  shared:
-    path: ../shared
+  sha_red:
+    git: https://github.com/s1r1m1r1/sha_red.git
   shared_preferences: ^2.5.3
   web_socket_channel: ^3.0.3
   web_socket_client: ^0.2.1

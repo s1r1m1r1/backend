@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:shared/shared.dart' show Role;
+import 'package:sha_red/sha_red.dart' show Role;
 
 // import 'package:uuid/uuid.dart';
 

@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';

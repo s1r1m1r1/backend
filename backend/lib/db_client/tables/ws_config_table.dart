@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 @DataClassName('WsConfigEntry')
 class WsConfigTable extends Table {

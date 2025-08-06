@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:backend/db_client/dao/todo_dao.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart' show Value;
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 import '../core/new_api_exceptions.dart';
 

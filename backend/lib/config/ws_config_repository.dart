@@ -5,8 +5,8 @@ import 'package:backend/config/ws_config_datasource.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/shared.dart';
 
+import 'package:sha_red/sha_red.dart';
 import '../inject/inject.dart';
 
 abstract class WsConfigRepository {

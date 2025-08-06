@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:injectable/injectable.dart';
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 import '../../app/logger/log_colors.dart';
 
