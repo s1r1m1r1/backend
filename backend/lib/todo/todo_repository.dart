@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:backend/core/debug_log.dart';
 import 'package:sha_red/sha_red.dart';
 
 import '../models/user.dart';
@@ -25,9 +25,9 @@ class TodoRepositoryImpl implements TodoRepository {
 
   @override
   Future<TodoDto> createTodo(CreateTodoDto createTodoDto) async {
-    stdout.writeln('create todo');
+    debugLog('create todo');
     final todo = await _datasource.createTodo(createTodoDto, user.userId);
-    stdout.writeln('create todo ready ${todo.toJson()}');
+    debugLog('create todo ready ${todo.toJson()}');
     return todo;
   }
 

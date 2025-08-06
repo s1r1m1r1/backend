@@ -1,5 +1,5 @@
-import 'package:backend/chat/counter_repository.dart';
-import 'package:backend/chat/letters_repository.dart';
+import 'package:backend/web_socket/counter_repository.dart';
+import 'package:backend/web_socket/letters_repository.dart';
 import 'package:backend/config/ws_config_repository.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/inject/inject.dart';
@@ -9,10 +9,7 @@ import 'package:backend/session/session_repository.dart';
 import 'package:backend/user/user_datasource.dart';
 import 'package:backend/user/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dotenv/dotenv.dart';
 // import 'package:drift/native.dart';
-
-final env = DotEnv()..load();
 
 final _db = getIt<DbClient>();
 // final _db = DbClient(NativeDatabase.memory());

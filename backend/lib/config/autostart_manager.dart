@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:backend/chat/counter_repository.dart';
+import 'package:backend/web_socket/counter_repository.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/inject/inject.dart';
 import 'package:injectable/injectable.dart';

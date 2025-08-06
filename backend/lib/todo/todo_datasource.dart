@@ -1,6 +1,6 @@
 // {@template todo_data_source_impl}
-import 'dart:io';
 
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/db_client/dao/todo_dao.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart' show Value;
@@ -50,10 +50,10 @@ class TodoDataSourceImpl implements TodoDataSource {
         description: result.description,
         createdAt: result.createdAt,
       );
-      stdout.writeln('has result $todo');
+      debugLog('has result $todo');
       return todo;
     } on Exception catch (e) {
-      stdout.writeln('exception create todo ${e.runtimeType}');
+      debugLog('exception create todo ${e.runtimeType}');
       throw ApiException.badRequest(message: 'Unexpected error');
     } finally {
       // await _databaseConnection.close();
@@ -90,7 +90,7 @@ class TodoDataSourceImpl implements TodoDataSource {
 
   @override
   Future<TodoDto> updateTodo({required int todoId, required UpdateTodoDto todo, required int userId}) async {
-    stdout.writeln('datasource update ${todo.id} ${todo.completed} $userId');
+    debugLog('datasource update ${todo.id} ${todo.completed} $userId');
     // this should be in repository
     final hasPermission = await _dao.hasPermission(todoId: todoId, userId: userId);
     if (!hasPermission) {
@@ -105,15 +105,15 @@ class TodoDataSourceImpl implements TodoDataSource {
         updatedAt: Value(DateTime.now()),
       ),
     );
-    stdout.writeln('datasource update  --- { $amount }');
+    debugLog('datasource update  --- { $amount }');
     if (amount == 0) {
-      stdout.writeln('datasource update  ok todo  $amount');
+      debugLog('datasource update  ok todo  $amount');
       throw ApiException.notFound(message: 'Todo not found');
     }
 
     final updated = await _dao.getTodoById(todoId: todoId, userId: userId);
 
-    stdout.writeln('update ok $updated');
+    debugLog('update ok $updated');
     return TodoDto(
       id: updated.id,
       title: updated.title,

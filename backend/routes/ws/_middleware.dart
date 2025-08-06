@@ -1,5 +1,5 @@
-import 'package:backend/chat/broadcast.dart';
-import 'package:backend/chat/counter_repository.dart';
+import 'package:backend/web_socket/broadcast.dart';
+import 'package:backend/web_socket/counter_repository.dart';
 import 'package:backend/inject/inject.dart';
 import 'package:dart_frog/dart_frog.dart';
 

@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:injectable/injectable.dart';
 
@@ -24,7 +23,7 @@ class CounterRepository {
   final _counters = <String, Counter>{};
 
   void putCounter(String roomId) {
-    stdout.writeln('$green CounterRepository:putCounter $roomId $reset');
+    debugLog('$green CounterRepository:putCounter $roomId $reset');
     _counters[roomId] = Counter();
   }
 

@@ -7,24 +7,22 @@ const androidHost = '127.0.2.2';
 
 const localhost = 'localhost';
 
-// const port = 8080;
-// const port = 8080;
+const port = 8080;
 
-// final host = switch (defaultTargetPlatform) {
-//   TargetPlatform.android => androidHost,
-//   TargetPlatform.iOS => iosHost,
-//   TargetPlatform.macOS => iosHost,
-//   _ => localhost,
-// };
-// final host = 'container-app-b51yc-before.containerapps.ru';
-final host = 'container-app-ijw7q-practical.containerapps.ru';
+final host = switch (defaultTargetPlatform) {
+  TargetPlatform.android => androidHost,
+  TargetPlatform.iOS => iosHost,
+  TargetPlatform.macOS => iosHost,
+  _ => localhost,
+};
+// final host = 'container-app-rhrbr-universe.containerapps.ru';
 
 abstract class HttpConst {
-  // static final baseUrl = 'http://$host:$port';
-  static final baseUrl = 'https://$host';
+  static final baseUrl = 'http://$host:$port';
+  // static final baseUrl = 'https://$host';
 }
 
 abstract class WebSocketConst {
-  // static final baseUrl = 'ws://$host:$port/ws/';
-  static final baseUrl = 'wss://$host/ws/';
+  static final baseUrl = 'ws://$host:$port/ws/';
+  // static final baseUrl = 'wss://$host/ws/';
 }

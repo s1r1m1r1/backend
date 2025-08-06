@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart' show Value;
 
@@ -13,7 +12,7 @@ class LettersRepository {
   const LettersRepository(this._dao);
 
   Future<LetterDto?> createLetter(Json payload) async {
-    stdout.writeln('Creating letter: start');
+    debugLog('Creating letter: start');
     final LetterDto letter = LetterDto.fromJson(payload);
     try {
       final entry = await _dao.insertRow(
@@ -27,7 +26,7 @@ class LettersRepository {
       if (entry?.id == null || entry?.chatRoomId == null) {
         return null;
       }
-      stdout.writeln('Creating letter: success');
+      debugLog('Creating letter: success');
       return LetterDto(
         id: entry!.id,
         chatRoomId: entry.chatRoomId,

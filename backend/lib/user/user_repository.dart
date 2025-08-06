@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:io';
+
+import 'package:backend/core/debug_log.dart';
 
 import '../core/new_api_exceptions.dart';
 import '../models/create_user_dto.dart';
@@ -32,44 +33,44 @@ class UserRepositoryImpl extends UserRepository {
 
   @override
   Future<User> createUser(CreateUserDto createUserDto) async {
-    stdout.writeln('createUser - email ${createUserDto.email}');
+    debugLog('createUser - email ${createUserDto.email}');
     final userExist = await _datasource.getUser(email: createUserDto.email);
 
     if (userExist != null) {
       throw ApiException.unauthorized(message: 'Email already in use');
     }
 
-    stdout.writeln('createUser email next');
+    debugLog('createUser email next');
     // dto is already validated in the controller
     // we will hash the password here
     final hashedPassword = passwordHasherService.hashPassword(createUserDto.password);
 
-    stdout.writeln('createUser email next 2 $hashedPassword');
+    debugLog('createUser email next 2 $hashedPassword');
     final user = await _datasource.createUser(createUserDto.copyWith(password: hashedPassword));
 
-    stdout.writeln('createUser email next 3');
+    debugLog('createUser email next 3');
     return user;
   }
 
   @override
   Future<User> loginUser(LoginUserDto loginUserDto) async {
-    stdout.writeln('loginUser email ${loginUserDto.email}');
+    debugLog('loginUser email ${loginUserDto.email}');
     final email = loginUserDto.email;
     User? user = await _datasource.getUser(email: email);
 
     if (user == null) {
-      stdout.writeln('$reset loginUser exception not userExits $reset');
+      debugLog('$reset loginUser exception not userExits $reset');
       throw ApiException.notFound();
     }
     final password = loginUserDto.password;
 
-    stdout.writeln('$reset loginUser ${password}, h: ${user.password} $reset');
+    debugLog('$reset loginUser ${password}, h: ${user.password} $reset');
     final isPasswordCorrect = passwordHasherService.checkPassword(password: password, hashedPassword: user.password);
     if (!isPasswordCorrect) {
-      stdout.writeln('loginUser Fail check passw incorrect');
+      debugLog('loginUser Fail check passw incorrect');
       throw ApiException.forbidden(message: 'password is incorrect');
     }
-    stdout.writeln('loginUser Success  passw ');
+    debugLog('loginUser Success  passw ');
     return user;
   }
 }

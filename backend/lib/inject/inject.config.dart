@@ -9,7 +9,7 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:backend/chat/counter_repository.dart' as _i763;
+import 'package:backend/web_socket/counter_repository.dart' as _i763;
 import 'package:backend/config/autostart_manager.dart' as _i887;
 import 'package:backend/config/ws_config_datasource.dart' as _i573;
 import 'package:backend/config/ws_config_repository.dart' as _i416;

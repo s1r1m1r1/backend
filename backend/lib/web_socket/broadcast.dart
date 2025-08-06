@@ -1,3 +1,4 @@
+import 'package:backend/core/debug_log.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -18,7 +19,7 @@ class Broadcast {
   /// A lock to prevent concurrent modifications to the maps.
   final _lock = Lock();
 
-  int get count => _channelsByTopic.length;
+  int get count => _topicsByChannel.length;
 
   /// Broadcasts a message to all channels subscribed to a specific topic.
   ///
@@ -39,7 +40,7 @@ class Broadcast {
           } catch (e) {
             // Log the error and remove the channel from the list.
             _channelsByTopic[topicId]?.remove(channel);
-            print('Failed to send message to a channel: $e');
+            debugLog('Failed to send message to a channel: $e');
             // Remove the channel from the reverse-lookup map as well.
             _topicsByChannel.remove(channel);
           }

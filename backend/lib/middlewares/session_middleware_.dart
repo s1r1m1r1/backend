@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/session/session.dart';
 import 'package:backend/session/session_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
@@ -13,7 +14,7 @@ Handler sessionMiddleware(Handler handler, {List<AddToContext> addToContext = co
     final authHeader = request.headers[HttpHeaders.authorizationHeader] ?? '';
     final token = authHeader.replaceFirst('Bearer ', '');
     if (token.isEmpty) {
-      stdout.writeln("token is null");
+      debugLog("token is null");
       return Response.json(body: {'message': 'Session token must not be empty'}, statusCode: HttpStatus.unauthorized);
     }
     final sessionRepository = context.read<SessionRepository>();
