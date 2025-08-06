@@ -1,7 +1,7 @@
 import 'package:backend/inject/inject.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/shared.dart';
 
+import 'package:sha_red/sha_red.dart';
 import '../db_client/dao/config_dao.dart';
 
 abstract class WsConfigDatasource {

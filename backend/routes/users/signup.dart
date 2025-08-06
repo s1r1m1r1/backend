@@ -9,7 +9,7 @@ import 'package:backend/session/session_repository.dart';
 import 'package:backend/user/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart' as frog;
 import 'package:dart_frog/dart_frog.dart';
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 import 'package:stack_trace/stack_trace.dart';
 
 FutureOr<frog.Response> onRequest(frog.RequestContext context) {

@@ -11,6 +11,9 @@ pubspec.lock
 # Files and directories created by dart_frog
 build/
 .dart_frog
+help.md
+help2.md
+Dockerfile.dev
 
 # Test related files
 coverage/

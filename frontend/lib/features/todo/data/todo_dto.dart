@@ -1,6 +1,6 @@
 import 'package:frontend/features/todo/domain/todo.dart';
 
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 extension TodoDtoExtension on TodoDto {
   Todo toModel() {

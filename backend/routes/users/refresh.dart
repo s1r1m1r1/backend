@@ -7,7 +7,7 @@ import 'package:backend/core/log_colors.dart';
 import 'package:backend/session/session_repository.dart';
 import 'package:dart_frog/dart_frog.dart' as frog;
 import 'package:dart_frog/dart_frog.dart';
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 FutureOr<frog.Response> onRequest(frog.RequestContext context) {
   return switch (context.request.method) {

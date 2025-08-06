@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:frontend/core/network/protected_api_service.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 abstract class WsConfigRepository {
   FutureOr<WsConfigDto?> getConfig();

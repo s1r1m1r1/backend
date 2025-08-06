@@ -7,7 +7,8 @@ import 'package:drift_dev/api/migrations_native.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
-import 'package:shared/shared.dart';
+
+import 'package:sha_red/sha_red.dart';
 import 'package:sqlite3/sqlite3.dart';
 // import 'package:uuid/uuid.dart';
 import 'dao/config_dao.dart';

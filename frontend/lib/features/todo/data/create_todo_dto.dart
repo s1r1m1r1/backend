@@ -1,4 +1,4 @@
-import 'package:shared/shared.dart';
+import 'package:sha_red/sha_red.dart';
 
 import '../domain/create_todo.dart';
 
