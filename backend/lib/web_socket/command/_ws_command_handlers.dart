@@ -1,4 +1,5 @@
 // This map is defined outside the stream listener, usually at the top of the file or in a separate file.
+import 'package:backend/web_socket/command/join_main_command.dart';
 import 'package:sha_red/sha_red.dart';
 
 import '_ws_command.dart';
@@ -9,10 +10,9 @@ import 'new_letter_command.dart';
 import 'delete_letter_command.dart';
 import 'join_letters_command.dart';
 import 'join_counter_command.dart';
-import 'leave_room_command.dart';
 import 'unimplemented_command.dart';
 
-final wsCommandHandlers = <WsEventToServer, WsCommand>{
+const wsCommandHandlers = <WsEventToServer, WsCommand>{
   WsEventToServer.joinAdmin: JoinAdminCommand(),
   WsEventToServer.incrementCounter: IncrementCounterCommand(),
   WsEventToServer.decrementCounter: DecrementCounterCommand(),
@@ -24,5 +24,6 @@ final wsCommandHandlers = <WsEventToServer, WsCommand>{
   WsEventToServer.listRooms: ListRoomsCommand(),
   WsEventToServer.sendLetterToRoom: SendLetterToRoomCommand(),
   WsEventToServer.fetchRoomHistory: FetchRoomHistoryCommand(),
+  WsEventToServer.joinMain: JoinMainCommand(),
   // ... and so on
 };

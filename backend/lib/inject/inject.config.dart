@@ -9,7 +9,6 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:backend/web_socket/counter_repository.dart' as _i763;
 import 'package:backend/config/autostart_manager.dart' as _i887;
 import 'package:backend/config/ws_config_datasource.dart' as _i573;
 import 'package:backend/config/ws_config_repository.dart' as _i416;
@@ -21,6 +20,8 @@ import 'package:backend/db_client/dao/todo_dao.dart' as _i553;
 import 'package:backend/db_client/dao/user_dao.dart' as _i958;
 import 'package:backend/db_client/db_client.dart' as _i946;
 import 'package:backend/db_client/db_module.dart' as _i459;
+import 'package:backend/web_socket/chat_room_repository.dart' as _i635;
+import 'package:backend/web_socket/counter_repository.dart' as _i920;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
@@ -41,10 +42,10 @@ extension GetItInjectableX on _i174.GetIt {
       dispose: dispose,
       init: (_i526.GetItHelper gh) {
         final dbClientModule = _$DbClientModule();
-        gh.lazySingleton<_i763.CounterRepository>(
-          () => _i763.CounterRepository(),
-        );
         gh.lazySingleton<_i946.DbClient>(() => dbClientModule.dbClient);
+        gh.lazySingleton<_i920.CounterRepository>(
+          () => _i920.CounterRepository(),
+        );
         gh.lazySingleton<_i553.TodoDao>(
           () => _i553.TodoDao(gh<_i946.DbClient>()),
         );
@@ -63,6 +64,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh.lazySingleton<_i667.ConfigDao>(
           () => _i667.ConfigDao(gh<_i946.DbClient>()),
         );
+        gh.lazySingleton<_i635.ChatRoomRepository>(
+          () => _i635.ChatRoomRepository(gh<_i196.RoomDao>()),
+        );
         gh.lazySingleton<_i573.WsConfigDatasource>(
           () => _i573.WsConfigDatasourceImpl(gh<_i667.ConfigDao>()),
         );
@@ -72,7 +76,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh.lazySingleton<_i887.AutostartManager>(
           () => _i887.AutostartManager(
             gh<_i416.WsConfigRepository>(),
-            gh<_i763.CounterRepository>(),
+            gh<_i920.CounterRepository>(),
+            gh<_i635.ChatRoomRepository>(),
           ),
         );
       },

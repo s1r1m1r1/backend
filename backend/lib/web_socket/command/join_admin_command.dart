@@ -10,6 +10,7 @@ import 'package:sha_red/sha_red.dart';
 import '_ws_command.dart';
 
 class JoinAdminCommand implements WsCommand {
+  const JoinAdminCommand();
   @override
   void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) async {
     stdout.writeln('$magenta JoinAdminCommand:start ${roomId} } $reset');
@@ -19,15 +20,13 @@ class JoinAdminCommand implements WsCommand {
 
     stdout.writeln('$green JoinAdminCommand:hasCounter } $reset');
     broadcast.subscribe(roomId, channel);
-    broadcast.broadcast(
-      'admin',
-      jsonEncode(
-        WsFromServer(
-          roomId: 'admin',
-          eventType: WsEventFromServer.adminInfo,
-          payload: IdPayload(broadcast.count).toJson(),
-        ).toJson(),
-      ),
+    final encoded = jsonEncode(
+      WsFromServer(
+        roomId: 'admin',
+        eventType: WsEventFromServer.adminInfo,
+        payload: IdPayload(broadcast.count).toJson(),
+      ).toJson(),
     );
+    broadcast.broadcast('admin', encoded);
   }
 }

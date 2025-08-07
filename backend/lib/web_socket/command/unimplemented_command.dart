@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 
 class LeaveRoomCommand implements WsCommand {
+  const LeaveRoomCommand();
   @override
   void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
     // Implement leave room logic using chat_room table
@@ -13,6 +14,7 @@ class LeaveRoomCommand implements WsCommand {
 }
 
 class ListRoomsCommand implements WsCommand {
+  const ListRoomsCommand();
   @override
   void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
     // Implement list rooms logic using chat_room table
@@ -22,6 +24,7 @@ class ListRoomsCommand implements WsCommand {
 }
 
 class SendLetterToRoomCommand implements WsCommand {
+  const SendLetterToRoomCommand();
   @override
   void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
     // Implement send letter to room logic using letters and chat_room tables
@@ -31,6 +34,7 @@ class SendLetterToRoomCommand implements WsCommand {
 }
 
 class FetchRoomHistoryCommand implements WsCommand {
+  const FetchRoomHistoryCommand();
   @override
   void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
     final broadcast = context.read<Broadcast>();

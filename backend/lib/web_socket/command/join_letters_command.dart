@@ -11,26 +11,24 @@ import '../letters_repository.dart';
 import '_ws_command.dart';
 
 class JoinLettersCommand implements WsCommand {
+  const JoinLettersCommand();
   @override
   void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) async {
     final broadcast = context.read<Broadcast>();
-    stdout.writeln("$green Join 1 $reset");
+    final letterRepo = context.read<LettersRepository>();
     if (payload != String) return;
-    stdout.writeln("$green Join 2 $reset");
-    final topicId = payload;
 
     stdout.writeln("$green Join topicId $reset");
-    broadcast.subscribe(topicId, channel);
-    final letters = await context.read<LettersRepository>().fetchAllLetters();
-    channel.sink.add(
-      jsonEncode(
-        WsFromServer(
-          roomId: topicId,
-          eventType: WsEventFromServer.joinedLetters,
-          payload: LettersPayload(letters).toJson(),
-        ).toJson(),
-      ),
+    broadcast.subscribe(roomId, channel);
+    final letters = await letterRepo.fetchAllLetters();
+    final encoded = jsonEncode(
+      WsFromServer(
+        roomId: roomId,
+        eventType: WsEventFromServer.joinedLetters,
+        payload: LettersPayload(letters).toJson(),
+      ).toJson(),
     );
+    channel.sink.add(encoded);
   }
 }
 

@@ -39,14 +39,10 @@ class LettersRepository {
     }
   }
 
-  Future<void> deleteLetter(Json payload) async {
+  Future<List<int>> deleteLetter(Json payload) async {
     final id = payload['id'];
-
-    try {
-      await _dao.deleteLetter(id);
-    } catch (err) {
-      throw Exception(err);
-    }
+    final deleted = await _dao.deleteLetter(id);
+    return deleted.map((i) => i.id).toList();
   }
 
   Future<Iterable<LetterDto>> fetchAllLetters() async {

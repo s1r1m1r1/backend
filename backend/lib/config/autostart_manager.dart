@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:backend/web_socket/chat_room_repository.dart';
 import 'package:backend/web_socket/counter_repository.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/inject/inject.dart';
@@ -12,7 +13,8 @@ import 'ws_config_repository.dart';
 class AutostartManager {
   final WsConfigRepository _wsConfigRepo;
   final CounterRepository _counterRepo;
-  AutostartManager(this._wsConfigRepo, this._counterRepo);
+  final ChatRoomRepository _chatRoomRepo;
+  AutostartManager(this._wsConfigRepo, this._counterRepo, this._chatRoomRepo);
 
   Future<void> init() async {
     try {
@@ -20,6 +22,7 @@ class AutostartManager {
       final configs = _wsConfigRepo.configs;
       for (final c in configs.values) {
         _counterRepo.putCounter(c.counterRoom);
+        _chatRoomRepo.add(c.counterRoom);
       }
       stdout.writeln(
         '$green AutostartManager:counter ${_counterRepo.counter('user')} ,2: ${_counterRepo.counter('test')}',
