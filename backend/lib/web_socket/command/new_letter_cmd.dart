@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:backend/web_socket/broadcast.dart';
 import 'package:backend/web_socket/chat_room_repository.dart';
-import 'package:backend/web_socket/command/_ws_command.dart';
+import 'package:backend/web_socket/command/_ws_cmd.dart';
 import 'package:backend/web_socket/letters_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';

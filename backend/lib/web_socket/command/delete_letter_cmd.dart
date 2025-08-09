@@ -8,7 +8,7 @@ import 'package:sha_red/sha_red.dart';
 
 import '../broadcast.dart';
 import '../chat_room_repository.dart';
-import '_ws_command.dart';
+import '_ws_cmd.dart';
 
 class DeleteLetterCommand implements WsCommand {
   const DeleteLetterCommand();

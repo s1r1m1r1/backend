@@ -2,9 +2,9 @@ import 'dart:async' show FutureOr;
 import 'dart:io';
 
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/models/create_user_dto.dart';
 import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/core/log_colors.dart';
+import 'package:backend/models/validation/email_password_ext.dart';
 import 'package:backend/session/session_repository.dart';
 import 'package:backend/user/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart' as frog;
@@ -23,13 +23,14 @@ FutureOr<Response> signup(RequestContext context) async {
   try {
     final body = await parseJson(context.request);
     stdout.writeln('$magenta signup 1$reset');
-    final createUser = CreateUserDto.validated(body);
+    final emailCredential = EmailCredentialDto.fromJson(body);
+    emailCredential.onCreateValidated();
 
     stdout.writeln('$magenta signup 2$reset');
     final userRepository = context.read<UserRepository>();
 
     stdout.writeln('$magenta signup 3$reset');
-    final user = await userRepository.createUser(createUser);
+    final user = await userRepository.createUser(emailCredential);
 
     stdout.writeln('$magenta signup 4$reset');
     final sessionRepository = context.read<SessionRepository>();

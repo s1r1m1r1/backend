@@ -4,7 +4,6 @@ import 'package:drift/drift.dart' show Value;
 
 import 'package:sha_red/sha_red.dart';
 import '../db_client/dao/letters_dao.dart';
-import '../models/typedefs.dart';
 
 class LettersRepository {
   final LettersDao _dao;

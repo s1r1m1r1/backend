@@ -7,7 +7,8 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
 
-import '_ws_command.dart';
+import '../../models/user.dart';
+import '_ws_cmd.dart';
 
 class JoinAdminCommand implements WsCommand {
   const JoinAdminCommand();
@@ -19,14 +20,16 @@ class JoinAdminCommand implements WsCommand {
     // todo send error
 
     stdout.writeln('$green JoinAdminCommand:hasCounter } $reset');
-    broadcast.subscribe(roomId, channel);
-    final encoded = jsonEncode(
-      WsFromServer(
-        roomId: 'admin',
-        eventType: WsEventFromServer.adminInfo,
-        payload: IdPayload(broadcast.count).toJson(),
-      ).toJson(),
-    );
-    broadcast.broadcast('admin', encoded);
+    final session = broadcast.getSession(channel);
+    if (session == null) return;
+    broadcast.subscribe(roomId: roomId, session: session, channel: channel);
+    // final encoded = jsonEncode(
+    //   WsFromServer(
+    //     roomId: 'admin',
+    //     eventType: WsEventFromServer.adminInfo,
+    //     payload: IdPayload(broadcast.count).toJson(),
+    //   ).toJson(),
+    // );
+    // broadcast.broadcast('admin', encoded);
   }
 }

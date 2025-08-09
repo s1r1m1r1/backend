@@ -8,7 +8,8 @@ import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
 
 import '../../core/log_colors.dart';
-import '_ws_command.dart';
+import '../../models/user.dart';
+import '_ws_cmd.dart';
 
 class JoinCounterCommand implements WsCommand {
   const JoinCounterCommand();
@@ -22,15 +23,17 @@ class JoinCounterCommand implements WsCommand {
 
     stdout.writeln('$green JoinCounterCommand: $counter  $reset');
     if (counter == null) return;
+    final session = broadcast.getSession(channel);
+    if (session == null) return;
     stdout.writeln('$green JoinCounterCommand:hasCounter } $reset');
-    broadcast.subscribe(roomId, channel);
-    final encoded = jsonEncode(
-      WsFromServer(
-        roomId: 'admin',
-        eventType: WsEventFromServer.adminInfo,
-        payload: IdPayload(broadcast.count).toJson(),
-      ).toJson(),
-    );
-    channel.sink.add(encoded);
+    broadcast.subscribe(roomId: roomId, session: session, channel: channel);
+    // final encoded = jsonEncode(
+    //   WsFromServer(
+    //     roomId: 'admin',
+    //     eventType: WsEventFromServer.adminInfo,
+    //     payload: IdPayload(broadcast.count).toJson(),
+    //   ).toJson(),
+    // );
+    // channel.sink.add(encoded);
   }
 }

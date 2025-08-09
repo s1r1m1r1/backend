@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
+import 'package:backend/models/validation/email_password_ext.dart';
+import 'package:sha_red/sha_red.dart';
 
 import '../core/new_api_exceptions.dart';
-import '../models/create_user_dto.dart';
 import '../models/login_user_dto.dart';
 import '../models/user.dart';
 import '../core/log_colors.dart';
@@ -13,9 +14,9 @@ import 'user_datasource.dart';
 abstract class UserRepository {
   Future<User?> getUser({int? userId, String? email});
 
-  Future<User> createUser(CreateUserDto createUserDto);
+  Future<User> createUser(EmailCredentialDto createUserDto);
 
-  Future<User> loginUser(LoginUserDto loginUserDto);
+  Future<User> loginUser(EmailCredentialDto loginUserDto);
 }
 
 class UserRepositoryImpl extends UserRepository {
@@ -32,7 +33,7 @@ class UserRepositoryImpl extends UserRepository {
   }
 
   @override
-  Future<User> createUser(CreateUserDto createUserDto) async {
+  Future<User> createUser(EmailCredentialDto createUserDto) async {
     debugLog('createUser - email ${createUserDto.email}');
     final userExist = await _datasource.getUser(email: createUserDto.email);
 
@@ -53,7 +54,7 @@ class UserRepositoryImpl extends UserRepository {
   }
 
   @override
-  Future<User> loginUser(LoginUserDto loginUserDto) async {
+  Future<User> loginUser(EmailCredentialDto loginUserDto) async {
     debugLog('loginUser email ${loginUserDto.email}');
     final email = loginUserDto.email;
     User? user = await _datasource.getUser(email: email);

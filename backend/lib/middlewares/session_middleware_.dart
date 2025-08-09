@@ -37,6 +37,7 @@ Handler sessionMiddleware(Handler handler, {List<AddToContext> addToContext = co
     addToContext.forEach((addToContext) {
       updatedContext = addToContext(updatedContext);
     });
+    debugLog('sessionMiddleware user ${user.email}');
     return handler(updatedContext);
   };
 }
