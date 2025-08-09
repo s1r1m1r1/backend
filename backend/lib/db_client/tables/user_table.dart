@@ -8,7 +8,7 @@ class UserTable extends Table {
   IntColumn get id => integer().autoIncrement()();
   // primary key
   TextColumn get email => text()();
-  TextColumn get password => text()();
+  TextColumn get password => text().withLength(min: 28)();
 
   //  admin, user, tester
   TextColumn get role => textEnum<Role>().withDefault(const Constant('user'))();

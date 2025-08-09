@@ -1,9 +1,0 @@
-arb-dir: lib/l10n
-template-arb-file: app_en.arb
-output-localization-file: app_localizations.dart
-# output-class: AppLocalizations # Optional: Custom class name for generated localizations
-# preferred-supported-locales: # Optional: List of locales to prioritize if device locale doesn't exactly match
-#   - en
-#   - es
-# synthetic-package: false # Set to true for a synthetic package, false to generate files directly in output-dir
-# output-dir: lib/generated # If synthetic-package is false, specify output directory

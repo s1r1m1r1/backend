@@ -39,6 +39,7 @@ class $UserTableTable extends UserTable
     'password',
     aliasedName,
     false,
+    additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 28),
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );

@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
@@ -28,11 +28,11 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
 
   FutureOr<SessionEntry?> getSession({String? token, String? refreshToken, int? userId}) async {
     if (token == null && refreshToken == null && userId == null) {
-      stdout.writeln('$red getSession: token, refreshToken, userId are null $reset');
+      debugLog('$red getSession: token, refreshToken, userId are null $reset');
       return null;
     }
 
-    stdout.writeln('$red getSession: token: $token, refreshToken: $refreshToken, userId: userId  $reset');
+    debugLog('$red getSession: token: $token, refreshToken: $refreshToken, userId: $userId  $reset');
     final query = select(sessionTable);
     if (token != null) query.where((t) => t.token.equals(token));
     if (refreshToken != null) query.where((t) => t.refreshToken.equals(refreshToken));

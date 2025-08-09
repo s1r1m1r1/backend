@@ -5,7 +5,7 @@ import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/login_user_dto.dart';
 import 'package:backend/models/serializers/parse_json.dart';
-import 'package:backend/models/user.dart';
+import 'package:backend/models/validation/email_password_ext.dart';
 import 'package:backend/session/session_repository.dart';
 import 'package:backend/user/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
@@ -24,7 +24,8 @@ FutureOr<Response> login(RequestContext context) async {
   try {
     final body = await parseJson(context.request);
     stdout.writeln('$magenta login 1$reset');
-    final loginUser = LoginUserDto.validated(body);
+    final emailCredential = EmailCredentialDto.fromJson(body);
+    emailCredential.onLoginValidated();
 
     stdout.writeln('$magenta login 2$reset');
     final userRepo = context.read<UserRepository>();
@@ -33,7 +34,7 @@ FutureOr<Response> login(RequestContext context) async {
     final sessionRepo = context.read<SessionRepository>();
 
     stdout.writeln('$magenta login 4$reset');
-    final user = await userRepo.loginUser(loginUser);
+    final user = await userRepo.loginUser(emailCredential);
 
     stdout.writeln('$magenta login 5$reset');
     final session = await sessionRepo.createSession(user.userId);

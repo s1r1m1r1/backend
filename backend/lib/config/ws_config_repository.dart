@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:backend/config/ws_config_datasource.dart';
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:injectable/injectable.dart';
@@ -24,11 +24,11 @@ class WsConfigRepositoryImpl implements WsConfigRepository {
 
   @override
   FutureOr<void> init() async {
-    stdout.writeln('$magenta init WsConfigRepositoryImpl$reset');
+    debugLog('$magenta init WsConfigRepositoryImpl$reset');
     final entries = await _datasource.getListConfig();
-    stdout.writeln('$magenta init count ${entries.length}$reset');
+    debugLog('$magenta init count ${entries.length}$reset');
     for (final entry in entries) {
-      stdout.writeln(
+      debugLog(
         '$magenta init name: ${entry.name},letterRoom: ${entry.lettersRoom},counterRoom: ${entry.counterRoom} role: ${entry.role}$reset',
       );
       _configs[entry.role] = entry;

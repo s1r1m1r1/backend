@@ -27,6 +27,11 @@ dependencies:
   broadcast_bloc: ^0.1.0-dev.2
   synchronized: ^3.4.0
   injectable: ^2.5.1
+  equatable: ^2.0.7
+
+dependency_overrides:
+  sha_red:
+    path: ../../sha_red
 
 dev_dependencies:
   mocktail: ^1.0.3
