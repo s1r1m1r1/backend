@@ -1,9 +1,5 @@
-import '../../lib/middlewares/session_middleware_.dart';
-import '../../lib/web_socket/broadcast.dart';
-import '../../lib/web_socket/counter_repository.dart';
-import '../../lib/inject/inject.dart';
+import 'package:backend/ws_/broadcast.dart';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:path/path.dart';
 
 // for all users , create one for all
 var _broadcast = Broadcast();
@@ -25,6 +21,5 @@ Handler middleware(Handler handler) {
 
 RequestContext _addToContext(RequestContext context) {
   var updatedContext = context.provide<Broadcast>(() => _broadcast);
-  updatedContext = updatedContext.provide<CounterRepository>(() => getIt<CounterRepository>());
   return updatedContext;
 }

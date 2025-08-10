@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../frontend"
+		},
+		{
+			"path": "../sha_red"
+		}
+	],
+	"settings": {
+		"dart.mcpServer": true
+	}
+}

@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import '../../lib/core/new_api_exceptions.dart';
-import '../../lib/models/serializers/parse_json.dart';
-import '../../lib/models/validation/map_to_int.dart';
-import '../../lib/models/validation/update_todo_validated.dart';
-import '../../lib/todo/todo_repository.dart';
+import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/models/serializers/parse_json.dart';
+import 'package:backend/models/validation/map_to_int.dart';
+import 'package:backend/models/validation/update_todo_validated.dart';
+import 'package:backend/todo/todo_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
@@ -20,7 +20,10 @@ Future<Response> onRequest(RequestContext context, String id) async {
     case HttpMethod.head:
     case HttpMethod.options:
     case HttpMethod.post:
-      return Response.json(body: {'error': '👀 Looks like you are lost 🔦'}, statusCode: HttpStatus.methodNotAllowed);
+      return Response.json(
+        body: {'error': '👀 Looks like you are lost 🔦'},
+        statusCode: HttpStatus.methodNotAllowed,
+      );
   }
 }
 
@@ -38,7 +41,10 @@ FutureOr<Response> getTodo(RequestContext context, String id) async {
     );
   } on Object catch (e) {
     stdout.writeln('store UNEXPECTED ERROR');
-    return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
+    return Response.json(
+      body: {'message': e.toString()},
+      statusCode: HttpStatus.internalServerError,
+    );
   }
 }
 
@@ -53,10 +59,16 @@ FutureOr<Response> updateTodo(RequestContext context, String id) async {
     return Response.json(body: res.toJson());
   } on ApiException catch (e, stack) {
     stdout.writeln('TodoController err: ${stack}');
-    return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
+    return Response.json(
+      body: {'message': e.toString()},
+      statusCode: HttpStatus.internalServerError,
+    );
   } on Object catch (e, stackTrace) {
     stdout.writeln('TodoController UNKNOWN ERROR ${stackTrace}');
-    return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
+    return Response.json(
+      body: {'message': e.toString()},
+      statusCode: HttpStatus.internalServerError,
+    );
   }
 }
 
@@ -73,6 +85,9 @@ FutureOr<Response> deleteTodo(RequestContext context, String id) async {
     return Response.json();
   } on Object catch (e) {
     stdout.writeln('store UNEXPECTED ERROR');
-    return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.internalServerError);
+    return Response.json(
+      body: {'message': e.toString()},
+      statusCode: HttpStatus.internalServerError,
+    );
   }
 }

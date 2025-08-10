@@ -1,8 +1,4 @@
 import 'dart:io';
-
-import 'lib/config/autostart_manager.dart';
-import 'lib/inject/inject.config.dart';
-import 'lib/inject/inject.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 /// Основная функция запуска сервера Dart Frog.
@@ -27,9 +23,7 @@ Future<HttpServer> run(Handler handler, InternetAddress ip, int port) async {
 */
 
   /// Scope correct works when hot-reload
-  if (!getIt.hasScope(BackendScope.name)) {
-    getIt.initBackendScope();
-    await getIt<AutostartManager>().init();
-  }
+  print('START');
+
   return serve(handler, ip, port);
 }

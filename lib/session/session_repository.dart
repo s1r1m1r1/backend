@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import '../core/new_api_exceptions.dart';
-import 'hash_extension.dart';
-import 'session_datasource.dart';
+import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/session/hash_extension.dart';
+import 'package:backend/session/session_datasource.dart';
 
-import 'session.dart';
+import 'package:backend/session/session.dart';
 
 abstract class SessionRepository {
   Future<Session> createSession(int userId);
@@ -21,7 +21,7 @@ class SessionRepositoryImpl implements SessionRepository {
   /// {@macro session_repository}
   ///
   /// The [now] function is used to get the current date and time.
-  const SessionRepositoryImpl({DateTime Function()? now, required this.sessionDatasource}) : _now = now ?? DateTime.now;
+  const SessionRepositoryImpl(this.sessionDatasource) : _now = DateTime.now;
 
   final DateTime Function() _now;
   final SessionDatasource sessionDatasource;
@@ -49,7 +49,11 @@ class SessionRepositoryImpl implements SessionRepository {
   /// If the session is not found or is expired, returns `null`.
   @override
   Future<Session?> getSession({String? token, String? refreshToken, int? userId}) async {
-    final session = await sessionDatasource.getSession(refreshToken: refreshToken, token: token, userId: userId);
+    final session = await sessionDatasource.getSession(
+      refreshToken: refreshToken,
+      token: token,
+      userId: userId,
+    );
     return session;
   }
 

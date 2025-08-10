@@ -1,6 +1,6 @@
 import 'package:sha_red/sha_red.dart';
 
-import '../../core/new_api_exceptions.dart';
+import 'package:backend/core/new_api_exceptions.dart';
 
 abstract class CreateTodoMethod {
   static CreateTodoDto validated(Map<String, dynamic> json) {
