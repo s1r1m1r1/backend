@@ -1,14 +1,10 @@
-import '../db_client.dart';
-import '../tables/todo_table.dart';
-import '../../core/new_api_exceptions.dart';
+import 'package:backend/db_client/db_client.dart';
+import 'package:backend/db_client/tables/todo_table.dart';
+import 'package:backend/core/new_api_exceptions.dart';
 import 'package:drift/drift.dart';
-import 'package:injectable/injectable.dart';
-
-import '../../inject/inject.dart';
 
 part 'todo_dao.g.dart';
 
-@LazySingleton(scope: BackendScope.name)
 @DriftAccessor(tables: [TodoTable])
 class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
   // this constructor is required so that the main database can create an instance
@@ -44,7 +40,9 @@ class TodoDao extends DatabaseAccessor<DbClient> with _$TodoDaoMixin {
 
   Future<TodoEntry> getTodoById({required int todoId, required int userId}) async {
     try {
-      final result = await (select(todoTable)..where((t) => t.id.equals(todoId) & t.userId.equals(userId))).getSingle();
+      final result = await (select(
+        todoTable,
+      )..where((t) => t.id.equals(todoId) & t.userId.equals(userId))).getSingle();
       return result;
     } catch (e) {
       throw ApiException.notFound(message: 'Todo not found');

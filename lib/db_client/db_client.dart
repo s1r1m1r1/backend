@@ -20,12 +20,20 @@ import 'tables/room_member_table.dart';
 import 'tables/letter_table.dart';
 import 'tables/session_table.dart';
 import 'tables/user_table.dart';
-import '../models/enums.dart';
+import 'package:backend/models/enums.dart';
 
 part 'db_client.g.dart';
 
 @DriftDatabase(
-  tables: [TodoTable, UserTable, SessionTable, LetterTable, RoomTable, RoomMemberTable, WsConfigTable],
+  tables: [
+    TodoTable,
+    UserTable,
+    SessionTable,
+    LetterTable,
+    RoomTable,
+    RoomMemberTable,
+    WsConfigTable,
+  ],
   daos: [TodoDao, UserDao, SessionDao, LettersDao, RoomDao, ConfigDao],
 )
 class DbClient extends _$DbClient {
@@ -90,9 +98,9 @@ class DbClient extends _$DbClient {
           final devCounter = await into(
             roomTable,
           ).insertReturning(RoomTableCompanion.insert(name: 'dev-counter', type: RoomType.counter));
-          final testCounter = await into(
-            roomTable,
-          ).insertReturning(RoomTableCompanion.insert(name: 'test-counter', type: RoomType.counter));
+          final testCounter = await into(roomTable).insertReturning(
+            RoomTableCompanion.insert(name: 'test-counter', type: RoomType.counter),
+          );
           await into(wsConfigTable).insert(
             WsConfigTableCompanion.insert(
               name: 'user',

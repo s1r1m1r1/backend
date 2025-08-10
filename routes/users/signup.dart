@@ -38,12 +38,18 @@ FutureOr<Response> signup(RequestContext context) async {
 
     stdout.writeln('$magenta signup return ${session.token} ${session.refreshToken} $reset');
     return Response.json(
-      body: TokenDto(accessToken: session.token, refreshToken: session.refreshToken).toJson(),
+      body: TokensDto(
+        AccessTokenDto(session.token),
+        RefreshTokenDto(session.refreshToken),
+      ).toJson(),
       statusCode: HttpStatus.created,
     );
   } on ApiException catch (e, stack) {
     stdout.writeln('$red signup err $reset ${stack}');
-    return Response.json(body: {'message': e.message, 'errors': e.errors}, statusCode: e.statusCode);
+    return Response.json(
+      body: {'message': e.message, 'errors': e.errors},
+      statusCode: e.statusCode,
+    );
   } catch (e, stack) {
     stdout.writeln('$magenta signup UNKNOWN ERROR $reset ${Chain.forTrace(stack)}');
     return Response.json(

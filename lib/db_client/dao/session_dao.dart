@@ -3,15 +3,12 @@ import 'dart:async';
 import '../../core/debug_log.dart';
 import '../db_client.dart';
 import 'package:drift/drift.dart';
-import 'package:injectable/injectable.dart';
 
 import '../../core/log_colors.dart';
-import '../../inject/inject.dart';
 import '../tables/session_table.dart';
 
 part 'session_dao.g.dart';
 
-@LazySingleton(scope: BackendScope.name)
 @DriftAccessor(tables: [SessionTable])
 class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
   // this constructor is required so that the main database can create an instance
@@ -32,7 +29,9 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
       return null;
     }
 
-    debugLog('$red getSession: token: $token, refreshToken: $refreshToken, userId: $userId  $reset');
+    debugLog(
+      '$red getSession: token: $token, refreshToken: $refreshToken, userId: $userId  $reset',
+    );
     final query = select(sessionTable);
     if (token != null) query.where((t) => t.token.equals(token));
     if (refreshToken != null) query.where((t) => t.refreshToken.equals(refreshToken));
@@ -41,8 +40,8 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
   }
 
   void softDeleteSessionByUserId(int userId) {
-    (update(
-      sessionTable,
-    )..where((t) => t.userId.equals(userId))).write(SessionTableCompanion(deletedAt: Value(DateTime.now())));
+    (update(sessionTable)..where((t) => t.userId.equals(userId))).write(
+      SessionTableCompanion(deletedAt: Value(DateTime.now())),
+    );
   }
 }

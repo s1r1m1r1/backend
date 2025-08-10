@@ -1,12 +1,14 @@
 import 'package:sha_red/sha_red.dart';
 
-import '../../core/new_api_exceptions.dart';
+import 'package:backend/core/new_api_exceptions.dart';
 
 extension EmailCredentialDtoExt on EmailCredentialDto {
   bool onCreateValidated() {
     final errors = <String>[];
 
-    if (!RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$").hasMatch(email)) {
+    if (!RegExp(
+      r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
+    ).hasMatch(email)) {
       errors.add('Email is invalid');
     }
 

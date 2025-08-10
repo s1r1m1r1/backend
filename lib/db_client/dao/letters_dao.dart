@@ -1,13 +1,10 @@
 import 'package:drift/drift.dart';
-import 'package:injectable/injectable.dart';
 
-import '../../inject/inject.dart';
-import '../db_client.dart';
-import '../tables/letter_table.dart';
+import 'package:backend/db_client/db_client.dart';
+import 'package:backend/db_client/tables/letter_table.dart';
 
 part 'letters_dao.g.dart';
 
-@LazySingleton(scope: BackendScope.name)
 @DriftAccessor(tables: [LetterTable])
 class LettersDao extends DatabaseAccessor<DbClient> with _$LettersDaoMixin {
   // this constructor is required so that the main database can create an instance

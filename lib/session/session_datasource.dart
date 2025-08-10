@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import '../core/debug_log.dart';
-import '../core/log_colors.dart';
-import '../db_client/db_client.dart';
-import 'session.dart';
+import 'package:backend/core/debug_log.dart';
+import 'package:backend/core/log_colors.dart';
+import 'package:backend/db_client/db_client.dart';
+import 'package:backend/session/session.dart';
 import 'package:drift/drift.dart' show Value;
 
-import '../db_client/dao/session_dao.dart';
+import 'package:backend/db_client/dao/session_dao.dart';
 
 //--------------------------------------------------------------
 abstract class SessionDatasource {
@@ -18,8 +18,9 @@ abstract class SessionDatasource {
 
 //--------------------------------------------------------------
 class SessionSqliteDatasourceImpl implements SessionDatasource {
-  SessionSqliteDatasourceImpl(this._dao);
-  final SessionDao _dao;
+  SessionSqliteDatasourceImpl(this._db);
+  final DbClient _db;
+  SessionDao get _dao => _db.sessionDao;
 
   @override
   FutureOr<bool> insertSession(Session session) async {

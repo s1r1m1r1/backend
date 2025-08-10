@@ -2,7 +2,6 @@
     "dart.mcpServer": true,
     "explorer.fileNesting.patterns": {
         "pubspec.yaml": "pubspec.lock,pubspec_overrides.yaml,.packages,.flutter-plugins,.flutter-plugins-dependencies,.metadata,devtools_options.yaml,codemagic.yaml,analysis_options.yaml,.tool-versions,flutter_jank_*.json,flutter_launcher_i*.yaml,flutter_*.png,flutter_native*.yaml,crowdin.yml,",
-        "*.dart": "${capture}.event.dart,${capture}.state.dart"
     },
     // видимоcть файлов
     "files.exclude": {
@@ -44,5 +43,5 @@
         ".git",
         "g.dart"
     ],
-    "dart.lineLength": 120
+    "dart.lineLength": 100
 }

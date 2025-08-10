@@ -1,4 +1,4 @@
-import '../core/new_api_exceptions.dart';
+import 'package:backend/core/new_api_exceptions.dart';
 import 'package:bcrypt/bcrypt.dart';
 
 class PasswordHasherService {

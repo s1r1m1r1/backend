@@ -1,15 +1,14 @@
 import 'dart:async';
 
-import '../core/debug_log.dart';
-import '../models/validation/email_password_ext.dart';
+import 'package:backend/core/debug_log.dart';
+import 'package:backend/models/validation/email_password_ext.dart';
 import 'package:sha_red/sha_red.dart';
 
-import '../core/new_api_exceptions.dart';
-import '../models/login_user_dto.dart';
-import '../models/user.dart';
-import '../core/log_colors.dart';
-import 'password_hash_service.dart';
-import 'user_datasource.dart';
+import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/models/user.dart';
+import 'package:backend/core/log_colors.dart';
+import 'package:backend/user/password_hash_service.dart';
+import 'package:backend/user/user_datasource.dart';
 
 abstract class UserRepository {
   Future<User?> getUser({int? userId, String? email});
@@ -66,7 +65,10 @@ class UserRepositoryImpl extends UserRepository {
     final password = loginUserDto.password;
 
     debugLog('$reset loginUser ${password}, h: ${user.password} $reset');
-    final isPasswordCorrect = passwordHasherService.checkPassword(password: password, hashedPassword: user.password);
+    final isPasswordCorrect = passwordHasherService.checkPassword(
+      password: password,
+      hashedPassword: user.password,
+    );
     if (!isPasswordCorrect) {
       debugLog('loginUser Fail check passw incorrect');
       throw ApiException.forbidden(message: 'password is incorrect');

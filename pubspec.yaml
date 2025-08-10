@@ -26,7 +26,6 @@ dependencies:
   dart_frog_web_socket: ^1.0.0
   broadcast_bloc: ^0.1.0-dev.2
   synchronized: ^3.4.0
-  injectable: ^2.5.1
   equatable: ^2.0.7
 
 dependency_overrides:
@@ -41,4 +40,3 @@ dev_dependencies:
   freezed: ^3.0.0
   json_serializable: ^6.7.1
   mockito: ^5.5.0
-  injectable_generator: ^2.8.1

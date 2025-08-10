@@ -1,13 +1,9 @@
 import '../db_client.dart';
 import '../tables/user_table.dart';
 import 'package:drift/drift.dart';
-import 'package:injectable/injectable.dart';
-
-import '../../inject/inject.dart';
 
 part 'user_dao.g.dart';
 
-@LazySingleton(scope: BackendScope.name)
 @DriftAccessor(tables: [UserTable])
 class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
   // this constructor is required so that the main database can create an instance
