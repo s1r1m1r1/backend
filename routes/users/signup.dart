@@ -1,12 +1,12 @@
 import 'dart:async' show FutureOr;
 import 'dart:io';
 
-import '../../lib/core/new_api_exceptions.dart';
-import '../../lib/models/serializers/parse_json.dart';
-import '../../lib/core/log_colors.dart';
-import '../../lib/models/validation/email_password_ext.dart';
-import '../../lib/session/session_repository.dart';
-import '../../lib/user/user_repository.dart';
+import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/models/serializers/parse_json.dart';
+import 'package:backend/core/log_colors.dart';
+import 'package:backend/models/validation/email_password_ext.dart';
+import 'package:backend/session/session_repository.dart';
+import 'package:backend/user/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart' as frog;
 import 'package:dart_frog/dart_frog.dart';
 import 'package:sha_red/sha_red.dart';

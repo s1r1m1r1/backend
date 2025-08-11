@@ -8,8 +8,8 @@ import 'package:backend/ws_/broadcast.dart';
 class DecrementCounterCommand implements WsCommand {
   const DecrementCounterCommand();
   @override
-  void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
-    final counter = context.read<CounterRepository>().counter(roomId);
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+    final counter = context.read<CounterRepository>().counter('counter');
     if (counter == null) return;
     final count = counter.decrement();
     final broadcast = context.read<Broadcast>();

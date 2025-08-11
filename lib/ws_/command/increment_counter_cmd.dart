@@ -8,8 +8,8 @@ import 'package:backend/ws_/command/_ws_cmd.dart';
 class IncrementCounterCommand implements WsCommand {
   const IncrementCounterCommand();
   @override
-  void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
-    final counter = context.read<CounterRepository>().counter(roomId);
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+    final counter = context.read<CounterRepository>().counter('counter');
     if (counter == null) return;
     final broadcast = context.read<Broadcast>();
     final count = counter.increment();

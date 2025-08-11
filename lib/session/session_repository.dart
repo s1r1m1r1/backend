@@ -13,6 +13,7 @@ abstract class SessionRepository {
   Future<Session?> getSession({String? token, String? refreshToken, int? userId});
 
   bool validateToken(Session session);
+  bool validateRefreshToken(Session session);
 
   FutureOr<void> deleteSession(int userId);
 }
@@ -81,5 +82,10 @@ class SessionRepositoryImpl implements SessionRepository {
   @override
   bool validateToken(Session session) {
     return session.tokenExpiryDate.isAfter(_now());
+  }
+
+  @override
+  bool validateRefreshToken(Session session) {
+    return session.refreshTokenExpiry.isAfter(_now());
   }
 }

@@ -12,8 +12,8 @@ import 'package:backend/ws_/command/_ws_cmd.dart';
 class DeleteLetterCommand implements WsCommand {
   const DeleteLetterCommand();
   @override
-  void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
-    final isValid = context.read<ChatRoomRepository>().isValid(roomId);
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+    final isValid = context.read<ChatRoomRepository>().isValid('roomId');
     if (!isValid) return;
     final broadcast = context.read<Broadcast>();
 
@@ -23,13 +23,9 @@ class DeleteLetterCommand implements WsCommand {
         .then((deleted) {
           if (deleted.isNotEmpty) {
             final encoded = jsonEncode(
-              WsFromServer(
-                eventType: WsEventFromServer.letterCreated,
-                payload: deleted,
-                roomId: roomId,
-              ),
+              WsFromServer(eventType: WsEventFromServer.letterCreated, payload: deleted),
             );
-            broadcast.broadcast(roomId, encoded);
+            broadcast.broadcast('room', encoded);
           }
         })
         .catchError((err) {

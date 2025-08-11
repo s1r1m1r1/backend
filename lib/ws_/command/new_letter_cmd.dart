@@ -11,8 +11,8 @@ import 'package:sha_red/sha_red.dart';
 class NewLetterCommand implements WsCommand {
   const NewLetterCommand();
   @override
-  void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
-    final isValid = context.read<ChatRoomRepository>().isValid(roomId);
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+    final isValid = context.read<ChatRoomRepository>().isValid('room');
     if (!isValid) return;
     final broadcast = context.read<Broadcast>();
 
@@ -22,13 +22,9 @@ class NewLetterCommand implements WsCommand {
         .then((letter) {
           if (letter != null) {
             final encoded = jsonEncode(
-              WsFromServer(
-                roomId: roomId,
-                eventType: WsEventFromServer.letterCreated,
-                payload: letter.toJson(),
-              ),
+              WsFromServer(eventType: WsEventFromServer.letterCreated, payload: letter.toJson()),
             );
-            broadcast.broadcast(roomId, encoded);
+            broadcast.broadcast('room', encoded);
           }
         })
         .catchError((err) {
