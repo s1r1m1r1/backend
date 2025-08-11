@@ -14,12 +14,7 @@ import '_ws_cmd.dart';
 class JoinLettersCommand implements WsCommand {
   const JoinLettersCommand();
   @override
-  void execute(
-    RequestContext context,
-    String roomId,
-    WebSocketChannel channel,
-    dynamic payload,
-  ) async {
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) async {
     final broadcast = context.read<Broadcast>();
     final letterRepo = context.read<LettersRepository>();
     if (payload != String) return;
@@ -28,7 +23,7 @@ class JoinLettersCommand implements WsCommand {
     stdout.writeln("$green Join topicId $reset");
     final session = broadcast.getSession(channel);
     if (session == null) return;
-    broadcast.subscribe(roomId: roomId, session: session, channel: channel);
+    broadcast.subscribe(roomId: 'roomId', session: session, channel: channel);
     final letters = await letterRepo.fetchAllLetters();
     // final body = WsFromServer(
     //     roomId: roomId,

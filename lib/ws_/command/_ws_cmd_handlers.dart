@@ -1,4 +1,7 @@
 // This map is defined outside the stream listener, usually at the top of the file or in a separate file.
+import 'package:backend/ws_/command/auth/login_cmd.dart';
+import 'package:backend/ws_/command/auth/with_refresh_cmd.dart';
+import 'package:backend/ws_/command/auth/with_token_cmd.dart';
 import 'package:backend/ws_/command/join_main_cmd.dart';
 import 'package:sha_red/sha_red.dart';
 
@@ -25,6 +28,10 @@ const wsCommandHandlers = <WsEventToServer, WsCommand>{
   WsEventToServer.sendLetterToRoom: SendLetterToRoomCommand(),
   WsEventToServer.fetchRoomHistory: FetchRoomHistoryCommand(),
   WsEventToServer.joinMain: JoinMainCommand(),
+  WsEventToServer.withToken: WithTokenCMD(),
+  WsEventToServer.withRefresh: WithRefreshCMD(),
+  WsEventToServer.login: LoginCMD(),
+  // WsEventToServer.signup: SignupCMD(),
 
   // ... and so on
 };

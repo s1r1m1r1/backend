@@ -10,13 +10,8 @@ import 'package:backend/ws_/command/_ws_cmd.dart';
 class JoinAdminCommand implements WsCommand {
   const JoinAdminCommand();
   @override
-  void execute(
-    RequestContext context,
-    String roomId,
-    WebSocketChannel channel,
-    dynamic payload,
-  ) async {
-    stdout.writeln('$magenta JoinAdminCommand:start ${roomId} } $reset');
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) async {
+    stdout.writeln('$magenta JoinAdminCommand:start ${'room'} } $reset');
     final broadcast = context.read<Broadcast>();
     // final user = context.read<User>();
     // todo send error
@@ -24,7 +19,7 @@ class JoinAdminCommand implements WsCommand {
     stdout.writeln('$green JoinAdminCommand:hasCounter } $reset');
     final session = broadcast.getSession(channel);
     if (session == null) return;
-    broadcast.subscribe(roomId: roomId, session: session, channel: channel);
+    broadcast.subscribe(roomId: 'room', session: session, channel: channel);
     // final encoded = jsonEncode(
     //   WsFromServer(
     //     roomId: 'admin',

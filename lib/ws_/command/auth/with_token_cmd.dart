@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:backend/core/log_colors.dart';
+import 'package:backend/core/new_api_exceptions.dart';
 import 'package:sha_red/sha_red.dart';
 
 import '../../../core/debug_log.dart';
@@ -13,29 +17,59 @@ import '../_ws_cmd.dart';
 class WithTokenCMD implements WsCommand {
   const WithTokenCMD();
   @override
-  void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
     final broadcast = context.read<Broadcast>();
     final sessionRepo = context.read<SessionRepository>();
-    if (payload != Map<String, dynamic>) {
-      debugLog("WithTokenCMD payload is not Map<String, dynamic>");
-      return;
-    }
     final dto = AccessTokenDto.fromJson(payload);
 
     sessionRepo
         .getSession(token: dto.value)
         .then((session) {
           if (session == null) {
-            return;
+            throw ApiException.unauthorized(message: 'Session not found');
           }
           final isTokenValid = sessionRepo.validateToken(session);
           if (!isTokenValid) {
-            return;
+            throw ApiException.unauthorized(message: 'Token expired');
           }
-          broadcast.subscribe(roomId: roomId, session: session, channel: channel);
+          broadcast.subscribe(roomId: 'main', session: session, channel: channel).then((_) {
+            final onlineMembers = jsonEncode(
+              WsFromServer(
+                eventType: WsEventFromServer.onlineUsers,
+                payload: OnlineUsersPayload(
+                  members: broadcast.activeUsersList.map((i) => 'nnn: ${i.userId}').toList(),
+                ),
+              ).toJson(OnlineUsersPayload.toJsonF),
+            );
+            broadcast.broadcast('main', onlineMembers).then((_) {
+              final answer = WsFromServer(
+                eventType: WsEventFromServer.joinedServer,
+                payload: JoinedServerPayload('main'),
+              ).toJson(JoinedServerPayload.toJsonF);
+              final encoded = jsonEncode(answer);
+              channel.sink.add(encoded);
+            });
+          });
         })
         .onError((er, st) {
-          debugLog("WithTokenCMD error $er");
+          if (er is ApiException && er.statusCode == 401) {
+            debugLog('$yellow${er.message}$reset');
+            channel.sink.add(
+              jsonEncode(WsFromServer(eventType: WsEventFromServer.tokenExpired).toJsonEvent()),
+            );
+            return;
+          }
+          debugLog("UnKnown error $er");
+          channel.sink.add(
+            jsonEncode(
+              jsonEncode(
+                WsFromServer(
+                  eventType: WsEventFromServer.unauthenticated,
+                  payload: WsErrorPayload(errorCode: 500),
+                ).toJson(WsErrorPayload.toJsonF),
+              ),
+            ),
+          );
         });
   }
 }

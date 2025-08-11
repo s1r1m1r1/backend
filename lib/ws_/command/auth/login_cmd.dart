@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 
+import '../../../core/log_colors.dart';
 import '../../../session/session_repository.dart';
 import '../../broadcast.dart';
 import 'package:dart_frog/dart_frog.dart';
@@ -17,57 +18,59 @@ import '../_ws_cmd.dart';
 class LoginCMD implements WsCommand {
   const LoginCMD();
   @override
-  void execute(RequestContext context, String roomId, WebSocketChannel channel, dynamic payload) {
+  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+    debugLog("LoginCMD START\n\n");
+
     final broadcast = context.read<Broadcast>();
     final userRepo = context.read<UserRepository>();
     final sessionRepo = context.read<SessionRepository>();
     if (payload is! Map<String, dynamic>) {
       debugLog("LoginCMD payload is not Map<String, dynamic>");
+
       return;
     }
     final dto = EmailCredentialDto.fromJson(payload);
     userRepo
         .loginUser(dto)
         .then(
-          (user) {
+          (user) async {
             sessionRepo.createSession(user.userId).then((session) {
-              final payload = TokensDto(
-                AccessTokenDto(session.token),
-                RefreshTokenDto(session.refreshToken),
-              ).toJson();
-              final dto = WsFromServer(
-                roomId: roomId,
-                eventType: WsEventFromServer.loggedIn,
-                payload: payload,
-              );
-              final encoded = jsonEncode(dto);
-              broadcast.subscribe(roomId: roomId, session: session, channel: channel);
-              channel.sink.add(encoded);
+              broadcast.subscribe(roomId: 'main', session: session, channel: channel).then((_) {
+                final onlineMembers = jsonEncode(
+                  WsFromServer(
+                    eventType: WsEventFromServer.onlineUsers,
+                    payload: OnlineUsersPayload(
+                      members: broadcast.activeUsersList.map((i) => 'userId: ${i.userId}').toList(),
+                    ),
+                  ).toJson(OnlineUsersPayload.toJsonF),
+                );
+                broadcast.broadcast('main', onlineMembers).then((_) {
+                  final payload = JoinedServerPayload(
+                    'main',
+                    tokens: TokensDto(
+                      AccessTokenDto(session.token),
+                      RefreshTokenDto(session.refreshToken),
+                    ),
+                  );
+                  final dto = WsFromServer(
+                    eventType: WsEventFromServer.joinedServer,
+                    payload: payload,
+                  ).toJson(JoinedServerPayload.toJsonF);
+                  final encoded = jsonEncode(dto);
+                  channel.sink.add(encoded);
+                });
+              });
             });
           },
           onError: (er, st) {
-            if (er is ApiException) {
+            if (er is ApiException && er.statusCode == 401) {
+              debugLog('$yellow${er.message}$reset');
               channel.sink.add(
-                jsonEncode(
-                  WsFromServer(
-                    roomId: roomId,
-                    eventType: WsEventFromServer.unauthenticated,
-                    payload: er.toString(),
-                  ),
-                ),
+                jsonEncode(WsFromServer(eventType: WsEventFromServer.tokenExpired).toJsonEvent()),
               );
               return;
             }
             debugLog("UnKnown error $er");
-            channel.sink.add(
-              jsonEncode(
-                WsFromServer(
-                  roomId: roomId,
-                  eventType: WsEventFromServer.unauthenticated,
-                  payload: er.toString(),
-                ),
-              ),
-            );
           },
         );
 
