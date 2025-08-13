@@ -2737,6 +2737,1498 @@ class WsConfigTableCompanion extends UpdateCompanion<WsConfigEntry> {
   }
 }
 
+class $CharacterTableTable extends CharacterTable
+    with TableInfo<$CharacterTableTable, CharacterEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CharacterTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _atkMeta = const VerificationMeta('atk');
+  @override
+  late final GeneratedColumn<int> atk = GeneratedColumn<int>(
+    'atk',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _defMeta = const VerificationMeta('def');
+  @override
+  late final GeneratedColumn<int> def = GeneratedColumn<int>(
+    'def',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mindMeta = const VerificationMeta('mind');
+  @override
+  late final GeneratedColumn<int> mind = GeneratedColumn<int>(
+    'mind',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _resistanceMeta = const VerificationMeta(
+    'resistance',
+  );
+  @override
+  late final GeneratedColumn<int> resistance = GeneratedColumn<int>(
+    'resistance',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _vitalityMeta = const VerificationMeta(
+    'vitality',
+  );
+  @override
+  late final GeneratedColumn<int> vitality = GeneratedColumn<int>(
+    'vitality',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _criticalChanceMeta = const VerificationMeta(
+    'criticalChance',
+  );
+  @override
+  late final GeneratedColumn<double> criticalChance = GeneratedColumn<double>(
+    'critical_chance',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _criticalDamageMeta = const VerificationMeta(
+    'criticalDamage',
+  );
+  @override
+  late final GeneratedColumn<double> criticalDamage = GeneratedColumn<double>(
+    'critical_damage',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES user_table (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    atk,
+    def,
+    mind,
+    resistance,
+    vitality,
+    criticalChance,
+    criticalDamage,
+    userId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'character_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CharacterEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('atk')) {
+      context.handle(
+        _atkMeta,
+        atk.isAcceptableOrUnknown(data['atk']!, _atkMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_atkMeta);
+    }
+    if (data.containsKey('def')) {
+      context.handle(
+        _defMeta,
+        def.isAcceptableOrUnknown(data['def']!, _defMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_defMeta);
+    }
+    if (data.containsKey('mind')) {
+      context.handle(
+        _mindMeta,
+        mind.isAcceptableOrUnknown(data['mind']!, _mindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mindMeta);
+    }
+    if (data.containsKey('resistance')) {
+      context.handle(
+        _resistanceMeta,
+        resistance.isAcceptableOrUnknown(data['resistance']!, _resistanceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_resistanceMeta);
+    }
+    if (data.containsKey('vitality')) {
+      context.handle(
+        _vitalityMeta,
+        vitality.isAcceptableOrUnknown(data['vitality']!, _vitalityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_vitalityMeta);
+    }
+    if (data.containsKey('critical_chance')) {
+      context.handle(
+        _criticalChanceMeta,
+        criticalChance.isAcceptableOrUnknown(
+          data['critical_chance']!,
+          _criticalChanceMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_criticalChanceMeta);
+    }
+    if (data.containsKey('critical_damage')) {
+      context.handle(
+        _criticalDamageMeta,
+        criticalDamage.isAcceptableOrUnknown(
+          data['critical_damage']!,
+          _criticalDamageMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_criticalDamageMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CharacterEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CharacterEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      atk: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}atk'],
+      )!,
+      def: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}def'],
+      )!,
+      mind: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mind'],
+      )!,
+      resistance: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}resistance'],
+      )!,
+      vitality: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}vitality'],
+      )!,
+      criticalChance: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}critical_chance'],
+      )!,
+      criticalDamage: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}critical_damage'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $CharacterTableTable createAlias(String alias) {
+    return $CharacterTableTable(attachedDatabase, alias);
+  }
+}
+
+class CharacterEntry extends DataClass implements Insertable<CharacterEntry> {
+  final int id;
+  final String name;
+  final int atk;
+  final int def;
+  final int mind;
+  final int resistance;
+  final int vitality;
+  final double criticalChance;
+  final double criticalDamage;
+  final int userId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const CharacterEntry({
+    required this.id,
+    required this.name,
+    required this.atk,
+    required this.def,
+    required this.mind,
+    required this.resistance,
+    required this.vitality,
+    required this.criticalChance,
+    required this.criticalDamage,
+    required this.userId,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['atk'] = Variable<int>(atk);
+    map['def'] = Variable<int>(def);
+    map['mind'] = Variable<int>(mind);
+    map['resistance'] = Variable<int>(resistance);
+    map['vitality'] = Variable<int>(vitality);
+    map['critical_chance'] = Variable<double>(criticalChance);
+    map['critical_damage'] = Variable<double>(criticalDamage);
+    map['user_id'] = Variable<int>(userId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  CharacterTableCompanion toCompanion(bool nullToAbsent) {
+    return CharacterTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      atk: Value(atk),
+      def: Value(def),
+      mind: Value(mind),
+      resistance: Value(resistance),
+      vitality: Value(vitality),
+      criticalChance: Value(criticalChance),
+      criticalDamage: Value(criticalDamage),
+      userId: Value(userId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory CharacterEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CharacterEntry(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      atk: serializer.fromJson<int>(json['atk']),
+      def: serializer.fromJson<int>(json['def']),
+      mind: serializer.fromJson<int>(json['mind']),
+      resistance: serializer.fromJson<int>(json['resistance']),
+      vitality: serializer.fromJson<int>(json['vitality']),
+      criticalChance: serializer.fromJson<double>(json['criticalChance']),
+      criticalDamage: serializer.fromJson<double>(json['criticalDamage']),
+      userId: serializer.fromJson<int>(json['userId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'atk': serializer.toJson<int>(atk),
+      'def': serializer.toJson<int>(def),
+      'mind': serializer.toJson<int>(mind),
+      'resistance': serializer.toJson<int>(resistance),
+      'vitality': serializer.toJson<int>(vitality),
+      'criticalChance': serializer.toJson<double>(criticalChance),
+      'criticalDamage': serializer.toJson<double>(criticalDamage),
+      'userId': serializer.toJson<int>(userId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  CharacterEntry copyWith({
+    int? id,
+    String? name,
+    int? atk,
+    int? def,
+    int? mind,
+    int? resistance,
+    int? vitality,
+    double? criticalChance,
+    double? criticalDamage,
+    int? userId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => CharacterEntry(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    atk: atk ?? this.atk,
+    def: def ?? this.def,
+    mind: mind ?? this.mind,
+    resistance: resistance ?? this.resistance,
+    vitality: vitality ?? this.vitality,
+    criticalChance: criticalChance ?? this.criticalChance,
+    criticalDamage: criticalDamage ?? this.criticalDamage,
+    userId: userId ?? this.userId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  CharacterEntry copyWithCompanion(CharacterTableCompanion data) {
+    return CharacterEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      atk: data.atk.present ? data.atk.value : this.atk,
+      def: data.def.present ? data.def.value : this.def,
+      mind: data.mind.present ? data.mind.value : this.mind,
+      resistance: data.resistance.present
+          ? data.resistance.value
+          : this.resistance,
+      vitality: data.vitality.present ? data.vitality.value : this.vitality,
+      criticalChance: data.criticalChance.present
+          ? data.criticalChance.value
+          : this.criticalChance,
+      criticalDamage: data.criticalDamage.present
+          ? data.criticalDamage.value
+          : this.criticalDamage,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CharacterEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('atk: $atk, ')
+          ..write('def: $def, ')
+          ..write('mind: $mind, ')
+          ..write('resistance: $resistance, ')
+          ..write('vitality: $vitality, ')
+          ..write('criticalChance: $criticalChance, ')
+          ..write('criticalDamage: $criticalDamage, ')
+          ..write('userId: $userId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    atk,
+    def,
+    mind,
+    resistance,
+    vitality,
+    criticalChance,
+    criticalDamage,
+    userId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CharacterEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.atk == this.atk &&
+          other.def == this.def &&
+          other.mind == this.mind &&
+          other.resistance == this.resistance &&
+          other.vitality == this.vitality &&
+          other.criticalChance == this.criticalChance &&
+          other.criticalDamage == this.criticalDamage &&
+          other.userId == this.userId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class CharacterTableCompanion extends UpdateCompanion<CharacterEntry> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> atk;
+  final Value<int> def;
+  final Value<int> mind;
+  final Value<int> resistance;
+  final Value<int> vitality;
+  final Value<double> criticalChance;
+  final Value<double> criticalDamage;
+  final Value<int> userId;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  const CharacterTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.atk = const Value.absent(),
+    this.def = const Value.absent(),
+    this.mind = const Value.absent(),
+    this.resistance = const Value.absent(),
+    this.vitality = const Value.absent(),
+    this.criticalChance = const Value.absent(),
+    this.criticalDamage = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  });
+  CharacterTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required int atk,
+    required int def,
+    required int mind,
+    required int resistance,
+    required int vitality,
+    required double criticalChance,
+    required double criticalDamage,
+    required int userId,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  }) : name = Value(name),
+       atk = Value(atk),
+       def = Value(def),
+       mind = Value(mind),
+       resistance = Value(resistance),
+       vitality = Value(vitality),
+       criticalChance = Value(criticalChance),
+       criticalDamage = Value(criticalDamage),
+       userId = Value(userId);
+  static Insertable<CharacterEntry> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? atk,
+    Expression<int>? def,
+    Expression<int>? mind,
+    Expression<int>? resistance,
+    Expression<int>? vitality,
+    Expression<double>? criticalChance,
+    Expression<double>? criticalDamage,
+    Expression<int>? userId,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (atk != null) 'atk': atk,
+      if (def != null) 'def': def,
+      if (mind != null) 'mind': mind,
+      if (resistance != null) 'resistance': resistance,
+      if (vitality != null) 'vitality': vitality,
+      if (criticalChance != null) 'critical_chance': criticalChance,
+      if (criticalDamage != null) 'critical_damage': criticalDamage,
+      if (userId != null) 'user_id': userId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+    });
+  }
+
+  CharacterTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<int>? atk,
+    Value<int>? def,
+    Value<int>? mind,
+    Value<int>? resistance,
+    Value<int>? vitality,
+    Value<double>? criticalChance,
+    Value<double>? criticalDamage,
+    Value<int>? userId,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+  }) {
+    return CharacterTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      atk: atk ?? this.atk,
+      def: def ?? this.def,
+      mind: mind ?? this.mind,
+      resistance: resistance ?? this.resistance,
+      vitality: vitality ?? this.vitality,
+      criticalChance: criticalChance ?? this.criticalChance,
+      criticalDamage: criticalDamage ?? this.criticalDamage,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (atk.present) {
+      map['atk'] = Variable<int>(atk.value);
+    }
+    if (def.present) {
+      map['def'] = Variable<int>(def.value);
+    }
+    if (mind.present) {
+      map['mind'] = Variable<int>(mind.value);
+    }
+    if (resistance.present) {
+      map['resistance'] = Variable<int>(resistance.value);
+    }
+    if (vitality.present) {
+      map['vitality'] = Variable<int>(vitality.value);
+    }
+    if (criticalChance.present) {
+      map['critical_chance'] = Variable<double>(criticalChance.value);
+    }
+    if (criticalDamage.present) {
+      map['critical_damage'] = Variable<double>(criticalDamage.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CharacterTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('atk: $atk, ')
+          ..write('def: $def, ')
+          ..write('mind: $mind, ')
+          ..write('resistance: $resistance, ')
+          ..write('vitality: $vitality, ')
+          ..write('criticalChance: $criticalChance, ')
+          ..write('criticalDamage: $criticalDamage, ')
+          ..write('userId: $userId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $UnitTableTable extends UnitTable
+    with TableInfo<$UnitTableTable, UnitEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UnitTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _atkMeta = const VerificationMeta('atk');
+  @override
+  late final GeneratedColumn<int> atk = GeneratedColumn<int>(
+    'atk',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _defMeta = const VerificationMeta('def');
+  @override
+  late final GeneratedColumn<int> def = GeneratedColumn<int>(
+    'def',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _vitalityMeta = const VerificationMeta(
+    'vitality',
+  );
+  @override
+  late final GeneratedColumn<int> vitality = GeneratedColumn<int>(
+    'vitality',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES user_table (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    atk,
+    def,
+    vitality,
+    userId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'unit_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<UnitEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('atk')) {
+      context.handle(
+        _atkMeta,
+        atk.isAcceptableOrUnknown(data['atk']!, _atkMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_atkMeta);
+    }
+    if (data.containsKey('def')) {
+      context.handle(
+        _defMeta,
+        def.isAcceptableOrUnknown(data['def']!, _defMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_defMeta);
+    }
+    if (data.containsKey('vitality')) {
+      context.handle(
+        _vitalityMeta,
+        vitality.isAcceptableOrUnknown(data['vitality']!, _vitalityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_vitalityMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  UnitEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UnitEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      atk: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}atk'],
+      )!,
+      def: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}def'],
+      )!,
+      vitality: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}vitality'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $UnitTableTable createAlias(String alias) {
+    return $UnitTableTable(attachedDatabase, alias);
+  }
+}
+
+class UnitEntry extends DataClass implements Insertable<UnitEntry> {
+  final int id;
+  final String name;
+  final int atk;
+  final int def;
+  final int vitality;
+  final int userId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const UnitEntry({
+    required this.id,
+    required this.name,
+    required this.atk,
+    required this.def,
+    required this.vitality,
+    required this.userId,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['atk'] = Variable<int>(atk);
+    map['def'] = Variable<int>(def);
+    map['vitality'] = Variable<int>(vitality);
+    map['user_id'] = Variable<int>(userId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  UnitTableCompanion toCompanion(bool nullToAbsent) {
+    return UnitTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      atk: Value(atk),
+      def: Value(def),
+      vitality: Value(vitality),
+      userId: Value(userId),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory UnitEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UnitEntry(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      atk: serializer.fromJson<int>(json['atk']),
+      def: serializer.fromJson<int>(json['def']),
+      vitality: serializer.fromJson<int>(json['vitality']),
+      userId: serializer.fromJson<int>(json['userId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'atk': serializer.toJson<int>(atk),
+      'def': serializer.toJson<int>(def),
+      'vitality': serializer.toJson<int>(vitality),
+      'userId': serializer.toJson<int>(userId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  UnitEntry copyWith({
+    int? id,
+    String? name,
+    int? atk,
+    int? def,
+    int? vitality,
+    int? userId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => UnitEntry(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    atk: atk ?? this.atk,
+    def: def ?? this.def,
+    vitality: vitality ?? this.vitality,
+    userId: userId ?? this.userId,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  UnitEntry copyWithCompanion(UnitTableCompanion data) {
+    return UnitEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      atk: data.atk.present ? data.atk.value : this.atk,
+      def: data.def.present ? data.def.value : this.def,
+      vitality: data.vitality.present ? data.vitality.value : this.vitality,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UnitEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('atk: $atk, ')
+          ..write('def: $def, ')
+          ..write('vitality: $vitality, ')
+          ..write('userId: $userId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    atk,
+    def,
+    vitality,
+    userId,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UnitEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.atk == this.atk &&
+          other.def == this.def &&
+          other.vitality == this.vitality &&
+          other.userId == this.userId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> atk;
+  final Value<int> def;
+  final Value<int> vitality;
+  final Value<int> userId;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  const UnitTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.atk = const Value.absent(),
+    this.def = const Value.absent(),
+    this.vitality = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  });
+  UnitTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required int atk,
+    required int def,
+    required int vitality,
+    required int userId,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  }) : name = Value(name),
+       atk = Value(atk),
+       def = Value(def),
+       vitality = Value(vitality),
+       userId = Value(userId);
+  static Insertable<UnitEntry> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? atk,
+    Expression<int>? def,
+    Expression<int>? vitality,
+    Expression<int>? userId,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (atk != null) 'atk': atk,
+      if (def != null) 'def': def,
+      if (vitality != null) 'vitality': vitality,
+      if (userId != null) 'user_id': userId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+    });
+  }
+
+  UnitTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<int>? atk,
+    Value<int>? def,
+    Value<int>? vitality,
+    Value<int>? userId,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+  }) {
+    return UnitTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      atk: atk ?? this.atk,
+      def: def ?? this.def,
+      vitality: vitality ?? this.vitality,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (atk.present) {
+      map['atk'] = Variable<int>(atk.value);
+    }
+    if (def.present) {
+      map['def'] = Variable<int>(def.value);
+    }
+    if (vitality.present) {
+      map['vitality'] = Variable<int>(vitality.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UnitTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('atk: $atk, ')
+          ..write('def: $def, ')
+          ..write('vitality: $vitality, ')
+          ..write('userId: $userId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $SelectedUnitTableTable extends SelectedUnitTable
+    with TableInfo<$SelectedUnitTableTable, SelectedUnitEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SelectedUnitTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _unitIdMeta = const VerificationMeta('unitId');
+  @override
+  late final GeneratedColumn<int> unitId = GeneratedColumn<int>(
+    'unit_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES unit_table (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES user_table (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [unitId, userId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'selected_unit_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SelectedUnitEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('unit_id')) {
+      context.handle(
+        _unitIdMeta,
+        unitId.isAcceptableOrUnknown(data['unit_id']!, _unitIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitIdMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {userId};
+  @override
+  SelectedUnitEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SelectedUnitEntry(
+      unitId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}unit_id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}user_id'],
+      )!,
+    );
+  }
+
+  @override
+  $SelectedUnitTableTable createAlias(String alias) {
+    return $SelectedUnitTableTable(attachedDatabase, alias);
+  }
+}
+
+class SelectedUnitEntry extends DataClass
+    implements Insertable<SelectedUnitEntry> {
+  final int unitId;
+  final int userId;
+  const SelectedUnitEntry({required this.unitId, required this.userId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['unit_id'] = Variable<int>(unitId);
+    map['user_id'] = Variable<int>(userId);
+    return map;
+  }
+
+  SelectedUnitTableCompanion toCompanion(bool nullToAbsent) {
+    return SelectedUnitTableCompanion(
+      unitId: Value(unitId),
+      userId: Value(userId),
+    );
+  }
+
+  factory SelectedUnitEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SelectedUnitEntry(
+      unitId: serializer.fromJson<int>(json['unitId']),
+      userId: serializer.fromJson<int>(json['userId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'unitId': serializer.toJson<int>(unitId),
+      'userId': serializer.toJson<int>(userId),
+    };
+  }
+
+  SelectedUnitEntry copyWith({int? unitId, int? userId}) => SelectedUnitEntry(
+    unitId: unitId ?? this.unitId,
+    userId: userId ?? this.userId,
+  );
+  SelectedUnitEntry copyWithCompanion(SelectedUnitTableCompanion data) {
+    return SelectedUnitEntry(
+      unitId: data.unitId.present ? data.unitId.value : this.unitId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SelectedUnitEntry(')
+          ..write('unitId: $unitId, ')
+          ..write('userId: $userId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(unitId, userId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SelectedUnitEntry &&
+          other.unitId == this.unitId &&
+          other.userId == this.userId);
+}
+
+class SelectedUnitTableCompanion extends UpdateCompanion<SelectedUnitEntry> {
+  final Value<int> unitId;
+  final Value<int> userId;
+  const SelectedUnitTableCompanion({
+    this.unitId = const Value.absent(),
+    this.userId = const Value.absent(),
+  });
+  SelectedUnitTableCompanion.insert({
+    required int unitId,
+    this.userId = const Value.absent(),
+  }) : unitId = Value(unitId);
+  static Insertable<SelectedUnitEntry> custom({
+    Expression<int>? unitId,
+    Expression<int>? userId,
+  }) {
+    return RawValuesInsertable({
+      if (unitId != null) 'unit_id': unitId,
+      if (userId != null) 'user_id': userId,
+    });
+  }
+
+  SelectedUnitTableCompanion copyWith({
+    Value<int>? unitId,
+    Value<int>? userId,
+  }) {
+    return SelectedUnitTableCompanion(
+      unitId: unitId ?? this.unitId,
+      userId: userId ?? this.userId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (unitId.present) {
+      map['unit_id'] = Variable<int>(unitId.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SelectedUnitTableCompanion(')
+          ..write('unitId: $unitId, ')
+          ..write('userId: $userId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DbClient extends GeneratedDatabase {
   _$DbClient(QueryExecutor e) : super(e);
   $DbClientManager get managers => $DbClientManager(this);
@@ -2749,12 +4241,18 @@ abstract class _$DbClient extends GeneratedDatabase {
     this,
   );
   late final $WsConfigTableTable wsConfigTable = $WsConfigTableTable(this);
+  late final $CharacterTableTable characterTable = $CharacterTableTable(this);
+  late final $UnitTableTable unitTable = $UnitTableTable(this);
+  late final $SelectedUnitTableTable selectedUnitTable =
+      $SelectedUnitTableTable(this);
   late final TodoDao todoDao = TodoDao(this as DbClient);
   late final UserDao userDao = UserDao(this as DbClient);
   late final SessionDao sessionDao = SessionDao(this as DbClient);
   late final LettersDao lettersDao = LettersDao(this as DbClient);
   late final RoomDao roomDao = RoomDao(this as DbClient);
   late final ConfigDao configDao = ConfigDao(this as DbClient);
+  late final GameDao gameDao = GameDao(this as DbClient);
+  late final UnitDao unitDao = UnitDao(this as DbClient);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2767,6 +4265,9 @@ abstract class _$DbClient extends GeneratedDatabase {
     letterTable,
     roomMemberTable,
     wsConfigTable,
+    characterTable,
+    unitTable,
+    selectedUnitTable,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -2790,6 +4291,34 @@ abstract class _$DbClient extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('room_member_table', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'user_table',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('character_table', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'user_table',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('unit_table', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'unit_table',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('selected_unit_table', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'user_table',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('selected_unit_table', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -2867,6 +4396,65 @@ final class $$UserTableTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _roomMemberTableRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CharacterTableTable, List<CharacterEntry>>
+  _characterTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
+    db.characterTable,
+    aliasName: $_aliasNameGenerator(db.userTable.id, db.characterTable.userId),
+  );
+
+  $$CharacterTableTableProcessedTableManager get characterTableRefs {
+    final manager = $$CharacterTableTableTableManager(
+      $_db,
+      $_db.characterTable,
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_characterTableRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$UnitTableTable, List<UnitEntry>>
+  _unitTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
+    db.unitTable,
+    aliasName: $_aliasNameGenerator(db.userTable.id, db.unitTable.userId),
+  );
+
+  $$UnitTableTableProcessedTableManager get unitTableRefs {
+    final manager = $$UnitTableTableTableManager(
+      $_db,
+      $_db.unitTable,
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_unitTableRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$SelectedUnitTableTable, List<SelectedUnitEntry>>
+  _selectedUnitTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
+    db.selectedUnitTable,
+    aliasName: $_aliasNameGenerator(
+      db.userTable.id,
+      db.selectedUnitTable.userId,
+    ),
+  );
+
+  $$SelectedUnitTableTableProcessedTableManager get selectedUnitTableRefs {
+    final manager = $$SelectedUnitTableTableTableManager(
+      $_db,
+      $_db.selectedUnitTable,
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _selectedUnitTableRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -2980,6 +4568,81 @@ class $$UserTableTableFilterComposer
           }) => $$RoomMemberTableTableFilterComposer(
             $db: $db,
             $table: $db.roomMemberTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> characterTableRefs(
+    Expression<bool> Function($$CharacterTableTableFilterComposer f) f,
+  ) {
+    final $$CharacterTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.characterTable,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CharacterTableTableFilterComposer(
+            $db: $db,
+            $table: $db.characterTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> unitTableRefs(
+    Expression<bool> Function($$UnitTableTableFilterComposer f) f,
+  ) {
+    final $$UnitTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.unitTable,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UnitTableTableFilterComposer(
+            $db: $db,
+            $table: $db.unitTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> selectedUnitTableRefs(
+    Expression<bool> Function($$SelectedUnitTableTableFilterComposer f) f,
+  ) {
+    final $$SelectedUnitTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.selectedUnitTable,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SelectedUnitTableTableFilterComposer(
+            $db: $db,
+            $table: $db.selectedUnitTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3131,6 +4794,82 @@ class $$UserTableTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> characterTableRefs<T extends Object>(
+    Expression<T> Function($$CharacterTableTableAnnotationComposer a) f,
+  ) {
+    final $$CharacterTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.characterTable,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CharacterTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.characterTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> unitTableRefs<T extends Object>(
+    Expression<T> Function($$UnitTableTableAnnotationComposer a) f,
+  ) {
+    final $$UnitTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.unitTable,
+      getReferencedColumn: (t) => t.userId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UnitTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.unitTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> selectedUnitTableRefs<T extends Object>(
+    Expression<T> Function($$SelectedUnitTableTableAnnotationComposer a) f,
+  ) {
+    final $$SelectedUnitTableTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.selectedUnitTable,
+          getReferencedColumn: (t) => t.userId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$SelectedUnitTableTableAnnotationComposer(
+                $db: $db,
+                $table: $db.selectedUnitTable,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$UserTableTableTableManager
@@ -3150,6 +4889,9 @@ class $$UserTableTableTableManager
             bool todoTableRefs,
             bool sessionTableRefs,
             bool roomMemberTableRefs,
+            bool characterTableRefs,
+            bool unitTableRefs,
+            bool selectedUnitTableRefs,
           })
         > {
   $$UserTableTableTableManager(_$DbClient db, $UserTableTable table)
@@ -3208,6 +4950,9 @@ class $$UserTableTableTableManager
                 todoTableRefs = false,
                 sessionTableRefs = false,
                 roomMemberTableRefs = false,
+                characterTableRefs = false,
+                unitTableRefs = false,
+                selectedUnitTableRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -3215,6 +4960,9 @@ class $$UserTableTableTableManager
                     if (todoTableRefs) db.todoTable,
                     if (sessionTableRefs) db.sessionTable,
                     if (roomMemberTableRefs) db.roomMemberTable,
+                    if (characterTableRefs) db.characterTable,
+                    if (unitTableRefs) db.unitTable,
+                    if (selectedUnitTableRefs) db.selectedUnitTable,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -3282,6 +5030,69 @@ class $$UserTableTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (characterTableRefs)
+                        await $_getPrefetchedData<
+                          UserEntry,
+                          $UserTableTable,
+                          CharacterEntry
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UserTableTableReferences
+                              ._characterTableRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UserTableTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).characterTableRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.userId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (unitTableRefs)
+                        await $_getPrefetchedData<
+                          UserEntry,
+                          $UserTableTable,
+                          UnitEntry
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UserTableTableReferences
+                              ._unitTableRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UserTableTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).unitTableRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.userId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (selectedUnitTableRefs)
+                        await $_getPrefetchedData<
+                          UserEntry,
+                          $UserTableTable,
+                          SelectedUnitEntry
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UserTableTableReferences
+                              ._selectedUnitTableRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UserTableTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).selectedUnitTableRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.userId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -3306,6 +5117,9 @@ typedef $$UserTableTableProcessedTableManager =
         bool todoTableRefs,
         bool sessionTableRefs,
         bool roomMemberTableRefs,
+        bool characterTableRefs,
+        bool unitTableRefs,
+        bool selectedUnitTableRefs,
       })
     >;
 typedef $$TodoTableTableCreateCompanionBuilder =
@@ -5323,6 +7137,1320 @@ typedef $$WsConfigTableTableProcessedTableManager =
       WsConfigEntry,
       PrefetchHooks Function()
     >;
+typedef $$CharacterTableTableCreateCompanionBuilder =
+    CharacterTableCompanion Function({
+      Value<int> id,
+      required String name,
+      required int atk,
+      required int def,
+      required int mind,
+      required int resistance,
+      required int vitality,
+      required double criticalChance,
+      required double criticalDamage,
+      required int userId,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+    });
+typedef $$CharacterTableTableUpdateCompanionBuilder =
+    CharacterTableCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<int> atk,
+      Value<int> def,
+      Value<int> mind,
+      Value<int> resistance,
+      Value<int> vitality,
+      Value<double> criticalChance,
+      Value<double> criticalDamage,
+      Value<int> userId,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+    });
+
+final class $$CharacterTableTableReferences
+    extends BaseReferences<_$DbClient, $CharacterTableTable, CharacterEntry> {
+  $$CharacterTableTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $UserTableTable _userIdTable(_$DbClient db) =>
+      db.userTable.createAlias(
+        $_aliasNameGenerator(db.characterTable.userId, db.userTable.id),
+      );
+
+  $$UserTableTableProcessedTableManager get userId {
+    final $_column = $_itemColumn<int>('user_id')!;
+
+    final manager = $$UserTableTableTableManager(
+      $_db,
+      $_db.userTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CharacterTableTableFilterComposer
+    extends Composer<_$DbClient, $CharacterTableTable> {
+  $$CharacterTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get atk => $composableBuilder(
+    column: $table.atk,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get def => $composableBuilder(
+    column: $table.def,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get mind => $composableBuilder(
+    column: $table.mind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get resistance => $composableBuilder(
+    column: $table.resistance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get vitality => $composableBuilder(
+    column: $table.vitality,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get criticalChance => $composableBuilder(
+    column: $table.criticalChance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get criticalDamage => $composableBuilder(
+    column: $table.criticalDamage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UserTableTableFilterComposer get userId {
+    final $$UserTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableFilterComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CharacterTableTableOrderingComposer
+    extends Composer<_$DbClient, $CharacterTableTable> {
+  $$CharacterTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get atk => $composableBuilder(
+    column: $table.atk,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get def => $composableBuilder(
+    column: $table.def,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get mind => $composableBuilder(
+    column: $table.mind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get resistance => $composableBuilder(
+    column: $table.resistance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get vitality => $composableBuilder(
+    column: $table.vitality,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get criticalChance => $composableBuilder(
+    column: $table.criticalChance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get criticalDamage => $composableBuilder(
+    column: $table.criticalDamage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UserTableTableOrderingComposer get userId {
+    final $$UserTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CharacterTableTableAnnotationComposer
+    extends Composer<_$DbClient, $CharacterTableTable> {
+  $$CharacterTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get atk =>
+      $composableBuilder(column: $table.atk, builder: (column) => column);
+
+  GeneratedColumn<int> get def =>
+      $composableBuilder(column: $table.def, builder: (column) => column);
+
+  GeneratedColumn<int> get mind =>
+      $composableBuilder(column: $table.mind, builder: (column) => column);
+
+  GeneratedColumn<int> get resistance => $composableBuilder(
+    column: $table.resistance,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get vitality =>
+      $composableBuilder(column: $table.vitality, builder: (column) => column);
+
+  GeneratedColumn<double> get criticalChance => $composableBuilder(
+    column: $table.criticalChance,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get criticalDamage => $composableBuilder(
+    column: $table.criticalDamage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  $$UserTableTableAnnotationComposer get userId {
+    final $$UserTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CharacterTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $CharacterTableTable,
+          CharacterEntry,
+          $$CharacterTableTableFilterComposer,
+          $$CharacterTableTableOrderingComposer,
+          $$CharacterTableTableAnnotationComposer,
+          $$CharacterTableTableCreateCompanionBuilder,
+          $$CharacterTableTableUpdateCompanionBuilder,
+          (CharacterEntry, $$CharacterTableTableReferences),
+          CharacterEntry,
+          PrefetchHooks Function({bool userId})
+        > {
+  $$CharacterTableTableTableManager(_$DbClient db, $CharacterTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CharacterTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CharacterTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CharacterTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> atk = const Value.absent(),
+                Value<int> def = const Value.absent(),
+                Value<int> mind = const Value.absent(),
+                Value<int> resistance = const Value.absent(),
+                Value<int> vitality = const Value.absent(),
+                Value<double> criticalChance = const Value.absent(),
+                Value<double> criticalDamage = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => CharacterTableCompanion(
+                id: id,
+                name: name,
+                atk: atk,
+                def: def,
+                mind: mind,
+                resistance: resistance,
+                vitality: vitality,
+                criticalChance: criticalChance,
+                criticalDamage: criticalDamage,
+                userId: userId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required int atk,
+                required int def,
+                required int mind,
+                required int resistance,
+                required int vitality,
+                required double criticalChance,
+                required double criticalDamage,
+                required int userId,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => CharacterTableCompanion.insert(
+                id: id,
+                name: name,
+                atk: atk,
+                def: def,
+                mind: mind,
+                resistance: resistance,
+                vitality: vitality,
+                criticalChance: criticalChance,
+                criticalDamage: criticalDamage,
+                userId: userId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$CharacterTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({userId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (userId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.userId,
+                                referencedTable: $$CharacterTableTableReferences
+                                    ._userIdTable(db),
+                                referencedColumn:
+                                    $$CharacterTableTableReferences
+                                        ._userIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CharacterTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $CharacterTableTable,
+      CharacterEntry,
+      $$CharacterTableTableFilterComposer,
+      $$CharacterTableTableOrderingComposer,
+      $$CharacterTableTableAnnotationComposer,
+      $$CharacterTableTableCreateCompanionBuilder,
+      $$CharacterTableTableUpdateCompanionBuilder,
+      (CharacterEntry, $$CharacterTableTableReferences),
+      CharacterEntry,
+      PrefetchHooks Function({bool userId})
+    >;
+typedef $$UnitTableTableCreateCompanionBuilder =
+    UnitTableCompanion Function({
+      Value<int> id,
+      required String name,
+      required int atk,
+      required int def,
+      required int vitality,
+      required int userId,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+    });
+typedef $$UnitTableTableUpdateCompanionBuilder =
+    UnitTableCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<int> atk,
+      Value<int> def,
+      Value<int> vitality,
+      Value<int> userId,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+    });
+
+final class $$UnitTableTableReferences
+    extends BaseReferences<_$DbClient, $UnitTableTable, UnitEntry> {
+  $$UnitTableTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $UserTableTable _userIdTable(_$DbClient db) => db.userTable
+      .createAlias($_aliasNameGenerator(db.unitTable.userId, db.userTable.id));
+
+  $$UserTableTableProcessedTableManager get userId {
+    final $_column = $_itemColumn<int>('user_id')!;
+
+    final manager = $$UserTableTableTableManager(
+      $_db,
+      $_db.userTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$SelectedUnitTableTable, List<SelectedUnitEntry>>
+  _selectedUnitTableRefsTable(_$DbClient db) => MultiTypedResultKey.fromTable(
+    db.selectedUnitTable,
+    aliasName: $_aliasNameGenerator(
+      db.unitTable.id,
+      db.selectedUnitTable.unitId,
+    ),
+  );
+
+  $$SelectedUnitTableTableProcessedTableManager get selectedUnitTableRefs {
+    final manager = $$SelectedUnitTableTableTableManager(
+      $_db,
+      $_db.selectedUnitTable,
+    ).filter((f) => f.unitId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _selectedUnitTableRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$UnitTableTableFilterComposer
+    extends Composer<_$DbClient, $UnitTableTable> {
+  $$UnitTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get atk => $composableBuilder(
+    column: $table.atk,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get def => $composableBuilder(
+    column: $table.def,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get vitality => $composableBuilder(
+    column: $table.vitality,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$UserTableTableFilterComposer get userId {
+    final $$UserTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableFilterComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> selectedUnitTableRefs(
+    Expression<bool> Function($$SelectedUnitTableTableFilterComposer f) f,
+  ) {
+    final $$SelectedUnitTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.selectedUnitTable,
+      getReferencedColumn: (t) => t.unitId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SelectedUnitTableTableFilterComposer(
+            $db: $db,
+            $table: $db.selectedUnitTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$UnitTableTableOrderingComposer
+    extends Composer<_$DbClient, $UnitTableTable> {
+  $$UnitTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get atk => $composableBuilder(
+    column: $table.atk,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get def => $composableBuilder(
+    column: $table.def,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get vitality => $composableBuilder(
+    column: $table.vitality,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$UserTableTableOrderingComposer get userId {
+    final $$UserTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$UnitTableTableAnnotationComposer
+    extends Composer<_$DbClient, $UnitTableTable> {
+  $$UnitTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get atk =>
+      $composableBuilder(column: $table.atk, builder: (column) => column);
+
+  GeneratedColumn<int> get def =>
+      $composableBuilder(column: $table.def, builder: (column) => column);
+
+  GeneratedColumn<int> get vitality =>
+      $composableBuilder(column: $table.vitality, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  $$UserTableTableAnnotationComposer get userId {
+    final $$UserTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> selectedUnitTableRefs<T extends Object>(
+    Expression<T> Function($$SelectedUnitTableTableAnnotationComposer a) f,
+  ) {
+    final $$SelectedUnitTableTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.selectedUnitTable,
+          getReferencedColumn: (t) => t.unitId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$SelectedUnitTableTableAnnotationComposer(
+                $db: $db,
+                $table: $db.selectedUnitTable,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$UnitTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $UnitTableTable,
+          UnitEntry,
+          $$UnitTableTableFilterComposer,
+          $$UnitTableTableOrderingComposer,
+          $$UnitTableTableAnnotationComposer,
+          $$UnitTableTableCreateCompanionBuilder,
+          $$UnitTableTableUpdateCompanionBuilder,
+          (UnitEntry, $$UnitTableTableReferences),
+          UnitEntry,
+          PrefetchHooks Function({bool userId, bool selectedUnitTableRefs})
+        > {
+  $$UnitTableTableTableManager(_$DbClient db, $UnitTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UnitTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UnitTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UnitTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> atk = const Value.absent(),
+                Value<int> def = const Value.absent(),
+                Value<int> vitality = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => UnitTableCompanion(
+                id: id,
+                name: name,
+                atk: atk,
+                def: def,
+                vitality: vitality,
+                userId: userId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required int atk,
+                required int def,
+                required int vitality,
+                required int userId,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => UnitTableCompanion.insert(
+                id: id,
+                name: name,
+                atk: atk,
+                def: def,
+                vitality: vitality,
+                userId: userId,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$UnitTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({userId = false, selectedUnitTableRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (selectedUnitTableRefs) db.selectedUnitTable,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (userId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.userId,
+                                    referencedTable: $$UnitTableTableReferences
+                                        ._userIdTable(db),
+                                    referencedColumn: $$UnitTableTableReferences
+                                        ._userIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (selectedUnitTableRefs)
+                        await $_getPrefetchedData<
+                          UnitEntry,
+                          $UnitTableTable,
+                          SelectedUnitEntry
+                        >(
+                          currentTable: table,
+                          referencedTable: $$UnitTableTableReferences
+                              ._selectedUnitTableRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UnitTableTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).selectedUnitTableRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.unitId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$UnitTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $UnitTableTable,
+      UnitEntry,
+      $$UnitTableTableFilterComposer,
+      $$UnitTableTableOrderingComposer,
+      $$UnitTableTableAnnotationComposer,
+      $$UnitTableTableCreateCompanionBuilder,
+      $$UnitTableTableUpdateCompanionBuilder,
+      (UnitEntry, $$UnitTableTableReferences),
+      UnitEntry,
+      PrefetchHooks Function({bool userId, bool selectedUnitTableRefs})
+    >;
+typedef $$SelectedUnitTableTableCreateCompanionBuilder =
+    SelectedUnitTableCompanion Function({
+      required int unitId,
+      Value<int> userId,
+    });
+typedef $$SelectedUnitTableTableUpdateCompanionBuilder =
+    SelectedUnitTableCompanion Function({Value<int> unitId, Value<int> userId});
+
+final class $$SelectedUnitTableTableReferences
+    extends
+        BaseReferences<_$DbClient, $SelectedUnitTableTable, SelectedUnitEntry> {
+  $$SelectedUnitTableTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $UnitTableTable _unitIdTable(_$DbClient db) =>
+      db.unitTable.createAlias(
+        $_aliasNameGenerator(db.selectedUnitTable.unitId, db.unitTable.id),
+      );
+
+  $$UnitTableTableProcessedTableManager get unitId {
+    final $_column = $_itemColumn<int>('unit_id')!;
+
+    final manager = $$UnitTableTableTableManager(
+      $_db,
+      $_db.unitTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_unitIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $UserTableTable _userIdTable(_$DbClient db) =>
+      db.userTable.createAlias(
+        $_aliasNameGenerator(db.selectedUnitTable.userId, db.userTable.id),
+      );
+
+  $$UserTableTableProcessedTableManager get userId {
+    final $_column = $_itemColumn<int>('user_id')!;
+
+    final manager = $$UserTableTableTableManager(
+      $_db,
+      $_db.userTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_userIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$SelectedUnitTableTableFilterComposer
+    extends Composer<_$DbClient, $SelectedUnitTableTable> {
+  $$SelectedUnitTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$UnitTableTableFilterComposer get unitId {
+    final $$UnitTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.unitId,
+      referencedTable: $db.unitTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UnitTableTableFilterComposer(
+            $db: $db,
+            $table: $db.unitTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$UserTableTableFilterComposer get userId {
+    final $$UserTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableFilterComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SelectedUnitTableTableOrderingComposer
+    extends Composer<_$DbClient, $SelectedUnitTableTable> {
+  $$SelectedUnitTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$UnitTableTableOrderingComposer get unitId {
+    final $$UnitTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.unitId,
+      referencedTable: $db.unitTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UnitTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.unitTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$UserTableTableOrderingComposer get userId {
+    final $$UserTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SelectedUnitTableTableAnnotationComposer
+    extends Composer<_$DbClient, $SelectedUnitTableTable> {
+  $$SelectedUnitTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$UnitTableTableAnnotationComposer get unitId {
+    final $$UnitTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.unitId,
+      referencedTable: $db.unitTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UnitTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.unitTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$UserTableTableAnnotationComposer get userId {
+    final $$UserTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.userId,
+      referencedTable: $db.userTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UserTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.userTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SelectedUnitTableTableTableManager
+    extends
+        RootTableManager<
+          _$DbClient,
+          $SelectedUnitTableTable,
+          SelectedUnitEntry,
+          $$SelectedUnitTableTableFilterComposer,
+          $$SelectedUnitTableTableOrderingComposer,
+          $$SelectedUnitTableTableAnnotationComposer,
+          $$SelectedUnitTableTableCreateCompanionBuilder,
+          $$SelectedUnitTableTableUpdateCompanionBuilder,
+          (SelectedUnitEntry, $$SelectedUnitTableTableReferences),
+          SelectedUnitEntry,
+          PrefetchHooks Function({bool unitId, bool userId})
+        > {
+  $$SelectedUnitTableTableTableManager(
+    _$DbClient db,
+    $SelectedUnitTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SelectedUnitTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SelectedUnitTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SelectedUnitTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> unitId = const Value.absent(),
+                Value<int> userId = const Value.absent(),
+              }) => SelectedUnitTableCompanion(unitId: unitId, userId: userId),
+          createCompanionCallback:
+              ({
+                required int unitId,
+                Value<int> userId = const Value.absent(),
+              }) => SelectedUnitTableCompanion.insert(
+                unitId: unitId,
+                userId: userId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$SelectedUnitTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({unitId = false, userId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (unitId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.unitId,
+                                referencedTable:
+                                    $$SelectedUnitTableTableReferences
+                                        ._unitIdTable(db),
+                                referencedColumn:
+                                    $$SelectedUnitTableTableReferences
+                                        ._unitIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (userId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.userId,
+                                referencedTable:
+                                    $$SelectedUnitTableTableReferences
+                                        ._userIdTable(db),
+                                referencedColumn:
+                                    $$SelectedUnitTableTableReferences
+                                        ._userIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$SelectedUnitTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$DbClient,
+      $SelectedUnitTableTable,
+      SelectedUnitEntry,
+      $$SelectedUnitTableTableFilterComposer,
+      $$SelectedUnitTableTableOrderingComposer,
+      $$SelectedUnitTableTableAnnotationComposer,
+      $$SelectedUnitTableTableCreateCompanionBuilder,
+      $$SelectedUnitTableTableUpdateCompanionBuilder,
+      (SelectedUnitEntry, $$SelectedUnitTableTableReferences),
+      SelectedUnitEntry,
+      PrefetchHooks Function({bool unitId, bool userId})
+    >;
 
 class $DbClientManager {
   final _$DbClient _db;
@@ -5341,4 +8469,10 @@ class $DbClientManager {
       $$RoomMemberTableTableTableManager(_db, _db.roomMemberTable);
   $$WsConfigTableTableTableManager get wsConfigTable =>
       $$WsConfigTableTableTableManager(_db, _db.wsConfigTable);
+  $$CharacterTableTableTableManager get characterTable =>
+      $$CharacterTableTableTableManager(_db, _db.characterTable);
+  $$UnitTableTableTableManager get unitTable =>
+      $$UnitTableTableTableManager(_db, _db.unitTable);
+  $$SelectedUnitTableTableTableManager get selectedUnitTable =>
+      $$SelectedUnitTableTableTableManager(_db, _db.selectedUnitTable);
 }

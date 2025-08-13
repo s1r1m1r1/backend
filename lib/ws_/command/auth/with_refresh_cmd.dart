@@ -7,7 +7,7 @@ import 'package:sha_red/sha_red.dart';
 import '../../../core/debug_log.dart';
 import '../../../core/log_colors.dart';
 import '../../../core/new_api_exceptions.dart';
-import '../../../session/session_repository.dart';
+import '../../../user/session_repository.dart';
 import '../../broadcast.dart';
 import '../_ws_cmd.dart';
 

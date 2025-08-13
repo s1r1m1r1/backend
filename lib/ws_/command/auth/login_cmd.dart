@@ -4,7 +4,7 @@ import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 
 import '../../../core/log_colors.dart';
-import '../../../session/session_repository.dart';
+import '../../../user/session_repository.dart';
 import '../../broadcast.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';

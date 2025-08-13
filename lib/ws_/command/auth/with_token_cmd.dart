@@ -5,7 +5,7 @@ import 'package:backend/core/new_api_exceptions.dart';
 import 'package:sha_red/sha_red.dart';
 
 import '../../../core/debug_log.dart';
-import '../../../session/session_repository.dart';
+import '../../../user/session_repository.dart';
 import '../../broadcast.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -62,12 +62,10 @@ class WithTokenCMD implements WsCommand {
           debugLog("UnKnown error $er");
           channel.sink.add(
             jsonEncode(
-              jsonEncode(
-                WsFromServer(
-                  eventType: WsEventFromServer.unauthenticated,
-                  payload: WsErrorPayload(errorCode: 500),
-                ).toJson(WsErrorPayload.toJsonF),
-              ),
+              WsFromServer(
+                eventType: WsEventFromServer.unauthenticated,
+                payload: WsErrorPayload(errorCode: 500),
+              ).toJson(WsErrorPayload.toJsonF),
             ),
           );
         });

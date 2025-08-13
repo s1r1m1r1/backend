@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/session/hash_extension.dart';
-import 'package:backend/session/session_datasource.dart';
+import 'package:backend/user/hash_extension.dart';
+import 'package:backend/user/session_datasource.dart';
 
-import 'package:backend/session/session.dart';
+import 'package:backend/user/session.dart';
 
 abstract class SessionRepository {
   Future<Session> createSession(int userId);
@@ -70,9 +70,9 @@ class SessionRepositoryImpl implements SessionRepository {
     final refreshToken = '${session.userId}_refresh_${now.toIso8601String()}'.hashValue;
     final updated = session.copyWith(
       token: token,
-      tokenExpiryDate: now.add(const Duration(seconds: 10)), // access token expiry
+      tokenExpiryDate: now.add(const Duration(minutes: 10)), // access token expiry
       refreshToken: refreshToken,
-      refreshTokenExpiry: now.add(const Duration(seconds: 1000)), // refresh token expiry
+      refreshTokenExpiry: now.add(const Duration(minutes: 120)), // refresh token expiry
     );
     final isOk = await sessionDatasource.insertSession(updated);
     if (isOk) return updated;

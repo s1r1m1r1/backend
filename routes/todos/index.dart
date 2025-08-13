@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/serializers/parse_json.dart';
-import 'package:backend/models/validation/create_todo_validated.dart';
 import 'package:backend/todo/todo_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
+import 'package:sha_red/sha_red.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   switch (context.request.method) {
@@ -48,7 +48,7 @@ FutureOr<Response> postTodo(RequestContext context) async {
   try {
     final todoRepo = context.read<TodoRepository>();
     final json = await parseJson(context.request);
-    final validated = CreateTodoMethod.validated(json);
+    final validated = CreateTodoDto.fromJson(json);
     final result = await todoRepo.createTodo(validated);
     return Response.json(body: result.toJson());
   } on ApiException catch (e, stack) {

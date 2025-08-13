@@ -2,7 +2,7 @@ import 'package:backend/core/debug_log.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:synchronized/synchronized.dart';
 
-import 'package:backend/session/session.dart';
+import 'package:backend/user/session.dart';
 
 /// A class to manage and broadcast messages to WebSocket channels grouped by a room.
 /// It ensures thread-safe operations and includes methods for managing subscriptions.
