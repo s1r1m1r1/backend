@@ -1,6 +1,8 @@
 import 'package:backend/cf/autostart_manager.dart';
 import 'package:backend/cf/ws_config_datasource.dart';
-import 'package:backend/session/session_datasource.dart';
+import 'package:backend/game/unit_datasource.dart';
+import 'package:backend/game/unit_repository.dart';
+import 'package:backend/user/session_datasource.dart';
 import 'package:backend/user/password_hash_service.dart';
 import 'package:backend/user/user_datasource.dart';
 import 'package:backend/ws_/chat_room_repository.dart';
@@ -9,7 +11,7 @@ import 'package:backend/ws_/counter_repository.dart';
 import 'package:backend/ws_/letters_repository.dart';
 import 'package:backend/cf/ws_config_repository.dart';
 import 'package:backend/db_client/db_client.dart';
-import 'package:backend/session/session_repository.dart';
+import 'package:backend/user/session_repository.dart';
 import 'package:backend/user/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 // import 'package:drift/native.dart';
@@ -27,6 +29,8 @@ final _autostartManager = AutostartManager(
   _chatRoomRepository,
 );
 
+final _unitRepository = UnitRepositoryImpl(UnitDatasourceImpl(_db));
+
 Handler middleware(Handler handler) {
   return handler
       .use(requestLogger())
@@ -37,6 +41,7 @@ Handler middleware(Handler handler) {
       .use(provider<CounterRepository>((_) => _counterRepository))
       .use(provider<WsConfigRepository>((_) => _wsConfigRepository))
       .use(provider<ChatRoomRepository>((_) => _chatRoomRepository))
+      .use(provider<UnitRepository>((_) => _unitRepository))
       .use(provider<AutostartManager>((_) => _autostartManager));
 
   // return handler(updatedContext);

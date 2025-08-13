@@ -2,17 +2,20 @@ import 'dart:io';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/session/session.dart';
-import 'package:backend/session/session_repository.dart';
+import 'package:backend/user/session.dart';
+import 'package:backend/user/session_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 import 'package:backend/models/user.dart';
 import 'package:backend/user/user_repository.dart';
 
+import '../core/log_colors.dart';
+
 Future<(User, Session)> checkSession(RequestContext context) async {
   final request = context.request;
   final authHeader = request.headers[HttpHeaders.authorizationHeader] ?? '';
   final token = authHeader.replaceFirst('Bearer ', '');
+  debugLog("$magenta token: $token $reset");
   if (token.isEmpty) {
     debugLog("token is null");
     throw ApiException.unauthorized(message: 'Session token must not be empty');

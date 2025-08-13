@@ -1,4 +1,10 @@
 import 'dart:io';
+import 'package:backend/db_client/dao/game_dao.dart';
+import 'package:backend/db_client/dao/unit_dao.dart';
+import 'package:backend/db_client/tables/character_table.dart';
+import 'package:backend/db_client/tables/selected_unit_table.dart';
+import 'package:backend/db_client/tables/unit_table.dart';
+
 import 'dao/letters_dao.dart';
 import 'dao/session_dao.dart';
 import 'dao/todo_dao.dart';
@@ -11,15 +17,15 @@ import 'package:path/path.dart' as p;
 import 'package:sha_red/sha_red.dart';
 import 'package:sqlite3/sqlite3.dart';
 // import 'package:uuid/uuid.dart';
-import 'dao/config_dao.dart';
-import 'dao/room_dao.dart';
-import 'dao/user_dao.dart';
-import 'tables/ws_config_table.dart';
-import 'tables/room_table.dart';
-import 'tables/room_member_table.dart';
-import 'tables/letter_table.dart';
-import 'tables/session_table.dart';
-import 'tables/user_table.dart';
+import 'package:backend/db_client/dao/config_dao.dart';
+import 'package:backend/db_client/dao/room_dao.dart';
+import 'package:backend/db_client/dao/user_dao.dart';
+import 'package:backend/db_client/tables/ws_config_table.dart';
+import 'package:backend/db_client/tables/room_table.dart';
+import 'package:backend/db_client/tables/room_member_table.dart';
+import 'package:backend/db_client/tables/letter_table.dart';
+import 'package:backend/db_client/tables/session_table.dart';
+import 'package:backend/db_client/tables/user_table.dart';
 import 'package:backend/models/enums.dart';
 
 part 'db_client.g.dart';
@@ -33,8 +39,11 @@ part 'db_client.g.dart';
     RoomTable,
     RoomMemberTable,
     WsConfigTable,
+    CharacterTable,
+    UnitTable,
+    SelectedUnitTable,
   ],
-  daos: [TodoDao, UserDao, SessionDao, LettersDao, RoomDao, ConfigDao],
+  daos: [TodoDao, UserDao, SessionDao, LettersDao, RoomDao, ConfigDao, GameDao, UnitDao],
 )
 class DbClient extends _$DbClient {
   DbClient(super.e);
