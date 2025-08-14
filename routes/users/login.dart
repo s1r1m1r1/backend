@@ -36,7 +36,7 @@ FutureOr<Response> login(RequestContext context) async {
     final user = await userRepo.loginUser(emailCredential);
 
     stdout.writeln('$magenta login 5$reset');
-    final session = await sessionRepo.createSession(user.userId);
+    final session = await sessionRepo.createSession(user);
     stdout.writeln('$magenta login return ${session.token} , ${session.refreshToken} $reset');
     return Response.json(
       body: TokensDto(

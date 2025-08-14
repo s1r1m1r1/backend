@@ -1,4 +1,4 @@
-import 'package:backend/ws_/broadcast.dart';
+import 'package:backend/user/ws_active_sessions.dart';
 import 'package:backend/ws_/command/_ws_cmd.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -37,7 +37,7 @@ class FetchRoomHistoryCommand implements WsCommand {
   const FetchRoomHistoryCommand();
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
-    final broadcast = context.read<Broadcast>();
+    final broadcast = context.read<WsActiveSessions>();
 
     // Implement fetch room history logic using letters and chat_room tables
     // Example: context.read<LettersRepository>().fetchRoomHistory(payload['roomId'])

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:backend/middlewares/session_middleware_.dart';
+import 'package:backend/user/http_check_session_.dart';
 
 import 'package:backend/cf/ws_config_repository.dart';
 import 'package:backend/models/user.dart';

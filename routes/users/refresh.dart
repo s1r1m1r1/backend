@@ -31,7 +31,7 @@ FutureOr<Response> refresh(RequestContext context) async {
         statusCode: HttpStatus.unauthorized,
       );
     }
-    stdout.writeln('$magenta [refresh] Session found for userId: ${session.userId} $reset');
+    stdout.writeln('$magenta [refresh] Session found for userId: ${session.user} $reset');
     final newSession = await sessionRepository.updateSession(session); // Implement this
     stdout.writeln(
       '$magenta [refresh] New session issued: accessToken=${newSession.token}, refreshToken=${newSession.refreshToken} $reset',

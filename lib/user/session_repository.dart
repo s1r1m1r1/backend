@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/models/user.dart';
 import 'package:backend/user/hash_extension.dart';
 import 'package:backend/user/session_datasource.dart';
 
 import 'package:backend/user/session.dart';
 
 abstract class SessionRepository {
-  Future<Session> createSession(int userId);
+  Future<Session> createSession(User user);
   Future<Session> updateSession(Session session);
 
   Future<Session?> getSession({String? token, String? refreshToken, int? userId});
@@ -28,13 +29,13 @@ class SessionRepositoryImpl implements SessionRepository {
   final SessionDatasource sessionDatasource;
 
   /// Creates a new session for the user with the given [userId].
-  Future<Session> createSession(int userId) async {
+  Future<Session> createSession(User user) async {
     final now = _now();
-    final token = '${userId}_${now.toIso8601String()}'.hashValue;
-    final refreshToken = '${userId}_refresh_${now.toIso8601String()}'.hashValue;
+    final token = '${user.userId}_${now.toIso8601String()}'.hashValue;
+    final refreshToken = '${user.userId}_refresh_${now.toIso8601String()}'.hashValue;
     final session = Session(
       token: token,
-      userId: userId,
+      user: user,
       tokenExpiryDate: now.add(const Duration(seconds: 10)), // access token expiry
       createdAt: now,
       refreshToken: refreshToken,
@@ -66,8 +67,8 @@ class SessionRepositoryImpl implements SessionRepository {
   @override
   Future<Session> updateSession(Session session) async {
     final now = _now();
-    final token = '${session.userId}_${now.toIso8601String()}'.hashValue;
-    final refreshToken = '${session.userId}_refresh_${now.toIso8601String()}'.hashValue;
+    final token = '${session.user.userId}_${now.toIso8601String()}'.hashValue;
+    final refreshToken = '${session.user.userId}_refresh_${now.toIso8601String()}'.hashValue;
     final updated = session.copyWith(
       token: token,
       tokenExpiryDate: now.add(const Duration(minutes: 10)), // access token expiry

@@ -1,47 +1,131 @@
-import 'package:equatable/equatable.dart';
+// The mixin remains the same.
+import 'dart:convert';
 
+import 'package:backend/game/unit.dart';
+import 'package:backend/models/user.dart';
+import 'package:equatable/equatable.dart';
+import 'package:sha_red/sha_red.dart';
+
+abstract class IGameSession {
+  abstract final Unit unit;
+}
+
+// The base Session class without the unit.
 class Session extends Equatable {
   const Session({
     this.id,
     required this.token,
-    required this.userId,
+    required this.user,
     required this.tokenExpiryDate,
     required this.createdAt,
     required this.refreshToken,
     required this.refreshTokenExpiry,
   });
+
   final int? id;
-
-  /// The session token.
   final String token;
-
-  /// The user id.
-  final int userId;
-
-  /// The session expiration date.
+  final User user;
   final DateTime tokenExpiryDate;
-
-  /// The session creation date.
   final DateTime createdAt;
-
-  /// The refresh token for this session.
   final String refreshToken;
-
-  /// The refresh token expiration date.
   final DateTime refreshTokenExpiry;
 
-  Session copyWith({String? token, DateTime? tokenExpiryDate, String? refreshToken, DateTime? refreshTokenExpiry}) {
+  Session copyWith({
+    String? token,
+    User? user,
+    DateTime? tokenExpiryDate,
+    DateTime? createdAt,
+    String? refreshToken,
+    DateTime? refreshTokenExpiry,
+  }) {
     return Session(
-      id: this.id,
+      id: id,
       token: token ?? this.token,
-      userId: this.userId,
+      user: user ?? this.user,
       tokenExpiryDate: tokenExpiryDate ?? this.tokenExpiryDate,
-      createdAt: this.createdAt,
+      createdAt: createdAt ?? this.createdAt,
       refreshToken: refreshToken ?? this.refreshToken,
       refreshTokenExpiry: refreshTokenExpiry ?? this.refreshTokenExpiry,
     );
   }
 
   @override
-  List<Object?> get props => [id, token, userId, tokenExpiryDate, createdAt, refreshToken, refreshTokenExpiry];
+  List<Object?> get props => [
+    id,
+    token,
+    user,
+    tokenExpiryDate,
+    createdAt,
+    refreshToken,
+    refreshTokenExpiry,
+  ];
+}
+
+// The GameSession class with the unit, extending Session.
+class GameSession extends Session implements IGameSession {
+  const GameSession({
+    int? id,
+    required String token,
+    required User user,
+    required DateTime tokenExpiryDate,
+    required DateTime createdAt,
+    required String refreshToken,
+    required DateTime refreshTokenExpiry,
+    required this.unit,
+  }) : super(
+         id: id,
+         token: token,
+         user: user,
+         tokenExpiryDate: tokenExpiryDate,
+         createdAt: createdAt,
+         refreshToken: refreshToken,
+         refreshTokenExpiry: refreshTokenExpiry,
+       );
+
+  factory GameSession.fromSession(Session session, Unit unit) {
+    return GameSession(
+      id: session.id,
+      token: session.token,
+      user: session.user,
+      tokenExpiryDate: session.tokenExpiryDate,
+      createdAt: session.createdAt,
+      refreshToken: session.refreshToken,
+      refreshTokenExpiry: session.refreshTokenExpiry,
+      unit: unit,
+    );
+  }
+
+  GameSession changeUnit(Unit unit) {
+    return GameSession(
+      id: id,
+      token: token,
+      user: user,
+      tokenExpiryDate: tokenExpiryDate,
+      createdAt: createdAt,
+      refreshToken: refreshToken,
+      refreshTokenExpiry: refreshTokenExpiry,
+      unit: unit,
+    );
+  }
+
+  @override
+  final Unit unit;
+
+  @override
+  List<Object?> get props => [user];
+}
+
+extension GameSessionExt on GameSession {
+  String toEncodedTokens() {
+    final payload = JoinedServerPayload(
+      'main',
+      tokens: TokensDto(AccessTokenDto(token), RefreshTokenDto(refreshToken)),
+    );
+    final dto = WsFromServer(
+      eventType: WsEventFromServer.joinedServer,
+      payload: payload,
+    ).toJson(JoinedServerPayload.toJsonF);
+    final encoded = jsonEncode(dto);
+    return encoded;
+  }
 }

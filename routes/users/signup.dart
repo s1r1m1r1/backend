@@ -34,7 +34,7 @@ FutureOr<Response> signup(RequestContext context) async {
 
     stdout.writeln('$magenta signup 4$reset');
     final sessionRepository = context.read<SessionRepository>();
-    final session = await sessionRepository.createSession(user.userId);
+    final session = await sessionRepository.createSession(user);
 
     stdout.writeln('$magenta signup return ${session.token} ${session.refreshToken} $reset');
     return Response.json(
