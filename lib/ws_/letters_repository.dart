@@ -10,15 +10,13 @@ class LettersRepository {
 
   const LettersRepository(this._dao);
 
-  Future<LetterDto?> createLetter(Json payload) async {
-    debugLog('Creating letter: start');
-    final LetterDto letter = LetterDto.fromJson(payload);
+  Future<LetterDto?> createLetter(LetterDto dto) async {
     try {
       final entry = await _dao.insertRow(
         LetterTableCompanion(
-          chatRoomId: Value(letter.chatRoomId),
-          content: Value(letter.content),
-          senderId: Value(letter.senderId),
+          chatRoomId: Value(dto.chatRoomId),
+          content: Value(dto.content),
+          senderId: Value(dto.senderId),
           createdAt: Value(DateTime.now()),
         ),
       );
@@ -38,10 +36,10 @@ class LettersRepository {
     }
   }
 
-  Future<List<int>> deleteLetter(Json payload) async {
-    final id = payload['id'];
-    final deleted = await _dao.deleteLetter(id);
-    return deleted.map((i) => i.id).toList();
+  Future<int> deleteLetter(int letterId) async {
+    final deleted = await _dao.deleteLetter(letterId);
+    if (deleted.isNotEmpty) return deleted.last.id;
+    return -1;
   }
 
   Future<Iterable<LetterDto>> fetchAllLetters() async {

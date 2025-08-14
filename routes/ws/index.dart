@@ -7,6 +7,7 @@ import 'package:backend/user/ws_active_sessions.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/ws_/command/_ws_cmd_handlers.dart';
 import 'package:backend/ws_/cubit/active_users_cubit.dart';
+import 'package:backend/ws_/cubit/room_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
@@ -16,6 +17,7 @@ Future<Response> onRequest(RequestContext context) async {
     debugLog('$green ON Request 1 $protocol $reset');
     final activeSessions = context.read<WsActiveSessions>();
     final activeUsersCubit = context.read<ActiveUsersCubit>();
+    final roomManager = context.read<RoomManager>();
 
     debugLog('$green ON Request 2  $reset');
     // final user = context.read<User>();
@@ -81,6 +83,7 @@ Future<Response> onRequest(RequestContext context) async {
         if (session != null) {
           activeUsersCubit.removeUser(session);
           activeUsersCubit.unsubscribe(channel);
+          roomManager.roomLetter['main']?.unsubscribe(channel);
         }
         channel.sink.close();
       },
