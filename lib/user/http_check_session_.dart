@@ -30,7 +30,7 @@ Future<(User, Session)> checkSession(RequestContext context) async {
     throw ApiException.unauthorized(message: 'Token is expired');
   }
 
-  final user = await context.read<UserRepository>().getUser(userId: session.userId);
+  final user = await context.read<UserRepository>().getUser(userId: session.user.userId);
   if (user == null) {
     throw ApiException.unauthorized(message: 'User by token not found');
   }

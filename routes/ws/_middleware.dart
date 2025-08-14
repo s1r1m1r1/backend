@@ -1,12 +1,11 @@
-import 'package:backend/ws_/broadcast.dart';
+import 'package:backend/user/ws_active_sessions.dart';
+import 'package:backend/ws_/cubit/active_users_cubit.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 // for all users , create one for all
-var _broadcast = Broadcast();
-//
-// Todo
-// check token for user once for init connection
-//
+var _activeSessions = WsActiveSessions();
+var _activeUsersCubit = ActiveUsersCubit();
+
 // Handler middleware(Handler handler) {
 //   return sessionMiddleware(handler, addToContext: [_addToContext]);
 // }
@@ -20,6 +19,7 @@ Handler middleware(Handler handler) {
 }
 
 RequestContext _addToContext(RequestContext context) {
-  var updatedContext = context.provide<Broadcast>(() => _broadcast);
+  var updatedContext = context.provide<WsActiveSessions>(() => _activeSessions);
+  updatedContext = updatedContext.provide<ActiveUsersCubit>(() => _activeUsersCubit);
   return updatedContext;
 }

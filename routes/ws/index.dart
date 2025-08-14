@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:backend/core/debug_log.dart';
-import 'package:backend/ws_/broadcast.dart';
+import 'package:backend/user/ws_active_sessions.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/ws_/command/_ws_cmd_handlers.dart';
+import 'package:backend/ws_/cubit/active_users_cubit.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
@@ -13,7 +14,8 @@ import 'package:sha_red/sha_red.dart';
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
     debugLog('$green ON Request 1 $protocol $reset');
-    final broadcast = context.read<Broadcast>();
+    final activeSessions = context.read<WsActiveSessions>();
+    final activeUsersCubit = context.read<ActiveUsersCubit>();
 
     debugLog('$green ON Request 2  $reset');
     // final user = context.read<User>();
@@ -75,17 +77,12 @@ Future<Response> onRequest(RequestContext context) async {
       },
       onDone: () async {
         debugLog('$magenta [WebSocket] Connection closed, unsubscribing all. $reset');
-        broadcast.unsubscribeAll(channel);
+        final session = activeSessions[channel];
+        if (session != null) {
+          activeUsersCubit.removeUser(session);
+          activeUsersCubit.unsubscribe(channel);
+        }
         channel.sink.close();
-        final onlineMembers = jsonEncode(
-          WsFromServer(
-            eventType: WsEventFromServer.onlineUsers,
-            payload: OnlineUsersPayload(
-              members: broadcast.activeUsersList.map((i) => 'userId: ${i.userId}').toList(),
-            ),
-          ).toJson(OnlineUsersPayload.toJsonF),
-        );
-        await broadcast.broadcast('main', onlineMembers);
       },
 
       cancelOnError: true,

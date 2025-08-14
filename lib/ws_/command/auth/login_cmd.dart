@@ -2,10 +2,14 @@ import 'dart:convert';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/game/unit.dart';
+import 'package:backend/game/unit_repository.dart';
+import 'package:backend/user/session.dart';
+import 'package:backend/ws_/cubit/active_users_cubit.dart';
 
 import '../../../core/log_colors.dart';
 import '../../../user/session_repository.dart';
-import '../../broadcast.dart';
+import '../../../user/ws_active_sessions.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
@@ -20,9 +24,10 @@ class LoginCMD implements WsCommand {
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
     debugLog("LoginCMD START\n\n");
-
-    final broadcast = context.read<Broadcast>();
+    final activeUsersCubit = context.read<ActiveUsersCubit>();
+    final activeSessions = context.read<WsActiveSessions>();
     final userRepo = context.read<UserRepository>();
+    final unitRepo = context.read<UnitRepository>();
     final sessionRepo = context.read<SessionRepository>();
     if (payload is! Map<String, dynamic>) {
       debugLog("LoginCMD payload is not Map<String, dynamic>");
@@ -32,47 +37,30 @@ class LoginCMD implements WsCommand {
     final dto = EmailCredentialDto.fromJson(payload);
     userRepo
         .loginUser(dto)
-        .then(
-          (user) async {
-            sessionRepo.createSession(user.userId).then((session) {
-              broadcast.subscribe(roomId: 'main', session: session, channel: channel).then((_) {
-                final onlineMembers = jsonEncode(
-                  WsFromServer(
-                    eventType: WsEventFromServer.onlineUsers,
-                    payload: OnlineUsersPayload(
-                      members: broadcast.activeUsersList.map((i) => 'userId: ${i.userId}').toList(),
-                    ),
-                  ).toJson(OnlineUsersPayload.toJsonF),
-                );
-                broadcast.broadcast('main', onlineMembers).then((_) {
-                  final payload = JoinedServerPayload(
-                    'main',
-                    tokens: TokensDto(
-                      AccessTokenDto(session.token),
-                      RefreshTokenDto(session.refreshToken),
-                    ),
-                  );
-                  final dto = WsFromServer(
-                    eventType: WsEventFromServer.joinedServer,
-                    payload: payload,
-                  ).toJson(JoinedServerPayload.toJsonF);
-                  final encoded = jsonEncode(dto);
-                  channel.sink.add(encoded);
-                });
-              });
+        .then((user) async {
+          sessionRepo.createSession(user).then((session) {
+            unitRepo.getSelectedUnit(session.user.userId).then((unit) {
+              if (unit == null) {
+                throw ApiException.notFound(message: 'Unit not found');
+              }
+              final gSession = GameSession.fromSession(session, Unit.fromDto(unit));
+              activeUsersCubit.subscribe(channel);
+              activeUsersCubit.addUser(gSession);
+              activeSessions[channel] = gSession;
+              channel.sink.add(gSession.toEncodedTokens());
             });
-          },
-          onError: (er, st) {
-            if (er is ApiException && er.statusCode == 401) {
-              debugLog('$yellow${er.message}$reset');
-              channel.sink.add(
-                jsonEncode(WsFromServer(eventType: WsEventFromServer.tokenExpired).toJsonEvent()),
-              );
-              return;
-            }
-            debugLog("UnKnown error $er");
-          },
-        );
+          });
+        })
+        .onError((er, st) {
+          if (er is ApiException && er.statusCode == 401) {
+            debugLog('$yellow${er.message}$reset');
+            channel.sink.add(
+              jsonEncode(WsFromServer(eventType: WsEventFromServer.tokenExpired).toJsonEvent()),
+            );
+            return;
+          }
+          debugLog("UnKnown error $er");
+        });
 
     // final encoded = jsonEncode(
     //   WsFromServer(

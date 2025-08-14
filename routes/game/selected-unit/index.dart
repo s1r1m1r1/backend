@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/game/unit_repository.dart';
-import 'package:backend/middlewares/session_middleware_.dart';
+import 'package:backend/user/http_check_session_.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 Future<Response> onRequest(RequestContext context) async {

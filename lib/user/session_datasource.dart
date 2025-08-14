@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/db_client/db_client.dart';
+import 'package:backend/models/user.dart';
 import 'package:backend/user/session.dart';
 import 'package:drift/drift.dart' show Value;
 
@@ -27,7 +28,7 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
     await _dao.insertRow(
       SessionTableCompanion(
         token: Value(session.token),
-        userId: Value(session.userId),
+        userId: Value(session.user.userId),
         expiryDate: Value(session.tokenExpiryDate),
         createdAt: Value(session.createdAt),
         refreshToken: Value(session.refreshToken),
@@ -43,7 +44,7 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
       SessionTableCompanion(
         id: Value(session.id!),
         token: Value(session.token),
-        userId: Value(session.userId),
+        userId: Value(session.user.userId),
         expiryDate: Value(session.tokenExpiryDate),
         createdAt: Value(session.createdAt),
         refreshToken: Value(session.refreshToken),
@@ -67,11 +68,16 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
       debugLog('$red getSession: entry is null $reset');
       return null;
     }
+    final user = await _db.userDao.getUser(userId: entry.userId);
+    if (user == null) {
+      debugLog('$red getSession: user is null $reset');
+      return null;
+    }
 
     return Session(
       createdAt: entry.createdAt,
       token: entry.token,
-      userId: entry.userId,
+      user: User(userId: user.id, email: user.email, role: user.role, createdAt: user.createdAt),
       tokenExpiryDate: entry.expiryDate,
       refreshToken: entry.refreshToken,
       refreshTokenExpiry: entry.refreshTokenExpiry,

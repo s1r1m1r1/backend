@@ -2,11 +2,15 @@ import 'dart:convert';
 
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/game/unit.dart';
+import 'package:backend/game/unit_repository.dart';
+import 'package:backend/user/session.dart';
+import 'package:backend/ws_/cubit/active_users_cubit.dart';
 import 'package:sha_red/sha_red.dart';
 
 import '../../../core/debug_log.dart';
 import '../../../user/session_repository.dart';
-import '../../broadcast.dart';
+import '../../../user/ws_active_sessions.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 
@@ -18,8 +22,10 @@ class WithTokenCMD implements WsCommand {
   const WithTokenCMD();
   @override
   void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
-    final broadcast = context.read<Broadcast>();
+    final activeSessions = context.read<WsActiveSessions>();
+    final activeUsersCubit = context.read<ActiveUsersCubit>();
     final sessionRepo = context.read<SessionRepository>();
+    final unitRepo = context.read<UnitRepository>();
     final dto = AccessTokenDto.fromJson(payload);
 
     sessionRepo
@@ -32,23 +38,16 @@ class WithTokenCMD implements WsCommand {
           if (!isTokenValid) {
             throw ApiException.unauthorized(message: 'Token expired');
           }
-          broadcast.subscribe(roomId: 'main', session: session, channel: channel).then((_) {
-            final onlineMembers = jsonEncode(
-              WsFromServer(
-                eventType: WsEventFromServer.onlineUsers,
-                payload: OnlineUsersPayload(
-                  members: broadcast.activeUsersList.map((i) => 'nnn: ${i.userId}').toList(),
-                ),
-              ).toJson(OnlineUsersPayload.toJsonF),
-            );
-            broadcast.broadcast('main', onlineMembers).then((_) {
-              final answer = WsFromServer(
-                eventType: WsEventFromServer.joinedServer,
-                payload: JoinedServerPayload('main'),
-              ).toJson(JoinedServerPayload.toJsonF);
-              final encoded = jsonEncode(answer);
-              channel.sink.add(encoded);
-            });
+          unitRepo.getSelectedUnit(session.user.userId).then((unit) {
+            if (unit == null) {
+              throw ApiException.notFound(message: 'Unit not found');
+            }
+            final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
+
+            activeUsersCubit.subscribe(channel);
+            activeUsersCubit.addUser(gameSession);
+            activeSessions[channel] = gameSession;
+            channel.sink.add(gameSession.toEncodedTokens());
           });
         })
         .onError((er, st) {
