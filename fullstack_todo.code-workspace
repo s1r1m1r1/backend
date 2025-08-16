@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": "../fullstack_todo"
 		},
 		{
 			"path": "../frontend"
@@ -11,6 +11,11 @@
 		}
 	],
 	"settings": {
+		"explorer.autoReveal": true,
+		"explorer.fileNesting.patterns": {
+			"pubspec.yaml": "pubspec.lock,pubspec_overrides.yaml,.packages,.flutter-plugins,.flutter-plugins-dependencies,.metadata,devtools_options.yaml,analysis_options.yaml,.tool-versions,",
+			"*.bloc.dart": "${capture}.event.dart,${capture}.state.dart,${capture}.guard.dart",
+		},
 		"dart.mcpServer": true
 	}
 }

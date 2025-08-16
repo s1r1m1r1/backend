@@ -5,7 +5,7 @@ import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/session.dart';
-import 'package:backend/ws_/cubit/active_users_cubit.dart';
+import 'package:backend/ws_/logic/active_users_cubit.dart';
 
 import '../../../core/log_colors.dart';
 import '../../../user/session_repository.dart';
@@ -46,7 +46,7 @@ class LoginCMD implements WsCommand {
               final gSession = GameSession.fromSession(session, Unit.fromDto(unit));
               activeUsersCubit.subscribe(channel);
               activeUsersCubit.addUser(gSession);
-              activeSessions[channel] = gSession;
+              activeSessions.addSession(channel, gSession);
               channel.sink.add(gSession.toEncodedTokens());
             });
           });

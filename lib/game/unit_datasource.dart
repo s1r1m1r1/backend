@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart' show Value;
+import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
 abstract class UnitDatasource {
@@ -19,6 +20,7 @@ abstract class UnitDatasource {
   Future<UnitDto?> getSelectedUnit(int userid);
 }
 
+@LazySingleton(as: UnitDatasource)
 class UnitDatasourceImpl implements UnitDatasource {
   UnitDatasourceImpl(this._db);
   final DbClient _db;

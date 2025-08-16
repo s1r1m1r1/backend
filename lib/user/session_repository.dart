@@ -6,6 +6,7 @@ import 'package:backend/user/hash_extension.dart';
 import 'package:backend/user/session_datasource.dart';
 
 import 'package:backend/user/session.dart';
+import 'package:injectable/injectable.dart';
 
 abstract class SessionRepository {
   Future<Session> createSession(User user);
@@ -19,6 +20,7 @@ abstract class SessionRepository {
   FutureOr<void> deleteSession(int userId);
 }
 
+@LazySingleton(as: SessionRepository)
 class SessionRepositoryImpl implements SessionRepository {
   /// {@macro session_repository}
   ///

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/models/validation/email_password_ext.dart';
+import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
 import 'package:backend/core/new_api_exceptions.dart';
@@ -18,6 +19,7 @@ abstract class UserRepository {
   Future<User> loginUser(EmailCredentialDto loginUserDto);
 }
 
+@LazySingleton(as: UserRepository)
 class UserRepositoryImpl extends UserRepository {
   UserRepositoryImpl(this._datasource, this.passwordHasherService);
   final UserDataSource _datasource;
