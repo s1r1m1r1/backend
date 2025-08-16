@@ -5,7 +5,8 @@ import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/session.dart';
-import 'package:backend/ws_/logic/active_users_cubit.dart';
+import 'package:backend/ws_/logic/active_users.bloc.dart';
+// import 'package:backend/ws_/logic/active_users_cubit.dart';
 
 import '../../../core/log_colors.dart';
 import '../../../user/session_repository.dart';
@@ -22,9 +23,13 @@ import '../_ws_cmd.dart';
 class LoginCMD implements WsCommand {
   const LoginCMD();
   @override
-  void execute(RequestContext context, WebSocketChannel channel, dynamic payload) {
+  void execute(
+    RequestContext context,
+    WebSocketChannel channel,
+    dynamic payload,
+  ) {
     debugLog("LoginCMD START\n\n");
-    final activeUsersCubit = context.read<ActiveUsersCubit>();
+    final activeUsersBloc = context.read<ActiveUsersBloc>();
     final activeSessions = context.read<WsActiveSessions>();
     final userRepo = context.read<UserRepository>();
     final unitRepo = context.read<UnitRepository>();
@@ -34,7 +39,7 @@ class LoginCMD implements WsCommand {
 
       return;
     }
-    final dto = EmailCredentialDto.fromJson(payload);
+    final dto = payload as EmailCredentialDto;
     userRepo
         .loginUser(dto)
         .then((user) async {
@@ -43,10 +48,12 @@ class LoginCMD implements WsCommand {
               if (unit == null) {
                 throw ApiException.notFound(message: 'Unit not found');
               }
-              final gSession = GameSession.fromSession(session, Unit.fromDto(unit));
-              activeUsersCubit.subscribe(channel);
-              activeUsersCubit.addUser(gSession);
+              final gSession = GameSession.fromSession(
+                session,
+                Unit.fromDto(unit),
+              );
               activeSessions.addSession(channel, gSession);
+              activeUsersBloc.add(ActiveUsersEvent.addUser(channel));
               channel.sink.add(gSession.toEncodedTokens());
             });
           });
@@ -54,9 +61,7 @@ class LoginCMD implements WsCommand {
         .onError((er, st) {
           if (er is ApiException && er.statusCode == 401) {
             debugLog('$yellow${er.message}$reset');
-            channel.sink.add(
-              jsonEncode(WsFromServer(eventType: WsEventFromServer.tokenExpired).toJsonEvent()),
-            );
+            channel.sink.add(jsonEncode(WWsFromServer.tokenExpired().toJson()));
             return;
           }
           debugLog("UnKnown error $er");

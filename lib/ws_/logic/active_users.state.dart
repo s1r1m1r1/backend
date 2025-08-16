@@ -10,12 +10,13 @@ class ActiveUsersState extends Equatable {
   /// jsonEncode(this)
   @override
   String toString() {
-    final asMap = WsFromServer(
-      eventType: WsEventFromServer.onlineUsers,
-      payload: OnlineMemberPayload(
-        members: gameSessions.map((i) => OnlineMemberDto(i.unit.id, i.unit.name)).toList(),
+    final asMap = WWsFromServer.onlineUsers(
+      OnlineMemberPayload(
+        gameSessions
+            .map((i) => OnlineMemberDto(i.unit.id, i.unit.name))
+            .toList(),
       ),
-    ).toJson(OnlineMemberPayload.toJsonF);
+    ).toJson();
     final json = jsonEncode(asMap);
     return json;
   }
