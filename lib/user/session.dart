@@ -118,13 +118,10 @@ class GameSession extends Session implements IGameSession {
 extension GameSessionExt on GameSession {
   String toEncodedTokens() {
     final payload = JoinedServerPayload(
-      'main',
+      mainRoomId: 'main',
       tokens: TokensDto(AccessTokenDto(token), RefreshTokenDto(refreshToken)),
     );
-    final dto = WsFromServer(
-      eventType: WsEventFromServer.joinedServer,
-      payload: payload,
-    ).toJson(JoinedServerPayload.toJsonF);
+    final dto = WWsFromServer.joinedServer(payload).toJson();
     final encoded = jsonEncode(dto);
     return encoded;
   }

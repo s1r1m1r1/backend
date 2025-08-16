@@ -5,15 +5,10 @@ import 'dart:io';
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/user/ws_active_sessions.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/ws_/command/_ws_cmd_handlers.dart';
 import 'package:backend/ws_/command/auth/login_cmd.dart';
 import 'package:backend/ws_/command/auth/with_refresh_cmd.dart';
 import 'package:backend/ws_/command/auth/with_token_cmd.dart';
-import 'package:backend/ws_/command/decrement_counter_cmd.dart';
-import 'package:backend/ws_/command/increment_counter_cmd.dart';
-import 'package:backend/ws_/command/unimplemented_cmd.dart';
-import 'package:backend/ws_/logic/active_users_cubit.dart';
-import 'package:backend/ws_/logic/letter.bloc.dart';
+import 'package:backend/ws_/logic/active_users.bloc.dart';
 import 'package:backend/ws_/logic/letter.bloc_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -23,19 +18,7 @@ Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
     debugLog('$green ON Request 1 $protocol $reset');
     final activeSessions = context.read<WsActiveSessions>();
-    final activeUsersCubit = context.read<ActiveUsersCubit>();
-
-    debugLog('$green ON Request 2  $reset');
-    // final user = context.read<User>();
-    // channel.sink.add(
-    //   jsonEncode(
-    //     WsFromServer(
-    //       eventType: WsEventFromServer.unauthenticated,
-    //       roomId: 'main',
-    //       payload: WsErrorPayload(message: 'Unauthorized'),
-    //     ).toJson(WsErrorPayload.toJsonF),
-    //   ),
-    // );
+    final activeUsersCubit = context.read<ActiveUsersBloc>();
 
     channel.stream.listen(
       (message) async {
@@ -48,73 +31,31 @@ Future<Response> onRequest(RequestContext context) async {
         }
         var decoded = jsonDecode(message);
         stdout.writeln('DECODED: $decoded');
-        final eventType = WsToServer.eventFromJson(decoded);
-        final payload = decoded['payload'];
 
-        //   try {
-        //     decoded = jsonDecode(message);
-        //   } catch (e) {
-        //     debugLog('$red [WebSocket] Failed to decode JSON: $e $reset');
-        //     // channel.sink.add('Invalid JSON');
-        //     return;
-        //   }
-        //   final roomId = decoded['room'] as String;
-        //   if (eventType == null) {
-        //     debugLog('$red [WebSocket] Event is null. $reset');
-        //     return;
-        //   }
-        //   debugLog('$green [WebSocket] Decoded message: $decoded $reset');
         try {
-          switch (eventType) {
-            case WsEventToServer.login:
-              LoginCMD().execute(context, channel, payload);
-            case WsEventToServer.signup:
+          final freezzzZ = WWsToServer.fromJson(decoded);
+          switch (freezzzZ) {
+            case Login_WsToServer(:final dto):
+              LoginCMD().execute(context, channel, dto);
+            case Signup_WsToServer():
               break;
-            case WsEventToServer.withToken:
-              WithTokenCMD().execute(context, channel, payload);
-            case WsEventToServer.withRefresh:
-              WithRefreshCMD().execute(context, channel, payload);
-            case WsEventToServer.newMessage:
-              break;
-            case WsEventToServer.deleteMessage:
-              break;
-            case WsEventToServer.incrementCounter:
-              IncrementCounterCommand().execute(context, channel, payload);
-            case WsEventToServer.decrementCounter:
-              DecrementCounterCommand().execute(context, channel, payload);
-            case WsEventToServer.deleteLetter:
+            case WithAccessToken_WsToServer(:final dto):
+              WithTokenCMD().execute(context, channel, dto);
+            case WithRefreshToken_WsToServer(:final dto):
+              WithRefreshCMD().execute(context, channel, dto);
+            case NewLetter_WsToServer(:final dto):
               final blocManager = context.read<LetterBlocManager>();
-              final dto = IdLetterPayload.fromJson(payload as Json);
+              blocManager.newLetter(channel, 'main' /*dto.roomId*/, dto.letter);
+            case DeleteLetter_WsToServer(:final dto):
+              final blocManager = context.read<LetterBlocManager>();
               blocManager.removeLetter(
                 channel,
                 'main' /*dto.roomId*/,
                 dto.letterId,
               );
-              break;
-            case WsEventToServer.newLetter:
-              final blocManager = context.read<LetterBlocManager>();
-              final dto = NewLetterPayload.fromJson(payload as Json);
-              blocManager.newLetter(channel, 'main' /*dto.roomId*/, dto.letter);
-
-            case WsEventToServer.joinLetters:
-              final room = LetterRoomPayload.fromJson(payload as Json);
+            case JoinLetters_WsToServer(:final dto):
               final letterBlocManager = context.read<LetterBlocManager>();
               letterBlocManager.subscribe(channel, 'main' /*room.roomId*/);
-            case WsEventToServer.joinCounter:
-              break;
-            case WsEventToServer.leaveRoom:
-              LeaveRoomCommand().execute(context, channel, payload);
-            case WsEventToServer.listRooms:
-              ListRoomsCommand().execute(context, channel, payload);
-            case WsEventToServer.sendLetterToRoom:
-              SendLetterToRoomCommand().execute(context, channel, payload);
-            case WsEventToServer.fetchRoomHistory:
-              FetchRoomHistoryCommand().execute(context, channel, payload);
-            case WsEventToServer.joinAdmin:
-            case WsEventToServer.joinMain:
-              break;
-            // WsEventToServer.joinCounter: JoinCounterCommand(),
-            // WsEventToServer.joinMain: JoinMainCommand(),
           }
         } catch (e, s) {
           debugLog('$red [WebSocket] Error: $e $s $reset');
@@ -131,10 +72,7 @@ Future<Response> onRequest(RequestContext context) async {
           disposer.dispose();
         }
         if (session != null) {
-          activeUsersCubit.removeUser(session);
-          activeUsersCubit.unsubscribe(channel);
-          activeSessions.removeSession(channel);
-          // letterBloc.roomLetter['main']?.unsubscribe(channel);
+          activeUsersCubit.add(ActiveUsersEvent.removeUser(session));
         }
         channel.sink.close();
       },

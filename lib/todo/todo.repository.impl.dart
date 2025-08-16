@@ -1,22 +1,10 @@
 import 'dart:async';
 
-import '../core/debug_log.dart';
+import 'package:backend/core/debug_log.dart';
+import 'package:backend/models/user.dart';
+import 'package:backend/todo/todo.datasource.dart';
+import 'package:backend/todo/todo.repository.dart';
 import 'package:sha_red/sha_red.dart';
-
-import '../models/user.dart';
-import 'todo_datasource.dart';
-
-abstract class TodoRepository {
-  Future<List<TodoDto>> getTodos();
-
-  FutureOr<TodoDto> getTodoById(int todoId);
-
-  Future<TodoDto> createTodo(CreateTodoDto createTodoDto);
-
-  FutureOr<TodoDto> updateTodo({required int todoId, required UpdateTodoDto updateTodoDto});
-
-  Future<int> deleteTodo(int todoId);
-}
 
 class TodoRepositoryImpl implements TodoRepository {
   TodoRepositoryImpl(this._datasource, this.user);
@@ -39,7 +27,10 @@ class TodoRepositoryImpl implements TodoRepository {
 
   @override
   FutureOr<TodoDto> getTodoById(int todoId) async {
-    final res = await _datasource.getTodoById(todoId: todoId, userId: user.userId);
+    final res = await _datasource.getTodoById(
+      todoId: todoId,
+      userId: user.userId,
+    );
     return res;
   }
 
@@ -50,8 +41,15 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  FutureOr<TodoDto> updateTodo({required int todoId, required UpdateTodoDto updateTodoDto}) async {
-    final r = await _datasource.updateTodo(todoId: todoId, todo: updateTodoDto, userId: user.userId);
+  FutureOr<TodoDto> updateTodo({
+    required int todoId,
+    required UpdateTodoDto updateTodoDto,
+  }) async {
+    final r = await _datasource.updateTodo(
+      todoId: todoId,
+      todo: updateTodoDto,
+      userId: user.userId,
+    );
     return r;
   }
 }

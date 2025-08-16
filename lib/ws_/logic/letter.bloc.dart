@@ -5,12 +5,12 @@ import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/user/ws_active_sessions.dart';
 import 'package:backend/ws_/letters_repository.dart';
+import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:equatable/equatable.dart';
 import 'package:sha_red/sha_red.dart';
 export 'package:bloc/bloc.dart';
 
-import '_broadcast_mixin.dart';
 // import 'package:broadcast_bloc/broadcast_bloc.dart';
 
 part 'letter.event.dart';
@@ -80,10 +80,9 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
   // --- Helper Methods ---
 
   String _lettersJSON() {
-    final body = WsFromServer(
-      eventType: WsEventFromServer.letters,
-      payload: LetterHistoryPayload(roomId, _letterCache),
-    ).toJson(LetterHistoryPayload.toJsonF);
+    final body = WWsFromServer.letters(
+      LetterHistoryPayload(roomId, _letterCache),
+    ).toJson();
     return jsonEncode(body);
   }
 
@@ -97,7 +96,8 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
       final disposer = _activeSessions.getDisposer(channel);
       debugLog('_onSubscribe disposer: ${disposer == null}');
       if (disposer == null) return;
-      disposer.shouldUnsubscribe.add(subscribe(channel));
+      subscribe(channel);
+      disposer.shouldUnsubscribe.add(unsubscribe);
     } catch (e, s) {
       addError(e, s);
     }

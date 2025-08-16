@@ -6,8 +6,10 @@ abstract class LetterState extends Equatable {
   List<Object?> get props => [];
 
   const factory LetterState.initial() = _InitialLetterState;
-  const factory LetterState.newLetter(String roomId, LetterDto letter) = _NewLetterState;
-  const factory LetterState.deleted(String roomId, int letterId) = _DeletedLetterState;
+  const factory LetterState.newLetter(String roomId, LetterDto letter) =
+      _NewLetterState;
+  const factory LetterState.deleted(String roomId, int letterId) =
+      _DeletedLetterState;
 }
 
 class _InitialLetterState extends LetterState {
@@ -26,10 +28,9 @@ class _NewLetterState extends LetterState {
   /// jsonEncode  here
   @override
   String toString() {
-    final body = WsFromServer(
-      eventType: WsEventFromServer.onLetter,
-      payload: LastLetterPayload(roomId, letter),
-    ).toJson(LastLetterPayload.toJsonF);
+    final body = WWsFromServer.onLetter(
+      LastLetterPayload(roomId, letter),
+    ).toJson();
     final encoded = jsonEncode(body);
     return encoded;
   }
@@ -48,10 +49,9 @@ class _DeletedLetterState extends LetterState {
   /// jsonEncode  here
   @override
   String toString() {
-    final body = WsFromServer(
-      eventType: WsEventFromServer.deletedLetter,
-      payload: IdLetterPayload(roomId, letterId),
-    ).toJson(IdLetterPayload.toJsonF);
+    final body = WWsFromServer.deletedLetter(
+      IdLetterPayload(roomId: roomId, letterId: letterId),
+    ).toJson();
     final encoded = jsonEncode(body);
     return encoded;
   }

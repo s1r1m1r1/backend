@@ -1,30 +1,10 @@
-// {@template todo_data_source_impl}
-
-import '../core/debug_log.dart';
-import '../db_client/dao/todo_dao.dart';
-import '../db_client/db_client.dart';
-import 'package:drift/drift.dart' show Value;
+import 'package:backend/core/debug_log.dart';
+import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/db_client/dao/todo_dao.dart';
+import 'package:backend/db_client/db_client.dart';
+import 'package:backend/todo/todo.datasource.dart';
+import 'package:drift/drift.dart';
 import 'package:sha_red/sha_red.dart';
-
-import '../core/new_api_exceptions.dart';
-
-abstract class TodoDataSource {
-  /// Returns a list of all todo items in the data source
-  Future<List<TodoDto>> getAllTodo(int userId);
-
-  /// Returns a todo item with the given [id] from the data source
-  /// If no todo item with the given [id] exists, returns `null`
-  Future<TodoDto> getTodoById({required int todoId, required int userId});
-
-  /// Creates a new todo item in the data source
-  Future<TodoDto> createTodo(CreateTodoDto todo, int userId);
-
-  /// Updates an existing todo item in the data source
-  Future<TodoDto> updateTodo({required int todoId, required UpdateTodoDto todo, required int userId});
-
-  /// Deletes a todo item with the given [id] from the data source
-  Future<int> deleteTodoById({required int todoId, required int userId});
-}
 
 class TodoDataSourceImpl implements TodoDataSource {
   const TodoDataSourceImpl(this._dao);
@@ -82,17 +62,31 @@ class TodoDataSourceImpl implements TodoDataSource {
   }
 
   @override
-  Future<TodoDto> getTodoById({required int todoId, required int userId}) async {
+  Future<TodoDto> getTodoById({
+    required int todoId,
+    required int userId,
+  }) async {
     // await _databaseConnection.connect();
     final result = await _dao.getTodoById(todoId: todoId, userId: userId);
-    return TodoDto(id: result.id, title: result.title, createdAt: result.createdAt);
+    return TodoDto(
+      id: result.id,
+      title: result.title,
+      createdAt: result.createdAt,
+    );
   }
 
   @override
-  Future<TodoDto> updateTodo({required int todoId, required UpdateTodoDto todo, required int userId}) async {
+  Future<TodoDto> updateTodo({
+    required int todoId,
+    required UpdateTodoDto todo,
+    required int userId,
+  }) async {
     debugLog('datasource update ${todo.id} ${todo.completed} $userId');
     // this should be in repository
-    final hasPermission = await _dao.hasPermission(todoId: todoId, userId: userId);
+    final hasPermission = await _dao.hasPermission(
+      todoId: todoId,
+      userId: userId,
+    );
     if (!hasPermission) {
       throw ApiException.unauthorized(message: 'Operation denied');
     }

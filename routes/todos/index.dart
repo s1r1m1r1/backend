@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/serializers/parse_json.dart';
-import 'package:backend/todo/todo_repository.dart';
+import 'package:backend/todo/todo.repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:sha_red/sha_red.dart';
 
@@ -33,7 +33,10 @@ FutureOr<Response> getTodos(RequestContext context) async {
     return Response.json(body: list.map((todo) => todo.toJson()).toList());
   } on ApiException catch (e, stack) {
     stdout.writeln('UserController ${e.statusCode} ${stack}');
-    return Response.json(body: {'message': e.toString()}, statusCode: HttpStatus.noContent);
+    return Response.json(
+      body: {'message': e.toString()},
+      statusCode: HttpStatus.noContent,
+    );
   } on Object catch (e, stack) {
     stdout.writeln('UserController UNKNOWN ERROR ${stack}');
     return Response.json(
