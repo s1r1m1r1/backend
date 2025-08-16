@@ -20,7 +20,7 @@ import 'package:backend/user/user_datasource.dart' as _i625;
 import 'package:backend/user/user_repository.dart' as _i470;
 import 'package:backend/user/ws_active_sessions.dart' as _i896;
 import 'package:backend/ws_/letters_repository.dart' as _i878;
-import 'package:backend/ws_/logic/letter.bloc_manager.dart' as _i1014;
+import 'package:backend/ws_/logic/letter.bloc_manager.dart' as _i288;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
@@ -61,8 +61,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i405.PasswordHasherService>(),
       ),
     );
-    gh.lazySingleton<_i1014.LetterBlocManager>(
-      () => _i1014.LetterBlocManager(
+    gh.lazySingleton<_i288.LetterBlocManager>(
+      () => _i288.LetterBlocManager(
         gh<_i878.LettersRepository>(),
         gh<_i896.WsActiveSessions>(),
       ),
