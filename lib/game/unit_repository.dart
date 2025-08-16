@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
 import 'unit_datasource.dart';
@@ -15,6 +16,7 @@ abstract class UnitRepository {
   Future deleteUnit({required int userId, required int characterId});
 }
 
+@LazySingleton(as: UnitRepository)
 class UnitRepositoryImpl implements UnitRepository {
   UnitRepositoryImpl(this._datasource);
   final UnitDatasource _datasource;

@@ -5,7 +5,7 @@ import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/session.dart';
-import 'package:backend/ws_/cubit/active_users_cubit.dart';
+import 'package:backend/ws_/logic/active_users_cubit.dart';
 import 'package:sha_red/sha_red.dart';
 
 import '../../../core/debug_log.dart';
@@ -46,7 +46,7 @@ class WithTokenCMD implements WsCommand {
 
             activeUsersCubit.subscribe(channel);
             activeUsersCubit.addUser(gameSession);
-            activeSessions[channel] = gameSession;
+            activeSessions.addSession(channel, gameSession);
             channel.sink.add(gameSession.toEncodedTokens());
           });
         })

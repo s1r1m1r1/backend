@@ -8,6 +8,7 @@ import 'package:backend/user/session.dart';
 import 'package:drift/drift.dart' show Value;
 
 import 'package:backend/db_client/dao/session_dao.dart';
+import 'package:injectable/injectable.dart';
 
 //--------------------------------------------------------------
 abstract class SessionDatasource {
@@ -18,6 +19,8 @@ abstract class SessionDatasource {
 }
 
 //--------------------------------------------------------------
+
+@LazySingleton(as: SessionDatasource)
 class SessionSqliteDatasourceImpl implements SessionDatasource {
   SessionSqliteDatasourceImpl(this._db);
   final DbClient _db;

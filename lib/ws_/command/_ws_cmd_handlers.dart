@@ -11,17 +11,14 @@ import 'package:backend/ws_/command/increment_counter_cmd.dart';
 import 'package:backend/ws_/command/decrement_counter_cmd.dart';
 import 'package:backend/ws_/command/new_letter_cmd.dart';
 import 'package:backend/ws_/command/delete_letter_cmd.dart';
-import 'package:backend/ws_/command/join_letters_cmd.dart';
-import 'package:backend/ws_/command/join_counter_cmd.dart';
 import 'package:backend/ws_/command/unimplemented_cmd.dart';
 
 const wsCommandHandlers = <WsEventToServer, WsCommand>{
   // WsEventToServer.joinAdmin: JoinAdminCommand(),
   WsEventToServer.incrementCounter: IncrementCounterCommand(),
   WsEventToServer.decrementCounter: DecrementCounterCommand(),
-  WsEventToServer.newLetter: NewLetterCommand(),
-  WsEventToServer.deleteLetter: DeleteLetterCommand(),
-  WsEventToServer.joinLetters: JoinLettersCommand(),
+  // WsEventToServer.newLetter: NewLetterCommand(),
+  // WsEventToServer.deleteLetter: DeleteLetterCommand(),
   // WsEventToServer.joinCounter: JoinCounterCommand(),
   WsEventToServer.leaveRoom: LeaveRoomCommand(),
   WsEventToServer.listRooms: ListRoomsCommand(),
@@ -31,6 +28,7 @@ const wsCommandHandlers = <WsEventToServer, WsCommand>{
   WsEventToServer.withToken: WithTokenCMD(),
   WsEventToServer.withRefresh: WithRefreshCMD(),
   WsEventToServer.login: LoginCMD(),
+
   // WsEventToServer.signup: SignupCMD(),
 
   // ... and so on

@@ -1,6 +1,8 @@
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:bcrypt/bcrypt.dart';
+import 'package:injectable/injectable.dart';
 
+@lazySingleton
 class PasswordHasherService {
   const PasswordHasherService();
 

@@ -2,6 +2,7 @@ import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/db_client/db_client.dart' show DbClient, UserTableCompanion;
 import 'package:drift/drift.dart';
+import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
 import 'package:backend/core/new_api_exceptions.dart';
@@ -13,6 +14,7 @@ abstract class UserDataSource {
   Future<User> createUser(EmailCredentialDto user);
 }
 
+@LazySingleton(as: UserDataSource)
 class UserDataSourceImpl implements UserDataSource {
   UserDataSourceImpl(this._db);
   final DbClient _db;

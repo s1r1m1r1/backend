@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/session.dart';
-import 'package:backend/ws_/cubit/active_users_cubit.dart';
+import 'package:backend/ws_/logic/active_users_cubit.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
@@ -41,7 +41,7 @@ class WithRefreshCMD implements WsCommand {
             final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
             activeUsersCubit.subscribe(channel);
             activeUsersCubit.addUser(gameSession);
-            activeSessions[channel] = gameSession;
+            activeSessions.addSession(channel, gameSession);
             channel.sink.add(gameSession.toEncodedTokens());
           });
         })

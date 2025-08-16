@@ -2,6 +2,7 @@ name: backend
 description: A new Dart Frog application
 version: 1.0.0+1
 publish_to: none
+resolution: workspace
 
 environment:
   sdk: ">=3.8.0 <4.0.0"
@@ -27,10 +28,14 @@ dependencies:
   broadcast_bloc: ^0.1.0-dev.2
   synchronized: ^3.4.0
   equatable: ^2.0.7
+  bloc_concurrency: ^0.3.0
+  get_it:
+  injectable: ^2.1.0
 
 dependency_overrides:
-  sha_red:
-    path: ../sha_red
+  bloc: ^9.0.0
+#   sha_red:
+#     path: ../sha_red
 
 dev_dependencies:
   mocktail: ^1.0.3
@@ -40,3 +45,4 @@ dev_dependencies:
   freezed: ^3.0.0
   json_serializable: ^6.7.1
   mockito: ^5.5.0
+  injectable_generator: ^2.1.0

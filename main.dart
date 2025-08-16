@@ -1,5 +1,16 @@
 import 'dart:io';
+import 'package:backend/core/inject.dart';
+import 'package:backend/ws_/logic/server_bloc_observer.dart';
+import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog/dart_frog.dart';
+import 'package:get_it/get_it.dart';
+
+Future<void> init(InternetAddress ip, int port) async {
+  // Any code initialized within this method will only run on server start, any hot reloads
+  // afterwards will not trigger this method until a hot restart.
+  Bloc.observer = ServerBlocObserver();
+  configInjector(GetIt.I);
+}
 
 /// Основная функция запуска сервера Dart Frog.
 /// Принимает [handler] для обработки запросов, [ip] адрес для привязки и [port] порт.

@@ -1,4 +1,4 @@
-import 'package:backend/ws_/cubit/active_users_cubit.dart';
+import 'package:backend/ws_/logic/active_users_cubit.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:synchronized/synchronized.dart';
 
