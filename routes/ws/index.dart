@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/user/ws_active_sessions.dart';
@@ -29,31 +27,29 @@ Future<Response> onRequest(RequestContext context) async {
           // channel.sink.add('Invalid message');
           return;
         }
-        var decoded = jsonDecode(message);
-        stdout.writeln('DECODED: $decoded');
 
         try {
-          final freezzzZ = WWsToServer.fromJson(decoded);
-          switch (freezzzZ) {
-            case Login_WsToServer(:final dto):
+          final freezed = ToServer.decoded(message);
+          switch (freezed) {
+            case Login_TS(:final dto):
               LoginCMD().execute(context, channel, dto);
-            case Signup_WsToServer():
+            case Signup_TS():
               break;
-            case WithAccessToken_WsToServer(:final dto):
-              WithTokenCMD().execute(context, channel, dto);
-            case WithRefreshToken_WsToServer(:final dto):
-              WithRefreshCMD().execute(context, channel, dto);
-            case NewLetter_WsToServer(:final dto):
+            case WithToken_TS(:final token):
+              WithTokenCMD().execute(context, channel, token);
+            case WithRefresh_TS(:final refresh):
+              WithRefreshCMD().execute(context, channel, refresh);
+            case NewLetter_TS(:final letter, :final roomId):
               final blocManager = context.read<LetterBlocManager>();
-              blocManager.newLetter(channel, 'main' /*dto.roomId*/, dto.letter);
-            case DeleteLetter_WsToServer(:final dto):
+              blocManager.newLetter(channel, 'main' /*dto.roomId*/, letter);
+            case DeleteLetter_TS(:final roomId, :final letterId):
               final blocManager = context.read<LetterBlocManager>();
               blocManager.removeLetter(
                 channel,
                 'main' /*dto.roomId*/,
-                dto.letterId,
+                letterId,
               );
-            case JoinLetters_WsToServer(:final dto):
+            case JoinLetters_TS(:final roomId):
               final letterBlocManager = context.read<LetterBlocManager>();
               letterBlocManager.subscribe(channel, 'main' /*room.roomId*/);
           }
