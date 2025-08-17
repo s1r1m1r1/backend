@@ -62,13 +62,18 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i405.PasswordHasherService>(),
       ),
     );
-    gh.lazySingleton<_i159.ActiveUsersBloc>(
-      () => _i159.ActiveUsersBloc(gh<_i896.WsActiveSessions>()),
-    );
     gh.lazySingleton<_i288.LetterBlocManager>(
       () => _i288.LetterBlocManager(
         gh<_i878.LettersRepository>(),
         gh<_i896.WsActiveSessions>(),
+      ),
+    );
+    gh.lazySingleton<_i159.ActiveUsersBloc>(
+      () => _i159.ActiveUsersBloc(
+        gh<_i896.WsActiveSessions>(),
+        gh<_i850.UnitRepository>(),
+        gh<_i854.SessionRepository>(),
+        gh<_i470.UserRepository>(),
       ),
     );
     return this;

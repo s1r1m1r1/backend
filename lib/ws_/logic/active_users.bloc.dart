@@ -1,6 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:backend/game/unit.dart';
+import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/session.dart';
+import 'package:backend/user/session_repository.dart';
+import 'package:backend/user/user_repository.dart';
 import 'package:backend/user/ws_active_sessions.dart';
 import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -16,9 +21,187 @@ part 'active_users.state.dart';
 class ActiveUsersBloc
     extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState> {
   final WsActiveSessions _activeSessions;
-  ActiveUsersBloc(this._activeSessions) : super(const ActiveUsersState([])) {
+  final UnitRepository _unitRepository;
+  final UserRepository _userRepository;
+  final SessionRepository _sessionRepository;
+  ActiveUsersBloc(
+    this._activeSessions,
+    this._unitRepository,
+    this._sessionRepository,
+    this._userRepository,
+  ) : super(const ActiveUsersState([])) {
     on<AddUser>(_addUser);
     on<RemoveUser>(_removeUser);
+    on<_WithTokenEvent>(_withToken);
+    on<_WithRefreshTokenEvent>(_withRefreshToken);
+    on<_LoginEvent>(_login);
+  }
+
+  FutureOr<void> _withToken(
+    _WithTokenEvent event,
+    Emitter<ActiveUsersState> emit,
+  ) async {
+    final channel = event.channel;
+    try {
+      final session = await _sessionRepository.getSession(token: event.token);
+      if (session == null) {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.authenticationFailed,
+          ).encoded(),
+        );
+        return;
+      }
+      ;
+      final isTokenValid = _sessionRepository.validateToken(session);
+      if (isTokenValid) {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.invalidToken,
+          ).encoded(),
+        );
+        return;
+      }
+      ;
+      final unit = await _unitRepository.getSelectedUnit(session.user.userId);
+      if (unit == null) {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.unitNotFound,
+          ).encoded(),
+        );
+        return;
+      }
+      final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
+      _activeSessions.addSession(channel, gameSession);
+      final disposer = _activeSessions.getDisposer(channel);
+      if (!state.gameSessions.contains(gameSession)) {
+        final updatedList = [...state.gameSessions, gameSession];
+        subscribe(channel);
+        channel.sink.add(gameSession.toEncodedTokens());
+        disposer!.shouldUnsubscribe.add(unsubscribe);
+        emit(ActiveUsersState(updatedList));
+      } else {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.sessionAlreadyRegistered,
+          ).encoded(),
+        );
+      }
+    } catch (e, s) {
+      addError(e, s);
+      channel.sink.add(
+        WWsFromServer.statusError(
+          error: WsServerError.authenticationFailed,
+        ).encoded(),
+      );
+    }
+  }
+
+  FutureOr<void> _withRefreshToken(
+    _WithRefreshTokenEvent event,
+    Emitter<ActiveUsersState> emit,
+  ) async {
+    final channel = event.channel;
+    try {
+      final session = await _sessionRepository.getSession(
+        refreshToken: event.refreshToken,
+      );
+      if (session == null) {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.authenticationFailed,
+          ).encoded(),
+        );
+        return;
+      }
+      ;
+      final isRefreshValid = _sessionRepository.validateRefreshToken(session);
+      if (isRefreshValid) {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.sessionExpired,
+          ).encoded(),
+        );
+        return;
+      }
+      ;
+      final unit = await _unitRepository.getSelectedUnit(session.user.userId);
+      if (unit == null) {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.unitNotFound,
+          ).encoded(),
+        );
+        return;
+      }
+      final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
+      _activeSessions.addSession(channel, gameSession);
+      final disposer = _activeSessions.getDisposer(channel);
+      if (!state.gameSessions.contains(gameSession)) {
+        final updatedList = [...state.gameSessions, gameSession];
+        subscribe(channel);
+        channel.sink.add(gameSession.toEncodedTokens());
+        disposer!.shouldUnsubscribe.add(unsubscribe);
+        emit(ActiveUsersState(updatedList));
+      } else {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.sessionAlreadyRegistered,
+          ).encoded(),
+        );
+      }
+    } catch (e, s) {
+      addError(e, s);
+      channel.sink.add(
+        WWsFromServer.statusError(
+          error: WsServerError.authenticationFailed,
+        ).encoded(),
+      );
+    }
+  }
+
+  FutureOr<void> _login(
+    _LoginEvent event,
+    Emitter<ActiveUsersState> emit,
+  ) async {
+    final channel = event.channel;
+    try {
+      final user = await _userRepository.loginUser(event.dto);
+      final session = await _sessionRepository.createSession(user);
+      final unit = await _unitRepository.getSelectedUnit(session.user.userId);
+      if (unit == null) {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.unitNotFound,
+          ).encoded(),
+        );
+        return;
+      }
+      final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
+      _activeSessions.addSession(channel, gameSession);
+      final disposer = _activeSessions.getDisposer(channel);
+      if (!state.gameSessions.contains(gameSession)) {
+        final updatedList = [...state.gameSessions, gameSession];
+        subscribe(channel);
+        channel.sink.add(gameSession.toEncodedTokens());
+        disposer!.shouldUnsubscribe.add(unsubscribe);
+        emit(ActiveUsersState(updatedList));
+      } else {
+        channel.sink.add(
+          WWsFromServer.statusError(
+            error: WsServerError.sessionAlreadyRegistered,
+          ).encoded(),
+        );
+      }
+    } catch (e, s) {
+      addError(e, s);
+      channel.sink.add(
+        WWsFromServer.statusError(
+          error: WsServerError.authenticationFailed,
+        ).encoded(),
+      );
+    }
   }
 
   void _addUser(AddUser event, Emitter<ActiveUsersState> emit) {

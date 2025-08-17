@@ -30,10 +30,10 @@ class WithTokenCMD implements WsCommand {
     final activeUsersBloc = context.read<ActiveUsersBloc>();
     final sessionRepo = context.read<SessionRepository>();
     final unitRepo = context.read<UnitRepository>();
-    final dto = payload as AccessTokenDto;
+    final dto = payload as String;
 
     sessionRepo
-        .getSession(token: dto.value)
+        .getSession(token: dto)
         .then((session) {
           if (session == null) {
             throw ApiException.unauthorized(message: 'Session not found');
@@ -65,13 +65,13 @@ class WithTokenCMD implements WsCommand {
             return;
           }
           debugLog("UnKnown error $er");
-          channel.sink.add(
-            jsonEncode(
-              WWsFromServer.unauthenticated(
-                WsErrorPayload(errorCode: 500),
-              ).toJson(),
-            ),
-          );
+          // channel.sink.add(
+          //   jsonEncode(
+          //     WWsFromServer.unauthenticated(
+          //       WsErrorPayload(errorCode: 500),
+          //     ).toJson(),
+          //   ),
+          // );
         });
   }
 }
