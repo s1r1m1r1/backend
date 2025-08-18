@@ -50,15 +50,7 @@ class Session extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-    id,
-    token,
-    user,
-    tokenExpiryDate,
-    createdAt,
-    refreshToken,
-    refreshTokenExpiry,
-  ];
+  List<Object?> get props => [user];
 }
 
 // The GameSession class with the unit, extending Session.
@@ -110,18 +102,16 @@ class GameSession extends Session implements IGameSession {
 
   @override
   final Unit unit;
-
-  @override
-  List<Object?> get props => [user];
 }
 
 extension GameSessionExt on GameSession {
   String toEncodedTokens() {
-    final payload = JoinedServerPayload(
+    final dto = ToClient.joinedServer(
       mainRoomId: 'main',
-      tokens: TokensDto(AccessTokenDto(token), RefreshTokenDto(refreshToken)),
-    );
-    final dto = WWsFromServer.joinedServer(payload).toJson();
+      user: user.toDto(),
+      unit: unit.toDto(),
+      tokens: TokensDto(accessToken: token, refreshToken: refreshToken),
+    ).toJson();
     final encoded = jsonEncode(dto);
     return encoded;
   }

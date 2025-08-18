@@ -5,6 +5,7 @@ import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:get_it/get_it.dart';
 
+// инициализация зависимостей один раз, во время  hot-reload этот блок не перезапускается
 Future<void> init(InternetAddress ip, int port) async {
   // Any code initialized within this method will only run on server start, any hot reloads
   // afterwards will not trigger this method until a hot restart.

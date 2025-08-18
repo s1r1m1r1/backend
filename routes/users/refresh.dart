@@ -2,6 +2,7 @@ import 'dart:async' show FutureOr;
 import 'dart:io';
 
 import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/game/unit_repository.dart';
 import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/user/session_repository.dart';
@@ -24,24 +25,37 @@ FutureOr<Response> refresh(RequestContext context) async {
     final refreshToken = RefreshTokenDto.fromJson(body);
 
     final sessionRepository = context.read<SessionRepository>();
-    final session = await sessionRepository.getSession(refreshToken: refreshToken.value);
+    final session = await sessionRepository.getSession(
+      refreshToken: refreshToken.value,
+    );
     if (session == null) {
       return Response.json(
         body: {'message': 'Invalid or expired refresh token'},
         statusCode: HttpStatus.unauthorized,
       );
     }
-    stdout.writeln('$magenta [refresh] Session found for userId: ${session.user} $reset');
-    final newSession = await sessionRepository.updateSession(session); // Implement this
+    stdout.writeln(
+      '$magenta [refresh] Session found for userId: ${session.user} $reset',
+    );
+    final newSession = await sessionRepository.updateSession(
+      session,
+    ); // Implement this
     stdout.writeln(
       '$magenta [refresh] New session issued: accessToken=${newSession.token}, refreshToken=${newSession.refreshToken} $reset',
     );
 
+    final unitRepo = context.read<UnitRepository>();
+    final unitDto = await unitRepo.getSelectedUnit(session.user.userId);
     return Response.json(
-      body: TokensDto(
-        AccessTokenDto(newSession.token),
-        RefreshTokenDto(newSession.refreshToken),
+      body: SessionDto(
+        user: session.user.toDto(),
+        tokens: TokensDto(
+          accessToken: session.token,
+          refreshToken: session.refreshToken,
+        ),
+        unit: unitDto,
       ).toJson(),
+
       statusCode: HttpStatus.accepted,
     );
   } on ApiException catch (e, stack) {

@@ -6,35 +6,46 @@ import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/session.dart';
 import 'package:backend/user/session_repository.dart';
 import 'package:backend/user/user_repository.dart';
-import 'package:backend/user/ws_active_sessions.dart';
+import 'package:backend/user/active_sessions_repository.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
 part 'active_users.event.dart';
 part 'active_users.state.dart';
+part 'active_users.bloc.freezed.dart';
+
+const _timeoutDuration = Duration(milliseconds: 100);
 
 // active_users_bloc.dart
 @lazySingleton
 class ActiveUsersBloc
     extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState> {
-  final WsActiveSessions _activeSessions;
+  final ActiveSessionsRepository _activeSessionsRepo;
   final UnitRepository _unitRepository;
   final UserRepository _userRepository;
   final SessionRepository _sessionRepository;
   ActiveUsersBloc(
-    this._activeSessions,
+    this._activeSessionsRepo,
     this._unitRepository,
     this._sessionRepository,
     this._userRepository,
   ) : super(const ActiveUsersState([])) {
-    on<AddUser>(_addUser);
-    on<RemoveUser>(_removeUser);
-    on<_WithTokenEvent>(_withToken);
-    on<_WithRefreshTokenEvent>(_withRefreshToken);
-    on<_LoginEvent>(_login);
+    on<_RemoveUser>(_removeUser);
+    on<SequentialActive_UsersEvent>((event, emit) async {
+      switch (event) {
+        case _WithTokenEvent():
+          await _withToken(event, emit);
+        case _WithRefreshTokenEvent():
+          await _withRefreshToken(event, emit);
+        case _LoginEvent():
+          await _login(event, emit);
+      }
+    }, transformer: sequential());
   }
 
   FutureOr<void> _withToken(
@@ -43,55 +54,63 @@ class ActiveUsersBloc
   ) async {
     final channel = event.channel;
     try {
-      final session = await _sessionRepository.getSession(token: event.token);
+      final session = await _sessionRepository
+          .getSession(token: event.token)
+          .timeout(_timeoutDuration);
       if (session == null) {
         channel.sink.add(
-          WWsFromServer.statusError(
+          ToClient.statusError(
             error: WsServerError.authenticationFailed,
           ).encoded(),
         );
         return;
       }
-      ;
-      final isTokenValid = _sessionRepository.validateToken(session);
-      if (isTokenValid) {
+
+      final isValid = _sessionRepository.validateToken(session);
+      if (isValid) {
         channel.sink.add(
-          WWsFromServer.statusError(
-            error: WsServerError.invalidToken,
-          ).encoded(),
+          ToClient.statusError(error: WsServerError.invalidToken).encoded(),
         );
         return;
       }
-      ;
-      final unit = await _unitRepository.getSelectedUnit(session.user.userId);
+      final unit = await _unitRepository
+          .getSelectedUnit(session.user.userId)
+          .timeout(_timeoutDuration);
       if (unit == null) {
         channel.sink.add(
-          WWsFromServer.statusError(
-            error: WsServerError.unitNotFound,
-          ).encoded(),
+          ToClient.statusError(error: WsServerError.unitNotFound).encoded(),
         );
         return;
       }
       final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-      _activeSessions.addSession(channel, gameSession);
-      final disposer = _activeSessions.getDisposer(channel);
-      if (!state.gameSessions.contains(gameSession)) {
+      _activeSessionsRepo.addSession(channel, gameSession);
+      final disposer = _activeSessionsRepo.getDisposer(channel);
+      if (!state.gameSessions.any(
+        (session) => session.user.userId == gameSession.user.userId,
+      )) {
         final updatedList = [...state.gameSessions, gameSession];
         subscribe(channel);
-        channel.sink.add(gameSession.toEncodedTokens());
         disposer!.shouldUnsubscribe.add(unsubscribe);
+        channel.sink.add(gameSession.toEncodedTokens());
         emit(ActiveUsersState(updatedList));
       } else {
-        channel.sink.add(
-          WWsFromServer.statusError(
-            error: WsServerError.sessionAlreadyRegistered,
-          ).encoded(),
-        );
+        _activeSessionsRepo.finishOtherSession(channel, gameSession);
+        final updatedList = List.of(state.gameSessions)
+          ..removeWhere((i) => session.user.userId == gameSession.user.userId)
+          ..add(gameSession);
+        subscribe(channel);
+        disposer!.shouldUnsubscribe.add(unsubscribe);
+        channel.sink.add(gameSession.toEncodedTokens());
+        emit(ActiveUsersState(updatedList));
       }
-    } catch (e, s) {
+    } on TimeoutException {
+      channel.sink.add(
+        ToClient.statusError(error: WsServerError.timeout).encoded(),
+      );
+    } on Object catch (e, s) {
       addError(e, s);
       channel.sink.add(
-        WWsFromServer.statusError(
+        ToClient.statusError(
           error: WsServerError.authenticationFailed,
         ).encoded(),
       );
@@ -104,57 +123,64 @@ class ActiveUsersBloc
   ) async {
     final channel = event.channel;
     try {
-      final session = await _sessionRepository.getSession(
-        refreshToken: event.refreshToken,
-      );
+      final session = await _sessionRepository
+          .getSession(refreshToken: event.refreshToken)
+          .timeout(_timeoutDuration);
       if (session == null) {
         channel.sink.add(
-          WWsFromServer.statusError(
+          ToClient.statusError(
             error: WsServerError.authenticationFailed,
           ).encoded(),
         );
         return;
       }
       ;
-      final isRefreshValid = _sessionRepository.validateRefreshToken(session);
-      if (isRefreshValid) {
+      final isValid = _sessionRepository.validateRefreshToken(session);
+      if (!isValid) {
         channel.sink.add(
-          WWsFromServer.statusError(
-            error: WsServerError.sessionExpired,
-          ).encoded(),
+          ToClient.statusError(error: WsServerError.sessionExpired).encoded(),
         );
         return;
       }
       ;
-      final unit = await _unitRepository.getSelectedUnit(session.user.userId);
+      final unit = await _unitRepository
+          .getSelectedUnit(session.user.userId)
+          .timeout(_timeoutDuration);
       if (unit == null) {
         channel.sink.add(
-          WWsFromServer.statusError(
-            error: WsServerError.unitNotFound,
-          ).encoded(),
+          ToClient.statusError(error: WsServerError.unitNotFound).encoded(),
         );
         return;
       }
       final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-      _activeSessions.addSession(channel, gameSession);
-      final disposer = _activeSessions.getDisposer(channel);
-      if (!state.gameSessions.contains(gameSession)) {
+      _activeSessionsRepo.addSession(channel, gameSession);
+      final disposer = _activeSessionsRepo.getDisposer(channel);
+      if (!state.gameSessions.any(
+        (session) => session.user.userId == gameSession.user.userId,
+      )) {
         final updatedList = [...state.gameSessions, gameSession];
         subscribe(channel);
-        channel.sink.add(gameSession.toEncodedTokens());
         disposer!.shouldUnsubscribe.add(unsubscribe);
+        channel.sink.add(gameSession.toEncodedTokens());
         emit(ActiveUsersState(updatedList));
       } else {
-        channel.sink.add(
-          WWsFromServer.statusError(
-            error: WsServerError.sessionAlreadyRegistered,
-          ).encoded(),
-        );
+        _activeSessionsRepo.finishOtherSession(channel, gameSession);
+        final updatedList = List.of(state.gameSessions)
+          ..removeWhere((i) => session.user.userId == gameSession.user.userId)
+          ..add(gameSession);
+        subscribe(channel);
+        disposer!.shouldUnsubscribe.add(unsubscribe);
+        channel.sink.add(gameSession.toEncodedTokens());
+        emit(ActiveUsersState(updatedList));
       }
-    } catch (e, s) {
+    } on TimeoutException {
+      channel.sink.add(
+        ToClient.statusError(error: WsServerError.timeout).encoded(),
+      );
+    } on Object catch (e, s) {
       addError(e, s);
       channel.sink.add(
-        WWsFromServer.statusError(
+        ToClient.statusError(
           error: WsServerError.authenticationFailed,
         ).encoded(),
       );
@@ -167,57 +193,58 @@ class ActiveUsersBloc
   ) async {
     final channel = event.channel;
     try {
-      final user = await _userRepository.loginUser(event.dto);
-      final session = await _sessionRepository.createSession(user);
-      final unit = await _unitRepository.getSelectedUnit(session.user.userId);
+      final user = await _userRepository
+          .loginUser(event.dto)
+          .timeout(_timeoutDuration);
+      final session = await _sessionRepository
+          .createSession(user)
+          .timeout(_timeoutDuration);
+      final unit = await _unitRepository
+          .getSelectedUnit(session.user.userId)
+          .timeout(_timeoutDuration);
       if (unit == null) {
         channel.sink.add(
-          WWsFromServer.statusError(
-            error: WsServerError.unitNotFound,
-          ).encoded(),
+          ToClient.statusError(error: WsServerError.unitNotFound).encoded(),
         );
         return;
       }
       final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-      _activeSessions.addSession(channel, gameSession);
-      final disposer = _activeSessions.getDisposer(channel);
-      if (!state.gameSessions.contains(gameSession)) {
+      _activeSessionsRepo.addSession(channel, gameSession);
+      final disposer = _activeSessionsRepo.getDisposer(channel);
+      if (!state.gameSessions.any(
+        (session) => session.user.userId == gameSession.user.userId,
+      )) {
         final updatedList = [...state.gameSessions, gameSession];
         subscribe(channel);
-        channel.sink.add(gameSession.toEncodedTokens());
         disposer!.shouldUnsubscribe.add(unsubscribe);
+        channel.sink.add(gameSession.toEncodedTokens());
         emit(ActiveUsersState(updatedList));
       } else {
+        _activeSessionsRepo.finishOtherSession(channel, gameSession);
+        final updatedList = List.of(state.gameSessions)
+          ..removeWhere((i) => session.user.userId == gameSession.user.userId)
+          ..add(gameSession);
         channel.sink.add(
-          WWsFromServer.statusError(
+          ToClient.statusError(
             error: WsServerError.sessionAlreadyRegistered,
           ).encoded(),
         );
       }
-    } catch (e, s) {
+    } on TimeoutException {
+      channel.sink.add(
+        ToClient.statusError(error: WsServerError.timeout).encoded(),
+      );
+    } on Object catch (e, s) {
       addError(e, s);
       channel.sink.add(
-        WWsFromServer.statusError(
+        ToClient.statusError(
           error: WsServerError.authenticationFailed,
         ).encoded(),
       );
     }
   }
 
-  void _addUser(AddUser event, Emitter<ActiveUsersState> emit) {
-    // Only add if the user isn't already in the list.
-    final session = _activeSessions.getSession(event.channel);
-    final disposer = _activeSessions.getDisposer(event.channel);
-    if (session == null || disposer == null) return;
-    if (!state.gameSessions.contains(session)) {
-      final updatedList = [...state.gameSessions, session];
-      subscribe(event.channel);
-      disposer.shouldUnsubscribe.add(unsubscribe);
-      emit(ActiveUsersState(updatedList));
-    }
-  }
-
-  void _removeUser(RemoveUser event, Emitter<ActiveUsersState> emit) {
+  void _removeUser(_RemoveUser event, Emitter<ActiveUsersState> emit) {
     final updatedList = state.gameSessions
         .where((session) => session != event.session)
         .toList();

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:injectable/injectable.dart';
@@ -15,7 +16,7 @@ abstract class UnitDatasource {
 
   Future<int> deleteUnit(int characterId);
 
-  Future<bool> setSelectedUnit({required int userid, required int unitId});
+  Future<UnitDto> setSelectedUnit({required int userid, required int unitId});
 
   Future<UnitDto?> getSelectedUnit(int userid);
 }
@@ -46,7 +47,10 @@ class UnitDatasourceImpl implements UnitDatasource {
   }
 
   @override
-  FutureOr<UnitDto?> getUnit({required int userId, required int characterId}) async {
+  FutureOr<UnitDto?> getUnit({
+    required int userId,
+    required int characterId,
+  }) async {
     final entry = await _db.unitDao.getUnit(characterId);
     if (entry?.userId != userId) {
       return null;
@@ -70,8 +74,13 @@ class UnitDatasourceImpl implements UnitDatasource {
         .then(
           (value) => value
               .map(
-                (e) =>
-                    UnitDto(id: e.id, name: e.name, vitality: e.vitality, atk: e.atk, def: e.def),
+                (e) => UnitDto(
+                  id: e.id,
+                  name: e.name,
+                  vitality: e.vitality,
+                  atk: e.atk,
+                  def: e.def,
+                ),
               )
               .toList(),
         );
@@ -104,11 +113,22 @@ class UnitDatasourceImpl implements UnitDatasource {
   }
 
   @override
-  Future<bool> setSelectedUnit({required int userid, required int unitId}) async {
-    await _db.unitDao.setSelectedUnit(
+  Future<UnitDto> setSelectedUnit({
+    required int userid,
+    required int unitId,
+  }) async {
+    final selectedEntry = await _db.unitDao.setSelectedUnit(
       SelectedUnitTableCompanion(userId: Value(userid), unitId: Value(unitId)),
     );
-    return true;
+    final unitEntry = await _db.unitDao.getUnit(selectedEntry.unitId);
+    if (unitEntry == null) throw ApiException.notFound();
+    return UnitDto(
+      id: unitEntry.id,
+      name: unitEntry.name,
+      vitality: unitEntry.vitality,
+      atk: unitEntry.atk,
+      def: unitEntry.def,
+    );
   }
 
   @override

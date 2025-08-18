@@ -1,6 +1,7 @@
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/db_client/db_client.dart' show DbClient, UserTableCompanion;
+import 'package:backend/db_client/db_client.dart'
+    show DbClient, UserTableCompanion;
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
@@ -20,7 +21,9 @@ class UserDataSourceImpl implements UserDataSource {
   final DbClient _db;
   Future<User> createUser(EmailCredentialDto user) async {
     try {
-      debugLog('$magenta createUser email ${user.email} p: ${user.password} $reset');
+      debugLog(
+        '$magenta createUser email ${user.email} p: ${user.password} $reset',
+      );
       // await _databaseConnection.connect();
       final entry = await _db.userDao.insert(
         UserTableCompanion(
@@ -37,7 +40,10 @@ class UserDataSourceImpl implements UserDataSource {
         role: entry.role,
       );
     } on Object catch (e, stack) {
-      throw ApiException.internalServerError(message: 'SQLite error with ${e.runtimeType}');
+      debugLog('$red createUser exception ${e.runtimeType} $stack $reset');
+      throw ApiException.internalServerError(
+        message: 'SQLite error with ${e.runtimeType}',
+      );
     } finally {
       // _dao.close();
       // await _databaseConnection.close();

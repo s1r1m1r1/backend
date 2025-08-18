@@ -28,9 +28,7 @@ class _NewLetterState extends LetterState {
   /// jsonEncode  here
   @override
   String toString() {
-    final body = WWsFromServer.onLetter(
-      LastLetterPayload(roomId, letter),
-    ).toJson();
+    final body = ToClient.onLetter(LastLetterPayload(roomId, letter)).toJson();
     final encoded = jsonEncode(body);
     return encoded;
   }
@@ -49,7 +47,7 @@ class _DeletedLetterState extends LetterState {
   /// jsonEncode  here
   @override
   String toString() {
-    final body = WWsFromServer.deletedLetter(
+    final body = ToClient.deletedLetter(
       IdLetterPayload(roomId: roomId, letterId: letterId),
     ).toJson();
     final encoded = jsonEncode(body);

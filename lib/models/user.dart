@@ -16,14 +16,8 @@ abstract class User with _$User {
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-}
 
-@Freezed(fromJson: true, toJson: true, equal: false)
-abstract class UserDto with _$UserDto {
-  const UserDto._();
-  const factory UserDto({required int userId, required String email}) = _UserDto;
-
-  factory UserDto.fromJson(Map<String, dynamic> json) => _$UserDtoFromJson(json);
-
-  factory UserDto.fromUser(User u) => UserDto(email: u.email, userId: u.userId);
+  UserDto toDto() {
+    return UserDto(email: email, role: role, userId: userId);
+  }
 }
