@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/user/ws_active_sessions.dart';
+import 'package:backend/user/active_sessions_repository.dart';
 import 'package:backend/ws_/letters_repository.dart';
 import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -25,7 +25,7 @@ class LetterBloc extends _LetterBloc with LetterBlocGuard {
 class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
   final String roomId;
   final LettersRepository _lettersRepository;
-  final WsActiveSessions _activeSessions;
+  final ActiveSessionsRepository _activeSessions;
   final _letterCache = <LetterDto>[];
 
   _LetterBloc(
@@ -80,7 +80,7 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
   // --- Helper Methods ---
 
   String _lettersJSON() {
-    final body = WWsFromServer.letters(
+    final body = ToClient.letters(
       LetterHistoryPayload(roomId, _letterCache),
     ).toJson();
     return jsonEncode(body);

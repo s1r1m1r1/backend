@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
-import 'package:backend/models/validation/email_password_ext.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
@@ -45,10 +44,14 @@ class UserRepositoryImpl extends UserRepository {
     debugLog('createUser email next');
     // dto is already validated in the controller
     // we will hash the password here
-    final hashedPassword = passwordHasherService.hashPassword(createUserDto.password);
+    final hashedPassword = passwordHasherService.hashPassword(
+      createUserDto.password,
+    );
 
     debugLog('createUser email next 2 $hashedPassword');
-    final user = await _datasource.createUser(createUserDto.copyWith(password: hashedPassword));
+    final user = await _datasource.createUser(
+      createUserDto.copyWith(password: hashedPassword),
+    );
 
     debugLog('createUser email next 3');
     return user;
@@ -72,10 +75,10 @@ class UserRepositoryImpl extends UserRepository {
       hashedPassword: user.password,
     );
     if (!isPasswordCorrect) {
-      debugLog('loginUser Fail check passw incorrect');
+      debugLog('loginUser Fail check passwd incorrect');
       throw ApiException.forbidden(message: 'password is incorrect');
     }
-    debugLog('loginUser Success  passw ');
+    debugLog('loginUser Success  passwd ');
     return user;
   }
 }

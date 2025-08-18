@@ -1,5 +1,3 @@
-import 'package:backend/cf/autostart_manager.dart';
-import 'package:backend/cf/ws_config_datasource.dart';
 import 'package:backend/game/unit_datasource.dart';
 import 'package:backend/game/unit_repository.dart';
 import 'package:backend/ws_/chat_room_repository.dart';
@@ -7,7 +5,6 @@ import 'package:backend/ws_/chat_room_repository.dart';
 import 'package:backend/ws_/counter_repository.dart';
 import 'package:backend/ws_/logic/letter.bloc_manager.dart';
 import 'package:backend/ws_/letters_repository.dart';
-import 'package:backend/cf/ws_config_repository.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/user/session_repository.dart';
 import 'package:backend/user/user_repository.dart';
@@ -20,13 +17,8 @@ final _userRepo = GetIt.I.get<UserRepository>();
 final _sessionRepository = GetIt.I.get<SessionRepository>();
 final _letterRepository = GetIt.I.get<LettersRepository>();
 final _counterRepository = CounterRepository();
-final _wsConfigRepository = WsConfigRepositoryImpl(WsConfigDatasourceImpl(_db));
 final _chatRoomRepository = ChatRoomRepository(_db);
-final _autostartManager = AutostartManager(
-  _wsConfigRepository,
-  _counterRepository,
-  _chatRoomRepository,
-);
+
 final _roomManager = GetIt.I.get<LetterBlocManager>()..createRoom('main');
 
 final _unitRepository = UnitRepositoryImpl(UnitDatasourceImpl(_db));
@@ -39,11 +31,9 @@ Handler middleware(Handler handler) {
       .use(provider<SessionRepository>((_) => _sessionRepository))
       .use(provider<LettersRepository>((_) => _letterRepository))
       .use(provider<CounterRepository>((_) => _counterRepository))
-      .use(provider<WsConfigRepository>((_) => _wsConfigRepository))
       .use(provider<ChatRoomRepository>((_) => _chatRoomRepository))
       .use(provider<LetterBlocManager>((_) => _roomManager))
-      .use(provider<UnitRepository>((_) => _unitRepository))
-      .use(provider<AutostartManager>((_) => _autostartManager));
+      .use(provider<UnitRepository>((_) => _unitRepository));
 
   // return handler(updatedContext);
 }

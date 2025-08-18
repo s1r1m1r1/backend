@@ -1,11 +1,8 @@
 import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
-import 'package:backend/user/ws_active_sessions.dart';
+import 'package:backend/user/active_sessions_repository.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/ws_/command/auth/login_cmd.dart';
-import 'package:backend/ws_/command/auth/with_refresh_cmd.dart';
-import 'package:backend/ws_/command/auth/with_token_cmd.dart';
 import 'package:backend/ws_/logic/active_users.bloc.dart';
 import 'package:backend/ws_/logic/letter.bloc_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
@@ -15,8 +12,8 @@ import 'package:sha_red/sha_red.dart';
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
     debugLog('$green ON Request 1 $protocol $reset');
-    final activeSessions = context.read<WsActiveSessions>();
-    final activeUsersCubit = context.read<ActiveUsersBloc>();
+    final activeSessions = context.read<ActiveSessionsRepository>();
+    final activeUsersBloc = context.read<ActiveUsersBloc>();
 
     channel.stream.listen(
       (message) async {
@@ -32,13 +29,17 @@ Future<Response> onRequest(RequestContext context) async {
           final freezed = ToServer.decoded(message);
           switch (freezed) {
             case Login_TS(:final dto):
-              LoginCMD().execute(context, channel, dto);
+              activeUsersBloc.add(ActiveUsersEvent.login(channel, dto));
             case Signup_TS():
               break;
             case WithToken_TS(:final token):
-              WithTokenCMD().execute(context, channel, token);
+              activeUsersBloc.add(ActiveUsersEvent.withToken(channel, token));
+              break;
             case WithRefresh_TS(:final refresh):
-              WithRefreshCMD().execute(context, channel, refresh);
+              activeUsersBloc.add(
+                ActiveUsersEvent.withRefresh(channel, refresh),
+              );
+              break;
             case NewLetter_TS(:final letter, :final roomId):
               final blocManager = context.read<LetterBlocManager>();
               blocManager.newLetter(channel, 'main' /*dto.roomId*/, letter);
@@ -68,7 +69,7 @@ Future<Response> onRequest(RequestContext context) async {
           disposer.dispose();
         }
         if (session != null) {
-          activeUsersCubit.add(ActiveUsersEvent.removeUser(session));
+          activeUsersBloc.add(ActiveUsersEvent.removeUser(session));
         }
         channel.sink.close();
       },

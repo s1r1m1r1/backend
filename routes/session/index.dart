@@ -1,20 +1,22 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' show HttpStatus;
 
+import 'package:backend/core/debug_log.dart';
+import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/http_check_session_.dart';
-import 'package:backend/models/validation/map_to_int.dart';
 import 'package:dart_frog/dart_frog.dart';
+import 'package:sha_red/sha_red.dart';
 
-Future<Response> onRequest(RequestContext context, String id) async {
+Future<Response> onRequest(RequestContext context) async {
   switch (context.request.method) {
+    case HttpMethod.get:
+      return await getSession(context);
+    case HttpMethod.post:
     case HttpMethod.put:
     case HttpMethod.patch:
-    case HttpMethod.post:
-      return setSelectedUnit(context, id);
     case HttpMethod.delete:
-    case HttpMethod.get:
     case HttpMethod.head:
     case HttpMethod.options:
       return Response.json(
@@ -24,27 +26,28 @@ Future<Response> onRequest(RequestContext context, String id) async {
   }
 }
 
-FutureOr<Response> setSelectedUnit(RequestContext context, String id) async {
+FutureOr<Response> getSession(RequestContext context) async {
   try {
     final record = await checkSession(context);
-    final user = record.$1;
     final unitRepo = context.read<UnitRepository>();
-    final unitId = mapToInt(id);
-    stdout.writeln('TodoController update start');
-    final unit = await unitRepo.setSelectedUnit(
-      userid: user.userId,
-      unitId: unitId,
+    final unit = await unitRepo.getSelectedUnit(record.$1.userId);
+    final dto = SessionDto(
+      user: record.$1.toDto(),
+      tokens: TokensDto(
+        accessToken: record.$2.token,
+        refreshToken: record.$2.refreshToken,
+      ),
+      unit: unit,
     );
-    return Response.json(body: unit.toJson());
+    return Response.json(body: dto.toJson());
   } on ApiException catch (e, stack) {
-    stdout.writeln('TodoController err: ${stack}');
-    //  notFound
+    debugLog('$yellow geListUnit $reset ${e.statusCode} ${stack}');
     return Response.json(
       body: {'message': e.toString()},
       statusCode: e.statusCode,
     );
-  } on Object catch (e, stackTrace) {
-    stdout.writeln('TodoController UNKNOWN ERROR ${stackTrace}');
+  } on Object catch (e, stack) {
+    debugLog('$yellow getListUnit $reset UNKNOWN ERROR ${stack}');
     return Response.json(
       body: {'message': e.toString()},
       statusCode: HttpStatus.internalServerError,

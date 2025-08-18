@@ -27,13 +27,3 @@ const _$RoleEnumMap = {
   Role.user: 'user',
   Role.tester: 'tester',
 };
-
-_UserDto _$UserDtoFromJson(Map<String, dynamic> json) => _UserDto(
-  userId: (json['userId'] as num).toInt(),
-  email: json['email'] as String,
-);
-
-Map<String, dynamic> _$UserDtoToJson(_UserDto instance) => <String, dynamic>{
-  'userId': instance.userId,
-  'email': instance.email,
-};

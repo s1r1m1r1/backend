@@ -17,6 +17,16 @@ class Unit extends Equatable {
   List<Object?> get props => [id, name, vitality, atk, def];
 
   factory Unit.fromDto(UnitDto dto) {
-    return Unit(id: dto.id, name: dto.name, vitality: dto.vitality, atk: dto.atk, def: dto.def);
+    return Unit(
+      id: dto.id,
+      name: dto.name,
+      vitality: dto.vitality,
+      atk: dto.atk,
+      def: dto.def,
+    );
+  }
+
+  UnitDto toDto() {
+    return UnitDto(id: id, name: name, vitality: vitality, atk: atk, def: def);
   }
 }

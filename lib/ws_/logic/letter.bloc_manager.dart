@@ -1,4 +1,4 @@
-import 'package:backend/user/ws_active_sessions.dart';
+import 'package:backend/user/active_sessions_repository.dart';
 import 'package:backend/ws_/logic/letter.bloc.dart';
 import 'package:backend/ws_/letters_repository.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -9,7 +9,7 @@ import 'package:sha_red/sha_red.dart';
 class LetterBlocManager {
   LetterBlocManager(this._lettersRepository, this._activeSessions);
   final LettersRepository _lettersRepository;
-  final WsActiveSessions _activeSessions;
+  final ActiveSessionsRepository _activeSessions;
   final _map = <String, LetterBloc>{};
 
   @Deprecated('dev fix')

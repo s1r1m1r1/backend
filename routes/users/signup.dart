@@ -36,13 +36,20 @@ FutureOr<Response> signup(RequestContext context) async {
     final sessionRepository = context.read<SessionRepository>();
     final session = await sessionRepository.createSession(user);
 
-    stdout.writeln('$magenta signup return ${session.token} ${session.refreshToken} $reset');
+    stdout.writeln(
+      '$magenta signup return ${session.token} ${session.refreshToken} $reset',
+    );
+
     return Response.json(
-      body: TokensDto(
-        AccessTokenDto(session.token),
-        RefreshTokenDto(session.refreshToken),
+      body: SessionDto(
+        user: session.user.toDto(),
+        tokens: TokensDto(
+          accessToken: session.token,
+          refreshToken: session.refreshToken,
+        ),
       ).toJson(),
-      statusCode: HttpStatus.created,
+
+      statusCode: HttpStatus.accepted,
     );
   } on ApiException catch (e, stack) {
     stdout.writeln('$red signup err $reset ${stack}');
@@ -51,7 +58,9 @@ FutureOr<Response> signup(RequestContext context) async {
       statusCode: e.statusCode,
     );
   } catch (e, stack) {
-    stdout.writeln('$magenta signup UNKNOWN ERROR $reset ${Chain.forTrace(stack)}');
+    stdout.writeln(
+      '$magenta signup UNKNOWN ERROR $reset ${Chain.forTrace(stack)}',
+    );
     return Response.json(
       body: {'message': 'An unexpected error occurred. Please try again later'},
       statusCode: HttpStatus.internalServerError,

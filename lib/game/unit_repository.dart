@@ -10,7 +10,7 @@ abstract class UnitRepository {
   Future<UnitDto?> updateUnit(int userId, UpdateUnitDto dto);
   FutureOr<UnitDto?> getUnit({required int userId, required int characterId});
   FutureOr<List<UnitDto>> getListUnit({required int userId});
-  Future<bool> setSelectedUnit({required int userid, required int unitId});
+  Future<UnitDto> setSelectedUnit({required int userid, required int unitId});
   Future<UnitDto?> getSelectedUnit(int userid);
 
   Future deleteUnit({required int userId, required int characterId});
@@ -27,7 +27,10 @@ class UnitRepositoryImpl implements UnitRepository {
   }
 
   @override
-  FutureOr<UnitDto?> getUnit({required int userId, required int characterId}) async {
+  FutureOr<UnitDto?> getUnit({
+    required int userId,
+    required int characterId,
+  }) async {
     return await _datasource.getUnit(userId: userId, characterId: characterId);
   }
 
@@ -42,8 +45,14 @@ class UnitRepositoryImpl implements UnitRepository {
   }
 
   @override
-  Future<bool> deleteUnit({required int userId, required int characterId}) async {
-    final entry = await _datasource.getUnit(userId: userId, characterId: characterId);
+  Future<bool> deleteUnit({
+    required int userId,
+    required int characterId,
+  }) async {
+    final entry = await _datasource.getUnit(
+      userId: userId,
+      characterId: characterId,
+    );
     if (entry != null) {
       final result = await _datasource.deleteUnit(characterId);
       return result == 1;
@@ -52,7 +61,7 @@ class UnitRepositoryImpl implements UnitRepository {
   }
 
   @override
-  Future<bool> setSelectedUnit({required int userid, required int unitId}) {
+  Future<UnitDto> setSelectedUnit({required int userid, required int unitId}) {
     return _datasource.setSelectedUnit(userid: userid, unitId: unitId);
   }
 
