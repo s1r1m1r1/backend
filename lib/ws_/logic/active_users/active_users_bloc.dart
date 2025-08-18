@@ -35,27 +35,20 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
     this._userRepository,
   ) : super(const ActiveUsersState([])) {
     on<_RemoveUser>(_removeUser);
-    on<SequentialActive_UsersEvent>((event, emit) async {
-      switch (event) {
-        case _WithTokenEvent():
-          await _withToken(event, emit);
-        case _WithRefreshTokenEvent():
-          await _withRefreshToken(event, emit);
-        case _LoginEvent():
-          await _login(event, emit);
-      }
-    }, transformer: sequential());
+    on<_JoinEvent>(_onJoin, transformer: sequential());
   }
 
-  FutureOr<void> _withToken(
-    _WithTokenEvent event,
+  FutureOr<void> _onJoin(
+    _JoinEvent event,
     Emitter<ActiveUsersState> emit,
   ) async {
     final channel = event.channel;
     try {
+      if (event.token == null && event.refreshToken == null) return;
       final session = await _sessionRepository
-          .getSession(token: event.token)
+          .getSession(token: event.token, refreshToken: event.refreshToken)
           .timeout(_timeoutDuration);
+
       if (session == null) {
         channel.sink.add(
           ToClient.statusError(
@@ -100,144 +93,6 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
       disposer!.shouldUnsubscribe.add(unsubscribe);
       channel.sink.add(gameSession.toEncodedTokens());
       emit(ActiveUsersState(getListGameSessions()));
-    } on TimeoutException {
-      channel.sink.add(
-        ToClient.statusError(error: WsServerError.timeout).encoded(),
-      );
-    } on Object catch (e, s) {
-      addError(e, s);
-      channel.sink.add(
-        ToClient.statusError(
-          error: WsServerError.authenticationFailed,
-        ).encoded(),
-      );
-    }
-  }
-
-  FutureOr<void> _withRefreshToken(
-    _WithRefreshTokenEvent event,
-    Emitter<ActiveUsersState> emit,
-  ) async {
-    final channel = event.channel;
-    try {
-      final session = await _sessionRepository
-          .getSession(refreshToken: event.refreshToken)
-          .timeout(_timeoutDuration);
-      if (session == null) {
-        channel.sink.add(
-          ToClient.statusError(
-            error: WsServerError.authenticationFailed,
-          ).encoded(),
-        );
-        return;
-      }
-      ;
-      final isValid = _sessionRepository.validateRefreshToken(session);
-      if (!isValid) {
-        channel.sink.add(
-          ToClient.statusError(error: WsServerError.sessionExpired).encoded(),
-        );
-        return;
-      }
-      ;
-      final unit = await _unitRepository
-          .getSelectedUnit(session.user.userId)
-          .timeout(_timeoutDuration);
-      if (unit == null) {
-        channel.sink.add(
-          ToClient.statusError(error: WsServerError.unitNotFound).encoded(),
-        );
-        return;
-      }
-      final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-      addSession(channel, gameSession);
-      final disposer = getDisposer(channel);
-
-      if (!state.gameSessions.any(
-        (session) => session.user.userId == gameSession.user.userId,
-      )) {
-        subscribe(channel);
-        disposer!.shouldUnsubscribe.add(unsubscribe);
-        channel.sink.add(gameSession.toEncodedTokens());
-        emit(ActiveUsersState(getListGameSessions()));
-      } else {
-        channel.sink.add(
-          ToClient.statusError(
-            error: WsServerError.sessionAlreadyRegistered,
-          ).encoded(),
-        );
-        // _activeSessionsRepo.finishOtherSession(channel, gameSession);
-        // final updatedList = List.of(state.gameSessions)
-        //   ..removeWhere((i) => session.user.userId == gameSession.user.userId)
-        //   ..add(gameSession);
-        // subscribe(channel);
-        // disposer!.shouldUnsubscribe.add(unsubscribe);
-        // channel.sink.add(gameSession.toEncodedTokens());
-        // emit(ActiveUsersState(updatedList));
-        channel.sink.close(1000, 'Session already registered');
-      }
-    } on TimeoutException {
-      channel.sink.add(
-        ToClient.statusError(error: WsServerError.timeout).encoded(),
-      );
-    } on Object catch (e, s) {
-      addError(e, s);
-      channel.sink.add(
-        ToClient.statusError(
-          error: WsServerError.authenticationFailed,
-        ).encoded(),
-      );
-    }
-  }
-
-  FutureOr<void> _login(
-    _LoginEvent event,
-    Emitter<ActiveUsersState> emit,
-  ) async {
-    final channel = event.channel;
-    try {
-      final user = await _userRepository
-          .loginUser(event.dto)
-          .timeout(_timeoutDuration);
-      final session = await _sessionRepository
-          .createSession(user)
-          .timeout(_timeoutDuration);
-      final unit = await _unitRepository
-          .getSelectedUnit(session.user.userId)
-          .timeout(_timeoutDuration);
-      if (unit == null) {
-        channel.sink.add(
-          ToClient.statusError(error: WsServerError.unitNotFound).encoded(),
-        );
-        return;
-      }
-      final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-      addSession(channel, gameSession);
-      final disposer = getDisposer(channel);
-
-      if (!state.gameSessions.any(
-        (session) => session.user.userId == gameSession.user.userId,
-      )) {
-        subscribe(channel);
-        disposer!.shouldUnsubscribe.add(unsubscribe);
-        channel.sink.add(gameSession.toEncodedTokens());
-        emit(ActiveUsersState(getListGameSessions()));
-      } else {
-        channel.sink.add(
-          ToClient.statusError(
-            error: WsServerError.sessionAlreadyRegistered,
-          ).encoded(),
-        );
-        // _activeSessionsRepo.finishOtherSession(channel, gameSession);
-        // final updatedList = List.of(state.gameSessions)
-        //   ..removeWhere((i) => session.user.userId == gameSession.user.userId)
-        //   ..add(gameSession);
-        // channel.sink.add(
-        //   ToClient.statusError(
-        //     error: WsServerError.sessionAlreadyRegistered,
-        //   ).encoded(),
-        // );
-      }
     } on TimeoutException {
       channel.sink.add(
         ToClient.statusError(error: WsServerError.timeout).encoded(),

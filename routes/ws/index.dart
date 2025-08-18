@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
-import 'package:backend/ws_/logic/active_users/active_sessions_mixin.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/user/session_repository.dart';
 import 'package:backend/ws_/logic/active_users/active_users_bloc.dart';
 import 'package:backend/ws_/logic/letter.bloc_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
@@ -18,28 +16,25 @@ Future<Response> onRequest(RequestContext context) async {
     channel.stream.listen(
       (message) async {
         debugLog('$green ON MESSAGE: $reset');
-        // try {
         if (message is! String) {
           debugLog('$red [WebSocket] Message is not a string. $reset');
-          // channel.sink.add('Invalid message');
           return;
         }
 
         try {
           final freezed = ToServer.decoded(message);
           switch (freezed) {
-            case Login_TS(:final dto):
-              activeUsersBloc.add(ActiveUsersEvent.login(channel, dto));
-            case Signup_TS():
-              break;
             case WithToken_TS(:final token):
               // 1. Authenticate the token
-              activeUsersBloc.add(ActiveUsersEvent.withToken(channel, token));
+              activeUsersBloc.add(
+                ActiveUsersEvent.join(channel: channel, token: token),
+              );
               break;
             case WithRefresh_TS(:final refresh):
               activeUsersBloc.add(
-                ActiveUsersEvent.withRefresh(channel, refresh),
+                ActiveUsersEvent.join(channel: channel, refreshToken: refresh),
               );
+
               break;
             case NewLetter_TS(:final letter, :final roomId):
               final blocManager = context.read<LetterBlocManager>();
@@ -97,10 +92,6 @@ Future<Response> onRequest(RequestContext context) async {
         } catch (e, s) {
           debugLog('$red [WebSocket] Error: $e $s $reset');
         }
-
-        // } catch (e) {
-        //   debugLog('$red [WebSocket] Error: $e $reset');
-        // }
       },
       onDone: () async {
         activeUsersBloc.add(ActiveUsersEvent.removeUser(channel));
