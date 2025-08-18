@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/session.dart';
 import 'package:backend/user/session_repository.dart';
 import 'package:backend/user/user_repository.dart';
-import 'package:backend/user/active_sessions_repository.dart';
+import 'package:backend/ws_/logic/active_users/active_sessions_mixin.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -15,22 +16,20 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
-part 'active_users.event.dart';
-part 'active_users.state.dart';
-part 'active_users.bloc.freezed.dart';
+part 'active_users_event.dart';
+part 'active_users_state.dart';
+part 'active_users_bloc.freezed.dart';
 
 const _timeoutDuration = Duration(milliseconds: 100);
 
 // active_users_bloc.dart
 @lazySingleton
-class ActiveUsersBloc
-    extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState> {
-  final ActiveSessionsRepository _activeSessionsRepo;
+class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
+    with ActiveUsersMixin {
   final UnitRepository _unitRepository;
   final UserRepository _userRepository;
   final SessionRepository _sessionRepository;
   ActiveUsersBloc(
-    this._activeSessionsRepo,
     this._unitRepository,
     this._sessionRepository,
     this._userRepository,
@@ -73,6 +72,18 @@ class ActiveUsersBloc
         );
         return;
       }
+      final existingChannel = getChannelForUser(session.user.userId);
+      if (existingChannel != null && existingChannel != channel) {
+        existingChannel.sink.add(
+          ToClient.statusError(
+            error: WsServerError.finishedDuplicateSession,
+          ).encoded(),
+        );
+        await existingChannel.sink.close(1000, 'New login from another device');
+        debugLog('Closed old session for user ${session.user.userId}');
+        return;
+      }
+
       final unit = await _unitRepository
           .getSelectedUnit(session.user.userId)
           .timeout(_timeoutDuration);
@@ -83,26 +94,12 @@ class ActiveUsersBloc
         return;
       }
       final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-      _activeSessionsRepo.addSession(channel, gameSession);
-      final disposer = _activeSessionsRepo.getDisposer(channel);
-      if (!state.gameSessions.any(
-        (session) => session.user.userId == gameSession.user.userId,
-      )) {
-        final updatedList = [...state.gameSessions, gameSession];
-        subscribe(channel);
-        disposer!.shouldUnsubscribe.add(unsubscribe);
-        channel.sink.add(gameSession.toEncodedTokens());
-        emit(ActiveUsersState(updatedList));
-      } else {
-        _activeSessionsRepo.finishOtherSession(channel, gameSession);
-        final updatedList = List.of(state.gameSessions)
-          ..removeWhere((i) => session.user.userId == gameSession.user.userId)
-          ..add(gameSession);
-        subscribe(channel);
-        disposer!.shouldUnsubscribe.add(unsubscribe);
-        channel.sink.add(gameSession.toEncodedTokens());
-        emit(ActiveUsersState(updatedList));
-      }
+      addSession(channel, gameSession);
+      final disposer = getDisposer(channel);
+      subscribe(channel);
+      disposer!.shouldUnsubscribe.add(unsubscribe);
+      channel.sink.add(gameSession.toEncodedTokens());
+      emit(ActiveUsersState(getListGameSessions()));
     } on TimeoutException {
       channel.sink.add(
         ToClient.statusError(error: WsServerError.timeout).encoded(),
@@ -153,25 +150,31 @@ class ActiveUsersBloc
         return;
       }
       final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-      _activeSessionsRepo.addSession(channel, gameSession);
-      final disposer = _activeSessionsRepo.getDisposer(channel);
+      addSession(channel, gameSession);
+      final disposer = getDisposer(channel);
+
       if (!state.gameSessions.any(
         (session) => session.user.userId == gameSession.user.userId,
       )) {
-        final updatedList = [...state.gameSessions, gameSession];
         subscribe(channel);
         disposer!.shouldUnsubscribe.add(unsubscribe);
         channel.sink.add(gameSession.toEncodedTokens());
-        emit(ActiveUsersState(updatedList));
+        emit(ActiveUsersState(getListGameSessions()));
       } else {
-        _activeSessionsRepo.finishOtherSession(channel, gameSession);
-        final updatedList = List.of(state.gameSessions)
-          ..removeWhere((i) => session.user.userId == gameSession.user.userId)
-          ..add(gameSession);
-        subscribe(channel);
-        disposer!.shouldUnsubscribe.add(unsubscribe);
-        channel.sink.add(gameSession.toEncodedTokens());
-        emit(ActiveUsersState(updatedList));
+        channel.sink.add(
+          ToClient.statusError(
+            error: WsServerError.sessionAlreadyRegistered,
+          ).encoded(),
+        );
+        // _activeSessionsRepo.finishOtherSession(channel, gameSession);
+        // final updatedList = List.of(state.gameSessions)
+        //   ..removeWhere((i) => session.user.userId == gameSession.user.userId)
+        //   ..add(gameSession);
+        // subscribe(channel);
+        // disposer!.shouldUnsubscribe.add(unsubscribe);
+        // channel.sink.add(gameSession.toEncodedTokens());
+        // emit(ActiveUsersState(updatedList));
+        channel.sink.close(1000, 'Session already registered');
       }
     } on TimeoutException {
       channel.sink.add(
@@ -209,26 +212,31 @@ class ActiveUsersBloc
         return;
       }
       final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-      _activeSessionsRepo.addSession(channel, gameSession);
-      final disposer = _activeSessionsRepo.getDisposer(channel);
+      addSession(channel, gameSession);
+      final disposer = getDisposer(channel);
+
       if (!state.gameSessions.any(
         (session) => session.user.userId == gameSession.user.userId,
       )) {
-        final updatedList = [...state.gameSessions, gameSession];
         subscribe(channel);
         disposer!.shouldUnsubscribe.add(unsubscribe);
         channel.sink.add(gameSession.toEncodedTokens());
-        emit(ActiveUsersState(updatedList));
+        emit(ActiveUsersState(getListGameSessions()));
       } else {
-        _activeSessionsRepo.finishOtherSession(channel, gameSession);
-        final updatedList = List.of(state.gameSessions)
-          ..removeWhere((i) => session.user.userId == gameSession.user.userId)
-          ..add(gameSession);
         channel.sink.add(
           ToClient.statusError(
             error: WsServerError.sessionAlreadyRegistered,
           ).encoded(),
         );
+        // _activeSessionsRepo.finishOtherSession(channel, gameSession);
+        // final updatedList = List.of(state.gameSessions)
+        //   ..removeWhere((i) => session.user.userId == gameSession.user.userId)
+        //   ..add(gameSession);
+        // channel.sink.add(
+        //   ToClient.statusError(
+        //     error: WsServerError.sessionAlreadyRegistered,
+        //   ).encoded(),
+        // );
       }
     } on TimeoutException {
       channel.sink.add(
@@ -245,9 +253,8 @@ class ActiveUsersBloc
   }
 
   void _removeUser(_RemoveUser event, Emitter<ActiveUsersState> emit) {
-    final updatedList = state.gameSessions
-        .where((session) => session != event.session)
-        .toList();
-    emit(ActiveUsersState(updatedList));
+    removeSession(event.channel);
+    event.channel.sink.close();
+    emit(ActiveUsersState(getListGameSessions()));
   }
 }

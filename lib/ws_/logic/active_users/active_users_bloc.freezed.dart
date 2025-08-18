@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'active_users.bloc.dart';
+part of 'active_users_bloc.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,30 +14,61 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ActiveUsersEvent {
 
-
+ WebSocketChannel get channel;
+/// Create a copy of ActiveUsersEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ActiveUsersEventCopyWith<ActiveUsersEvent> get copyWith => _$ActiveUsersEventCopyWithImpl<ActiveUsersEvent>(this as ActiveUsersEvent, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActiveUsersEvent);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActiveUsersEvent&&(identical(other.channel, channel) || other.channel == channel));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,channel);
 
 @override
 String toString() {
-  return 'ActiveUsersEvent()';
+  return 'ActiveUsersEvent(channel: $channel)';
 }
 
 
 }
 
 /// @nodoc
-class $ActiveUsersEventCopyWith<$Res>  {
-$ActiveUsersEventCopyWith(ActiveUsersEvent _, $Res Function(ActiveUsersEvent) __);
+abstract mixin class $ActiveUsersEventCopyWith<$Res>  {
+  factory $ActiveUsersEventCopyWith(ActiveUsersEvent value, $Res Function(ActiveUsersEvent) _then) = _$ActiveUsersEventCopyWithImpl;
+@useResult
+$Res call({
+ WebSocketChannel channel
+});
+
+
+
+
+}
+/// @nodoc
+class _$ActiveUsersEventCopyWithImpl<$Res>
+    implements $ActiveUsersEventCopyWith<$Res> {
+  _$ActiveUsersEventCopyWithImpl(this._self, this._then);
+
+  final ActiveUsersEvent _self;
+  final $Res Function(ActiveUsersEvent) _then;
+
+/// Create a copy of ActiveUsersEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? channel = null,}) {
+  return _then(_self.copyWith(
+channel: null == channel ? _self.channel : channel // ignore: cast_nullable_to_non_nullable
+as WebSocketChannel,
+  ));
+}
+
 }
 
 
@@ -125,13 +156,13 @@ return removeUser(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( WebSocketChannel channel,  String token)?  withToken,TResult Function( WebSocketChannel channel,  String refreshToken)?  withRefresh,TResult Function( WebSocketChannel channel,  EmailCredentialDto dto)?  login,TResult Function( GameSession session)?  removeUser,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( WebSocketChannel channel,  String token)?  withToken,TResult Function( WebSocketChannel channel,  String refreshToken)?  withRefresh,TResult Function( WebSocketChannel channel,  EmailCredentialDto dto)?  login,TResult Function( WebSocketChannel channel)?  removeUser,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WithTokenEvent() when withToken != null:
 return withToken(_that.channel,_that.token);case _WithRefreshTokenEvent() when withRefresh != null:
 return withRefresh(_that.channel,_that.refreshToken);case _LoginEvent() when login != null:
 return login(_that.channel,_that.dto);case _RemoveUser() when removeUser != null:
-return removeUser(_that.session);case _:
+return removeUser(_that.channel);case _:
   return orElse();
 
 }
@@ -149,13 +180,13 @@ return removeUser(_that.session);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( WebSocketChannel channel,  String token)  withToken,required TResult Function( WebSocketChannel channel,  String refreshToken)  withRefresh,required TResult Function( WebSocketChannel channel,  EmailCredentialDto dto)  login,required TResult Function( GameSession session)  removeUser,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( WebSocketChannel channel,  String token)  withToken,required TResult Function( WebSocketChannel channel,  String refreshToken)  withRefresh,required TResult Function( WebSocketChannel channel,  EmailCredentialDto dto)  login,required TResult Function( WebSocketChannel channel)  removeUser,}) {final _that = this;
 switch (_that) {
 case _WithTokenEvent():
 return withToken(_that.channel,_that.token);case _WithRefreshTokenEvent():
 return withRefresh(_that.channel,_that.refreshToken);case _LoginEvent():
 return login(_that.channel,_that.dto);case _RemoveUser():
-return removeUser(_that.session);}
+return removeUser(_that.channel);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -169,13 +200,13 @@ return removeUser(_that.session);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( WebSocketChannel channel,  String token)?  withToken,TResult? Function( WebSocketChannel channel,  String refreshToken)?  withRefresh,TResult? Function( WebSocketChannel channel,  EmailCredentialDto dto)?  login,TResult? Function( GameSession session)?  removeUser,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( WebSocketChannel channel,  String token)?  withToken,TResult? Function( WebSocketChannel channel,  String refreshToken)?  withRefresh,TResult? Function( WebSocketChannel channel,  EmailCredentialDto dto)?  login,TResult? Function( WebSocketChannel channel)?  removeUser,}) {final _that = this;
 switch (_that) {
 case _WithTokenEvent() when withToken != null:
 return withToken(_that.channel,_that.token);case _WithRefreshTokenEvent() when withRefresh != null:
 return withRefresh(_that.channel,_that.refreshToken);case _LoginEvent() when login != null:
 return login(_that.channel,_that.dto);case _RemoveUser() when removeUser != null:
-return removeUser(_that.session);case _:
+return removeUser(_that.channel);case _:
   return null;
 
 }
@@ -190,12 +221,12 @@ class _WithTokenEvent extends ActiveUsersEvent implements SequentialActive_Users
   const _WithTokenEvent(this.channel, this.token): super._();
   
 
- final  WebSocketChannel channel;
+@override final  WebSocketChannel channel;
  final  String token;
 
 /// Create a copy of ActiveUsersEvent
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 _$WithTokenEventCopyWith<_WithTokenEvent> get copyWith => __$WithTokenEventCopyWithImpl<_WithTokenEvent>(this, _$identity);
 
@@ -221,7 +252,7 @@ String toString() {
 /// @nodoc
 abstract mixin class _$WithTokenEventCopyWith<$Res> implements $ActiveUsersEventCopyWith<$Res> {
   factory _$WithTokenEventCopyWith(_WithTokenEvent value, $Res Function(_WithTokenEvent) _then) = __$WithTokenEventCopyWithImpl;
-@useResult
+@override @useResult
 $Res call({
  WebSocketChannel channel, String token
 });
@@ -240,7 +271,7 @@ class __$WithTokenEventCopyWithImpl<$Res>
 
 /// Create a copy of ActiveUsersEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? token = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? token = null,}) {
   return _then(_WithTokenEvent(
 null == channel ? _self.channel : channel // ignore: cast_nullable_to_non_nullable
 as WebSocketChannel,null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
@@ -258,12 +289,12 @@ class _WithRefreshTokenEvent extends ActiveUsersEvent implements SequentialActiv
   const _WithRefreshTokenEvent(this.channel, this.refreshToken): super._();
   
 
- final  WebSocketChannel channel;
+@override final  WebSocketChannel channel;
  final  String refreshToken;
 
 /// Create a copy of ActiveUsersEvent
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 _$WithRefreshTokenEventCopyWith<_WithRefreshTokenEvent> get copyWith => __$WithRefreshTokenEventCopyWithImpl<_WithRefreshTokenEvent>(this, _$identity);
 
@@ -289,7 +320,7 @@ String toString() {
 /// @nodoc
 abstract mixin class _$WithRefreshTokenEventCopyWith<$Res> implements $ActiveUsersEventCopyWith<$Res> {
   factory _$WithRefreshTokenEventCopyWith(_WithRefreshTokenEvent value, $Res Function(_WithRefreshTokenEvent) _then) = __$WithRefreshTokenEventCopyWithImpl;
-@useResult
+@override @useResult
 $Res call({
  WebSocketChannel channel, String refreshToken
 });
@@ -308,7 +339,7 @@ class __$WithRefreshTokenEventCopyWithImpl<$Res>
 
 /// Create a copy of ActiveUsersEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? refreshToken = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? refreshToken = null,}) {
   return _then(_WithRefreshTokenEvent(
 null == channel ? _self.channel : channel // ignore: cast_nullable_to_non_nullable
 as WebSocketChannel,null == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
@@ -326,12 +357,12 @@ class _LoginEvent extends ActiveUsersEvent implements SequentialActive_UsersEven
   const _LoginEvent(this.channel, this.dto): super._();
   
 
- final  WebSocketChannel channel;
+@override final  WebSocketChannel channel;
  final  EmailCredentialDto dto;
 
 /// Create a copy of ActiveUsersEvent
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 _$LoginEventCopyWith<_LoginEvent> get copyWith => __$LoginEventCopyWithImpl<_LoginEvent>(this, _$identity);
 
@@ -357,7 +388,7 @@ String toString() {
 /// @nodoc
 abstract mixin class _$LoginEventCopyWith<$Res> implements $ActiveUsersEventCopyWith<$Res> {
   factory _$LoginEventCopyWith(_LoginEvent value, $Res Function(_LoginEvent) _then) = __$LoginEventCopyWithImpl;
-@useResult
+@override @useResult
 $Res call({
  WebSocketChannel channel, EmailCredentialDto dto
 });
@@ -376,7 +407,7 @@ class __$LoginEventCopyWithImpl<$Res>
 
 /// Create a copy of ActiveUsersEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? dto = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? dto = null,}) {
   return _then(_LoginEvent(
 null == channel ? _self.channel : channel // ignore: cast_nullable_to_non_nullable
 as WebSocketChannel,null == dto ? _self.dto : dto // ignore: cast_nullable_to_non_nullable
@@ -400,14 +431,14 @@ $EmailCredentialDtoCopyWith<$Res> get dto {
 
 
 class _RemoveUser extends ActiveUsersEvent {
-  const _RemoveUser(this.session): super._();
+  const _RemoveUser(this.channel): super._();
   
 
- final  GameSession session;
+@override final  WebSocketChannel channel;
 
 /// Create a copy of ActiveUsersEvent
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 _$RemoveUserCopyWith<_RemoveUser> get copyWith => __$RemoveUserCopyWithImpl<_RemoveUser>(this, _$identity);
 
@@ -415,16 +446,16 @@ _$RemoveUserCopyWith<_RemoveUser> get copyWith => __$RemoveUserCopyWithImpl<_Rem
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RemoveUser&&(identical(other.session, session) || other.session == session));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RemoveUser&&(identical(other.channel, channel) || other.channel == channel));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,session);
+int get hashCode => Object.hash(runtimeType,channel);
 
 @override
 String toString() {
-  return 'ActiveUsersEvent.removeUser(session: $session)';
+  return 'ActiveUsersEvent.removeUser(channel: $channel)';
 }
 
 
@@ -433,9 +464,9 @@ String toString() {
 /// @nodoc
 abstract mixin class _$RemoveUserCopyWith<$Res> implements $ActiveUsersEventCopyWith<$Res> {
   factory _$RemoveUserCopyWith(_RemoveUser value, $Res Function(_RemoveUser) _then) = __$RemoveUserCopyWithImpl;
-@useResult
+@override @useResult
 $Res call({
- GameSession session
+ WebSocketChannel channel
 });
 
 
@@ -452,10 +483,10 @@ class __$RemoveUserCopyWithImpl<$Res>
 
 /// Create a copy of ActiveUsersEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? session = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? channel = null,}) {
   return _then(_RemoveUser(
-null == session ? _self.session : session // ignore: cast_nullable_to_non_nullable
-as GameSession,
+null == channel ? _self.channel : channel // ignore: cast_nullable_to_non_nullable
+as WebSocketChannel,
   ));
 }
 

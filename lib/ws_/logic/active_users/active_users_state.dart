@@ -1,4 +1,4 @@
-part of 'active_users.bloc.dart';
+part of 'active_users_bloc.dart';
 
 class ActiveUsersState extends Equatable {
   const ActiveUsersState(this.gameSessions);
