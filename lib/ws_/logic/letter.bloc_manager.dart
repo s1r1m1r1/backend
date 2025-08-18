@@ -1,47 +1,45 @@
-import 'package:backend/user/active_sessions_repository.dart';
+import 'package:backend/user/session.dart';
 import 'package:backend/ws_/logic/letter.bloc.dart';
 import 'package:backend/ws_/letters_repository.dart';
+import 'package:backend/ws_/model/web_socket_disposer.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
 @lazySingleton
 class LetterBlocManager {
-  LetterBlocManager(this._lettersRepository, this._activeSessions);
+  LetterBlocManager(this._lettersRepository);
   final LettersRepository _lettersRepository;
-  final ActiveSessionsRepository _activeSessions;
   final _map = <String, LetterBloc>{};
 
   @Deprecated('dev fix')
   LetterBloc? getBloc(String roomName) => _map[roomName];
 
   void createRoom(String name) {
-    _map[name] = LetterBloc(name, _lettersRepository, _activeSessions);
+    _map[name] = LetterBloc(name, _lettersRepository);
   }
 
-  void subscribe(WebSocketChannel channel, String roomName) {
-    final session = _activeSessions.getSession(channel);
-    if (session == null) return;
-
+  void subscribe(
+    WebSocketChannel channel,
+    Session session,
+    WebSocketDisposer disposer,
+    String roomName,
+  ) {
     final bloc = _map[roomName];
     if (bloc == null) return;
 
     final hasAccess = bloc.hasAccess(session.user.role);
     if (hasAccess) {
-      bloc.add(LetterEvent.subscribe(channel));
+      bloc.add(LetterEvent.subscribe(channel, disposer));
     }
   }
 
   void newLetter(
     WebSocketChannel channel,
     String roomId,
+    Session session,
     CreateLetterDto letter,
   ) {
-    final session = _activeSessions.getSession(channel);
-    if (session == null) {
-      return;
-    }
-
     final bloc = _map[roomId];
     if (bloc == null) return;
 
@@ -51,12 +49,12 @@ class LetterBlocManager {
     }
   }
 
-  void removeLetter(WebSocketChannel channel, String roomId, int letterId) {
-    final session = _activeSessions.getSession(channel);
-    if (session == null) {
-      return;
-    }
-
+  void removeLetter(
+    WebSocketChannel channel,
+    Session session,
+    String roomId,
+    int letterId,
+  ) {
     final bloc = _map[roomId];
     if (bloc == null) return;
 

@@ -1,4 +1,4 @@
-part of 'active_users.bloc.dart';
+part of 'active_users_bloc.dart';
 
 @freezed
 sealed class ActiveUsersEvent with _$ActiveUsersEvent {
@@ -21,7 +21,8 @@ sealed class ActiveUsersEvent with _$ActiveUsersEvent {
     EmailCredentialDto dto,
   ) = _LoginEvent;
 
-  const factory ActiveUsersEvent.removeUser(GameSession session) = _RemoveUser;
+  const factory ActiveUsersEvent.removeUser(WebSocketChannel channel) =
+      _RemoveUser;
 }
 
 sealed class SequentialActive_UsersEvent implements ActiveUsersEvent {}

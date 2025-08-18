@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
-import 'package:backend/user/active_sessions_repository.dart';
+import 'package:backend/ws_/logic/active_users/active_sessions_mixin.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/ws_/logic/active_users.bloc.dart';
+import 'package:backend/user/session_repository.dart';
+import 'package:backend/ws_/logic/active_users/active_users_bloc.dart';
 import 'package:backend/ws_/logic/letter.bloc_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -12,7 +13,6 @@ import 'package:sha_red/sha_red.dart';
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
     debugLog('$green ON Request 1 $protocol $reset');
-    final activeSessions = context.read<ActiveSessionsRepository>();
     final activeUsersBloc = context.read<ActiveUsersBloc>();
 
     channel.stream.listen(
@@ -33,6 +33,7 @@ Future<Response> onRequest(RequestContext context) async {
             case Signup_TS():
               break;
             case WithToken_TS(:final token):
+              // 1. Authenticate the token
               activeUsersBloc.add(ActiveUsersEvent.withToken(channel, token));
               break;
             case WithRefresh_TS(:final refresh):
@@ -42,17 +43,56 @@ Future<Response> onRequest(RequestContext context) async {
               break;
             case NewLetter_TS(:final letter, :final roomId):
               final blocManager = context.read<LetterBlocManager>();
-              blocManager.newLetter(channel, 'main' /*dto.roomId*/, letter);
+              final session = activeUsersBloc.getSession(channel);
+              if (session == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+                return;
+              }
+              blocManager.newLetter(
+                channel,
+                'main' /*dto.roomId*/,
+                session,
+                letter,
+              );
             case DeleteLetter_TS(:final roomId, :final letterId):
               final blocManager = context.read<LetterBlocManager>();
+              final session = activeUsersBloc.getSession(channel);
+              if (session == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+                return;
+              }
               blocManager.removeLetter(
                 channel,
+                session,
                 'main' /*dto.roomId*/,
                 letterId,
               );
             case JoinLetters_TS(:final roomId):
               final letterBlocManager = context.read<LetterBlocManager>();
-              letterBlocManager.subscribe(channel, 'main' /*room.roomId*/);
+              final session = activeUsersBloc.getSession(channel);
+              final disposer = activeUsersBloc.getDisposer(channel);
+              if (session == null || disposer == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+                return;
+              }
+              letterBlocManager.subscribe(
+                channel,
+                session,
+                disposer,
+                'main' /*room.roomId*/,
+              );
           }
         } catch (e, s) {
           debugLog('$red [WebSocket] Error: $e $s $reset');
@@ -63,15 +103,7 @@ Future<Response> onRequest(RequestContext context) async {
         // }
       },
       onDone: () async {
-        final session = activeSessions.getSession(channel);
-        final disposer = activeSessions.getDisposer(channel);
-        if (disposer != null) {
-          disposer.dispose();
-        }
-        if (session != null) {
-          activeUsersBloc.add(ActiveUsersEvent.removeUser(session));
-        }
-        channel.sink.close();
+        activeUsersBloc.add(ActiveUsersEvent.removeUser(channel));
       },
 
       cancelOnError: true,

@@ -13,14 +13,13 @@ import 'package:backend/db_client/db_client.dart' as _i946;
 import 'package:backend/db_client/db_module.dart' as _i459;
 import 'package:backend/game/unit_datasource.dart' as _i845;
 import 'package:backend/game/unit_repository.dart' as _i850;
-import 'package:backend/user/active_sessions_repository.dart' as _i661;
 import 'package:backend/user/password_hash_service.dart' as _i405;
 import 'package:backend/user/session_datasource.dart' as _i1057;
 import 'package:backend/user/session_repository.dart' as _i854;
 import 'package:backend/user/user_datasource.dart' as _i625;
 import 'package:backend/user/user_repository.dart' as _i470;
 import 'package:backend/ws_/letters_repository.dart' as _i878;
-import 'package:backend/ws_/logic/active_users.bloc.dart' as _i159;
+import 'package:backend/ws_/logic/active_users/active_users_bloc.dart' as _i199;
 import 'package:backend/ws_/logic/letter.bloc_manager.dart' as _i288;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -37,14 +36,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i405.PasswordHasherService>(
       () => const _i405.PasswordHasherService(),
     );
-    gh.lazySingleton<_i661.ActiveSessionsRepository>(
-      () => _i661.ActiveSessionsRepository(),
-    );
     gh.lazySingleton<_i1057.SessionDatasource>(
       () => _i1057.SessionSqliteDatasourceImpl(gh<_i946.DbClient>()),
     );
     gh.lazySingleton<_i878.LettersRepository>(
       () => _i878.LettersRepository(gh<_i946.DbClient>()),
+    );
+    gh.lazySingleton<_i288.LetterBlocManager>(
+      () => _i288.LetterBlocManager(gh<_i878.LettersRepository>()),
     );
     gh.lazySingleton<_i625.UserDataSource>(
       () => _i625.UserDataSourceImpl(gh<_i946.DbClient>()),
@@ -58,21 +57,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i850.UnitRepository>(
       () => _i850.UnitRepositoryImpl(gh<_i845.UnitDatasource>()),
     );
-    gh.lazySingleton<_i288.LetterBlocManager>(
-      () => _i288.LetterBlocManager(
-        gh<_i878.LettersRepository>(),
-        gh<_i661.ActiveSessionsRepository>(),
-      ),
-    );
     gh.lazySingleton<_i470.UserRepository>(
       () => _i470.UserRepositoryImpl(
         gh<_i625.UserDataSource>(),
         gh<_i405.PasswordHasherService>(),
       ),
     );
-    gh.lazySingleton<_i159.ActiveUsersBloc>(
-      () => _i159.ActiveUsersBloc(
-        gh<_i661.ActiveSessionsRepository>(),
+    gh.lazySingleton<_i199.ActiveUsersBloc>(
+      () => _i199.ActiveUsersBloc(
         gh<_i850.UnitRepository>(),
         gh<_i854.SessionRepository>(),
         gh<_i470.UserRepository>(),

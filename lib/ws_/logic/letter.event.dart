@@ -7,7 +7,10 @@ sealed class LetterEvent extends Equatable {
     WebSocketChannel channel,
     CreateLetterDto dto,
   ) = _NewLetterLE;
-  const factory LetterEvent.subscribe(WebSocketChannel channel) = _SubscribeLE;
+  const factory LetterEvent.subscribe(
+    WebSocketChannel channel,
+    WebSocketDisposer disposer,
+  ) = _SubscribeLE;
   const factory LetterEvent.removeLetter(
     WebSocketChannel channel,
     int letterId,
@@ -34,9 +37,10 @@ class _RemoveLetterLE extends LetterEvent {
 }
 
 class _SubscribeLE extends LetterEvent {
-  const _SubscribeLE(this.channel);
+  const _SubscribeLE(this.channel, this.disposer);
 
   final WebSocketChannel channel;
+  final WebSocketDisposer disposer;
 
   @override
   List<Object?> get props => [channel];

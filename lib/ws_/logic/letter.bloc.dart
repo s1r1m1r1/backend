@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/user/active_sessions_repository.dart';
 import 'package:backend/ws_/letters_repository.dart';
+import 'package:backend/ws_/model/web_socket_disposer.dart';
 import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:equatable/equatable.dart';
@@ -18,21 +17,17 @@ part 'letter.state.dart';
 part 'letter.guard.dart';
 
 class LetterBloc extends _LetterBloc with LetterBlocGuard {
-  LetterBloc(super.roomId, super.lettersRepository, super._activeSessions);
+  LetterBloc(super.roomId, super.lettersRepository);
 }
 
 // letter_bloc.dart
 class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
   final String roomId;
   final LettersRepository _lettersRepository;
-  final ActiveSessionsRepository _activeSessions;
   final _letterCache = <LetterDto>[];
 
-  _LetterBloc(
-    this.roomId,
-    LettersRepository lettersRepository,
-    this._activeSessions,
-  ) : _lettersRepository = lettersRepository,
+  _LetterBloc(this.roomId, LettersRepository lettersRepository)
+    : _lettersRepository = lettersRepository,
       super(const LetterState.initial()) {
     on<_SubscribeLE>(_onSubscribe);
     on<_RemoveLetterLE>(_onRemoveLetter);
@@ -93,11 +88,8 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
     try {
       final channel = event.channel;
       channel.sink.add(_lettersJSON());
-      final disposer = _activeSessions.getDisposer(channel);
-      debugLog('_onSubscribe disposer: ${disposer == null}');
-      if (disposer == null) return;
       subscribe(channel);
-      disposer.shouldUnsubscribe.add(unsubscribe);
+      event.disposer.shouldUnsubscribe.add(unsubscribe);
     } catch (e, s) {
       addError(e, s);
     }
