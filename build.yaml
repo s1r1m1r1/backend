@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      # https://github.com/rrousselGit/freezed#changing-the-behavior-for-the-entire-project
+      freezed:
+        options:
+          map:
+            map: false
+            map_or_null: false
+            maybe_map: false
+          when:
+            when: false
+            when_or_null: false
+            maybe_when: false
