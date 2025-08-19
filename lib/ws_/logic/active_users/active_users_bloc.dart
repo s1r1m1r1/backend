@@ -101,7 +101,7 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
       subscribe(channel);
       disposer?.shouldUnsubscribe.add(() => unsubscribe(channel));
 
-      channel.sink.add(gameSession.toEncodedTokens());
+      channel.sink.add(gameSession.encodedSession());
       emit(ActiveUsersState(getListGameSessions()));
     } on TimeoutException {
       channel.sink.add(
