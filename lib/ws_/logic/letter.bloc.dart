@@ -89,7 +89,7 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
       final channel = event.channel;
       channel.sink.add(_lettersJSON());
       subscribe(channel);
-      event.disposer.shouldUnsubscribe.add(unsubscribe);
+      event.disposer.shouldUnsubscribe.add(() => unsubscribe(channel));
     } catch (e, s) {
       addError(e, s);
     }

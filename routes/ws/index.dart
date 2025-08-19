@@ -27,12 +27,20 @@ Future<Response> onRequest(RequestContext context) async {
             case WithToken_TS(:final token):
               // 1. Authenticate the token
               activeUsersBloc.add(
-                ActiveUsersEvent.join(channel: channel, token: token),
+                ActiveUsersEvent.join(
+                  channel: channel,
+                  token: token,
+                  isRefresh: false,
+                ),
               );
               break;
             case WithRefresh_TS(:final refresh):
               activeUsersBloc.add(
-                ActiveUsersEvent.join(channel: channel, refreshToken: refresh),
+                ActiveUsersEvent.join(
+                  channel: channel,
+                  token: refresh,
+                  isRefresh: true,
+                ),
               );
 
               break;

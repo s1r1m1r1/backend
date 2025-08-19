@@ -25,19 +25,15 @@ mixin class ActiveUsersMixin {
     return userid_channelKV[userId];
   }
 
-  void addDisposer(WebSocketChannel channel, WebSocketDisposer disposer) {
-    shouldUnsubscribeKV[channel] = disposer;
-  }
-
-  WebSocketDisposer? getDisposer(WebSocketChannel channel) {
-    return shouldUnsubscribeKV[channel];
-  }
+  // void addDisposer(WebSocketChannel channel, WebSocketDisposer disposer) {
+  //   shouldUnsubscribeKV[channel] = WebSocketDisposer();
+  // }
 
   void addSession(WebSocketChannel channel, GameSession session) {
     channel_useridKV[channel] = session.user.userId;
     userid_sessionKV[session.user.userId] = session;
     userid_channelKV[session.user.userId] = channel;
-    shouldUnsubscribeKV[channel] = WebSocketDisposer(channel);
+    shouldUnsubscribeKV[channel] = WebSocketDisposer();
   }
 
   void removeSession(WebSocketChannel channel) {
@@ -45,5 +41,13 @@ mixin class ActiveUsersMixin {
     userid_sessionKV.remove(userId);
     userid_channelKV.remove(userId);
     channel_useridKV.remove(channel);
+  }
+
+  WebSocketDisposer? getDisposer(WebSocketChannel channel) {
+    return shouldUnsubscribeKV[channel];
+  }
+
+  void removeDisposer(WebSocketChannel channel) {
+    shouldUnsubscribeKV.remove(channel);
   }
 }
