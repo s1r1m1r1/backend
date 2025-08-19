@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:backend/core/debug_log.dart';
+import 'package:backend/core/log_colors.dart';
 import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/session.dart';
 import 'package:backend/user/session_repository.dart';
 import 'package:backend/user/user_repository.dart';
 import 'package:backend/ws_/logic/active_users/active_sessions_mixin.dart';
+import 'package:backend/ws_/model/web_socket_disposer.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
@@ -44,16 +46,16 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
   ) async {
     final channel = event.channel;
     try {
-      if (event.token == null && event.refreshToken == null) return;
+      final isRefresh = event.isRefresh;
       final session = await _sessionRepository
-          .getSession(token: event.token, refreshToken: event.refreshToken)
+          .getSession(
+            token: isRefresh ? null : event.token,
+            refreshToken: isRefresh ? event.token : null,
+          )
           .timeout(_timeoutDuration);
-
       if (session == null) {
         channel.sink.add(
-          ToClient.statusError(
-            error: WsServerError.authenticationFailed,
-          ).encoded(),
+          ToClient.statusError(error: WsServerError.sessionExpired).encoded(),
         );
         return;
       }
@@ -61,20 +63,27 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
       final isValid = _sessionRepository.validateToken(session);
       if (isValid) {
         channel.sink.add(
-          ToClient.statusError(error: WsServerError.invalidToken).encoded(),
+          ToClient.statusError(
+            error: isRefresh
+                ? WsServerError.sessionExpired
+                : WsServerError.invalidToken,
+          ).encoded(),
         );
         return;
       }
       final existingChannel = getChannelForUser(session.user.userId);
       if (existingChannel != null && existingChannel != channel) {
+        removeSession(existingChannel);
+        final disposer = getDisposer(channel);
         existingChannel.sink.add(
           ToClient.statusError(
             error: WsServerError.finishedDuplicateSession,
           ).encoded(),
         );
         await existingChannel.sink.close(1000, 'New login from another device');
+        disposer?.dispose();
+        removeDisposer(channel);
         debugLog('Closed old session for user ${session.user.userId}');
-        return;
       }
 
       final unit = await _unitRepository
@@ -88,9 +97,10 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
       }
       final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
       addSession(channel, gameSession);
-      final disposer = getDisposer(channel);
+      final WebSocketDisposer? disposer = getDisposer(channel);
       subscribe(channel);
-      disposer!.shouldUnsubscribe.add(unsubscribe);
+      disposer?.shouldUnsubscribe.add(() => unsubscribe(channel));
+
       channel.sink.add(gameSession.toEncodedTokens());
       emit(ActiveUsersState(getListGameSessions()));
     } on TimeoutException {
@@ -98,7 +108,8 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
         ToClient.statusError(error: WsServerError.timeout).encoded(),
       );
     } on Object catch (e, s) {
-      addError(e, s);
+      // addError(e, s);
+      debugLog('$red [ActiveUsersBloc] _onJoin $e $s $reset');
       channel.sink.add(
         ToClient.statusError(
           error: WsServerError.authenticationFailed,
@@ -109,7 +120,10 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
 
   void _removeUser(_RemoveUser event, Emitter<ActiveUsersState> emit) {
     removeSession(event.channel);
-    event.channel.sink.close();
+    final disposer = getDisposer(event.channel);
+    disposer?.dispose();
+    event.channel.sink.close(1000, 'Removed');
+    removeDisposer(event.channel);
     emit(ActiveUsersState(getListGameSessions()));
   }
 }

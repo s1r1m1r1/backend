@@ -1,18 +1,15 @@
-import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
-import 'package:stream_channel/stream_channel.dart';
+import 'dart:async';
 
-typedef UnsubscribeCallback = Function(StreamChannel<dynamic> channel);
+typedef LateCallback = FutureOr<void> Function();
 
 class WebSocketDisposer {
-  final WebSocketChannel _channel;
-  WebSocketDisposer(this._channel);
+  WebSocketDisposer();
 
-  final shouldUnsubscribe = <UnsubscribeCallback>[];
+  final shouldUnsubscribe = <LateCallback>[];
 
   void dispose() {
     for (final callback in shouldUnsubscribe) {
-      callback(_channel);
+      callback.call();
     }
-    _channel.sink.close();
   }
 }

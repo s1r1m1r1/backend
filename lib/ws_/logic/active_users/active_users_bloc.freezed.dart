@@ -43,28 +43,28 @@ String toString() {
 
 
 class _JoinEvent extends ActiveUsersEvent {
-  const _JoinEvent({required this.channel, this.token, this.refreshToken}): super._();
+  const _JoinEvent({required this.channel, required this.token, required this.isRefresh}): super._();
   
 
 @override final  WebSocketChannel channel;
- final  String? token;
- final  String? refreshToken;
+ final  String token;
+ final  bool isRefresh;
 
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _JoinEvent&&(identical(other.channel, channel) || other.channel == channel)&&(identical(other.token, token) || other.token == token)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _JoinEvent&&(identical(other.channel, channel) || other.channel == channel)&&(identical(other.token, token) || other.token == token)&&(identical(other.isRefresh, isRefresh) || other.isRefresh == isRefresh));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,channel,token,refreshToken);
+int get hashCode => Object.hash(runtimeType,channel,token,isRefresh);
 
 @override
 String toString() {
-  return 'ActiveUsersEvent.join(channel: $channel, token: $token, refreshToken: $refreshToken)';
+  return 'ActiveUsersEvent.join(channel: $channel, token: $token, isRefresh: $isRefresh)';
 }
 
 
