@@ -76,6 +76,33 @@ class $UserTableTable extends UserTable
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _emailVerifiedMeta = const VerificationMeta(
+    'emailVerified',
+  );
+  @override
+  late final GeneratedColumn<bool> emailVerified = GeneratedColumn<bool>(
+    'email_verified',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("email_verified" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _confirmationTokenMeta = const VerificationMeta(
+    'confirmationToken',
+  );
+  @override
+  late final GeneratedColumn<String> confirmationToken =
+      GeneratedColumn<String>(
+        'confirmation_token',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -84,6 +111,8 @@ class $UserTableTable extends UserTable
     role,
     createdAt,
     deletedAt,
+    emailVerified,
+    confirmationToken,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -128,6 +157,24 @@ class $UserTableTable extends UserTable
         deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
       );
     }
+    if (data.containsKey('email_verified')) {
+      context.handle(
+        _emailVerifiedMeta,
+        emailVerified.isAcceptableOrUnknown(
+          data['email_verified']!,
+          _emailVerifiedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('confirmation_token')) {
+      context.handle(
+        _confirmationTokenMeta,
+        confirmationToken.isAcceptableOrUnknown(
+          data['confirmation_token']!,
+          _confirmationTokenMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -163,6 +210,14 @@ class $UserTableTable extends UserTable
         DriftSqlType.dateTime,
         data['${effectivePrefix}deleted_at'],
       ),
+      emailVerified: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}email_verified'],
+      )!,
+      confirmationToken: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}confirmation_token'],
+      ),
     );
   }
 
@@ -182,6 +237,8 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
   final Role role;
   final DateTime createdAt;
   final DateTime? deletedAt;
+  final bool emailVerified;
+  final String? confirmationToken;
   const UserEntry({
     required this.id,
     required this.email,
@@ -189,6 +246,8 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
     required this.role,
     required this.createdAt,
     this.deletedAt,
+    required this.emailVerified,
+    this.confirmationToken,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -205,6 +264,10 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
     if (!nullToAbsent || deletedAt != null) {
       map['deleted_at'] = Variable<DateTime>(deletedAt);
     }
+    map['email_verified'] = Variable<bool>(emailVerified);
+    if (!nullToAbsent || confirmationToken != null) {
+      map['confirmation_token'] = Variable<String>(confirmationToken);
+    }
     return map;
   }
 
@@ -218,6 +281,10 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
       deletedAt: deletedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(deletedAt),
+      emailVerified: Value(emailVerified),
+      confirmationToken: confirmationToken == null && nullToAbsent
+          ? const Value.absent()
+          : Value(confirmationToken),
     );
   }
 
@@ -235,6 +302,10 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
       ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      emailVerified: serializer.fromJson<bool>(json['emailVerified']),
+      confirmationToken: serializer.fromJson<String?>(
+        json['confirmationToken'],
+      ),
     );
   }
   @override
@@ -249,6 +320,8 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
       ),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'emailVerified': serializer.toJson<bool>(emailVerified),
+      'confirmationToken': serializer.toJson<String?>(confirmationToken),
     };
   }
 
@@ -259,6 +332,8 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
     Role? role,
     DateTime? createdAt,
     Value<DateTime?> deletedAt = const Value.absent(),
+    bool? emailVerified,
+    Value<String?> confirmationToken = const Value.absent(),
   }) => UserEntry(
     id: id ?? this.id,
     email: email ?? this.email,
@@ -266,6 +341,10 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
     role: role ?? this.role,
     createdAt: createdAt ?? this.createdAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    emailVerified: emailVerified ?? this.emailVerified,
+    confirmationToken: confirmationToken.present
+        ? confirmationToken.value
+        : this.confirmationToken,
   );
   UserEntry copyWithCompanion(UserTableCompanion data) {
     return UserEntry(
@@ -275,6 +354,12 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
       role: data.role.present ? data.role.value : this.role,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      emailVerified: data.emailVerified.present
+          ? data.emailVerified.value
+          : this.emailVerified,
+      confirmationToken: data.confirmationToken.present
+          ? data.confirmationToken.value
+          : this.confirmationToken,
     );
   }
 
@@ -286,14 +371,24 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
           ..write('password: $password, ')
           ..write('role: $role, ')
           ..write('createdAt: $createdAt, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('emailVerified: $emailVerified, ')
+          ..write('confirmationToken: $confirmationToken')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, email, password, role, createdAt, deletedAt);
+  int get hashCode => Object.hash(
+    id,
+    email,
+    password,
+    role,
+    createdAt,
+    deletedAt,
+    emailVerified,
+    confirmationToken,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -303,7 +398,9 @@ class UserEntry extends DataClass implements Insertable<UserEntry> {
           other.password == this.password &&
           other.role == this.role &&
           other.createdAt == this.createdAt &&
-          other.deletedAt == this.deletedAt);
+          other.deletedAt == this.deletedAt &&
+          other.emailVerified == this.emailVerified &&
+          other.confirmationToken == this.confirmationToken);
 }
 
 class UserTableCompanion extends UpdateCompanion<UserEntry> {
@@ -313,6 +410,8 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
   final Value<Role> role;
   final Value<DateTime> createdAt;
   final Value<DateTime?> deletedAt;
+  final Value<bool> emailVerified;
+  final Value<String?> confirmationToken;
   const UserTableCompanion({
     this.id = const Value.absent(),
     this.email = const Value.absent(),
@@ -320,6 +419,8 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     this.role = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.emailVerified = const Value.absent(),
+    this.confirmationToken = const Value.absent(),
   });
   UserTableCompanion.insert({
     this.id = const Value.absent(),
@@ -328,6 +429,8 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     this.role = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.emailVerified = const Value.absent(),
+    this.confirmationToken = const Value.absent(),
   }) : email = Value(email),
        password = Value(password);
   static Insertable<UserEntry> custom({
@@ -337,6 +440,8 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     Expression<String>? role,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? deletedAt,
+    Expression<bool>? emailVerified,
+    Expression<String>? confirmationToken,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -345,6 +450,8 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
       if (role != null) 'role': role,
       if (createdAt != null) 'created_at': createdAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
+      if (emailVerified != null) 'email_verified': emailVerified,
+      if (confirmationToken != null) 'confirmation_token': confirmationToken,
     });
   }
 
@@ -355,6 +462,8 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     Value<Role>? role,
     Value<DateTime>? createdAt,
     Value<DateTime?>? deletedAt,
+    Value<bool>? emailVerified,
+    Value<String?>? confirmationToken,
   }) {
     return UserTableCompanion(
       id: id ?? this.id,
@@ -363,6 +472,8 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       deletedAt: deletedAt ?? this.deletedAt,
+      emailVerified: emailVerified ?? this.emailVerified,
+      confirmationToken: confirmationToken ?? this.confirmationToken,
     );
   }
 
@@ -389,6 +500,12 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
     if (deletedAt.present) {
       map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
+    if (emailVerified.present) {
+      map['email_verified'] = Variable<bool>(emailVerified.value);
+    }
+    if (confirmationToken.present) {
+      map['confirmation_token'] = Variable<String>(confirmationToken.value);
+    }
     return map;
   }
 
@@ -400,7 +517,9 @@ class UserTableCompanion extends UpdateCompanion<UserEntry> {
           ..write('password: $password, ')
           ..write('role: $role, ')
           ..write('createdAt: $createdAt, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('emailVerified: $emailVerified, ')
+          ..write('confirmationToken: $confirmationToken')
           ..write(')'))
         .toString();
   }
@@ -4331,6 +4450,8 @@ typedef $$UserTableTableCreateCompanionBuilder =
       Value<Role> role,
       Value<DateTime> createdAt,
       Value<DateTime?> deletedAt,
+      Value<bool> emailVerified,
+      Value<String?> confirmationToken,
     });
 typedef $$UserTableTableUpdateCompanionBuilder =
     UserTableCompanion Function({
@@ -4340,6 +4461,8 @@ typedef $$UserTableTableUpdateCompanionBuilder =
       Value<Role> role,
       Value<DateTime> createdAt,
       Value<DateTime?> deletedAt,
+      Value<bool> emailVerified,
+      Value<String?> confirmationToken,
     });
 
 final class $$UserTableTableReferences
@@ -4499,6 +4622,16 @@ class $$UserTableTableFilterComposer
 
   ColumnFilters<DateTime> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get emailVerified => $composableBuilder(
+    column: $table.emailVerified,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get confirmationToken => $composableBuilder(
+    column: $table.confirmationToken,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4691,6 +4824,16 @@ class $$UserTableTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get emailVerified => $composableBuilder(
+    column: $table.emailVerified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get confirmationToken => $composableBuilder(
+    column: $table.confirmationToken,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UserTableTableAnnotationComposer
@@ -4719,6 +4862,16 @@ class $$UserTableTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get emailVerified => $composableBuilder(
+    column: $table.emailVerified,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get confirmationToken => $composableBuilder(
+    column: $table.confirmationToken,
+    builder: (column) => column,
+  );
 
   Expression<T> todoTableRefs<T extends Object>(
     Expression<T> Function($$TodoTableTableAnnotationComposer a) f,
@@ -4913,6 +5066,8 @@ class $$UserTableTableTableManager
                 Value<Role> role = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> emailVerified = const Value.absent(),
+                Value<String?> confirmationToken = const Value.absent(),
               }) => UserTableCompanion(
                 id: id,
                 email: email,
@@ -4920,6 +5075,8 @@ class $$UserTableTableTableManager
                 role: role,
                 createdAt: createdAt,
                 deletedAt: deletedAt,
+                emailVerified: emailVerified,
+                confirmationToken: confirmationToken,
               ),
           createCompanionCallback:
               ({
@@ -4929,6 +5086,8 @@ class $$UserTableTableTableManager
                 Value<Role> role = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
+                Value<bool> emailVerified = const Value.absent(),
+                Value<String?> confirmationToken = const Value.absent(),
               }) => UserTableCompanion.insert(
                 id: id,
                 email: email,
@@ -4936,6 +5095,8 @@ class $$UserTableTableTableManager
                 role: role,
                 createdAt: createdAt,
                 deletedAt: deletedAt,
+                emailVerified: emailVerified,
+                confirmationToken: confirmationToken,
               ),
           withReferenceMapper: (p0) => p0
               .map(

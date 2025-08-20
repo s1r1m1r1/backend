@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- int get userId; String get email; Role get role; DateTime get createdAt; String get password;
+ int get userId; String get email; Role get role; DateTime get createdAt; bool get emailVerified; String? get confirmationToken; String get password;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,7 +30,7 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 String toString() {
-  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, password: $password)';
+  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, emailVerified: $emailVerified, confirmationToken: $confirmationToken, password: $password)';
 }
 
 
@@ -41,7 +41,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- int userId, String email, Role role, DateTime createdAt, String password
+ int userId, String email, Role role, DateTime createdAt, bool emailVerified, String? confirmationToken, String password
 });
 
 
@@ -58,13 +58,15 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? email = null,Object? role = null,Object? createdAt = null,Object? password = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? email = null,Object? role = null,Object? createdAt = null,Object? emailVerified = null,Object? confirmationToken = freezed,Object? password = null,}) {
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as int,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as Role,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
+as DateTime,emailVerified: null == emailVerified ? _self.emailVerified : emailVerified // ignore: cast_nullable_to_non_nullable
+as bool,confirmationToken: freezed == confirmationToken ? _self.confirmationToken : confirmationToken // ignore: cast_nullable_to_non_nullable
+as String?,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -77,13 +79,15 @@ as String,
 @JsonSerializable()
 
 class _User extends User {
-  const _User({required this.userId, required this.email, required this.role, required this.createdAt, this.password = ''}): super._();
+  const _User({required this.userId, required this.email, required this.role, required this.createdAt, this.emailVerified = false, this.confirmationToken, this.password = ''}): super._();
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
 @override final  int userId;
 @override final  String email;
 @override final  Role role;
 @override final  DateTime createdAt;
+@override@JsonKey() final  bool emailVerified;
+@override final  String? confirmationToken;
 @override@JsonKey() final  String password;
 
 /// Create a copy of User
@@ -101,7 +105,7 @@ Map<String, dynamic> toJson() {
 
 @override
 String toString() {
-  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, password: $password)';
+  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, emailVerified: $emailVerified, confirmationToken: $confirmationToken, password: $password)';
 }
 
 
@@ -112,7 +116,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- int userId, String email, Role role, DateTime createdAt, String password
+ int userId, String email, Role role, DateTime createdAt, bool emailVerified, String? confirmationToken, String password
 });
 
 
@@ -129,13 +133,15 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? email = null,Object? role = null,Object? createdAt = null,Object? password = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? email = null,Object? role = null,Object? createdAt = null,Object? emailVerified = null,Object? confirmationToken = freezed,Object? password = null,}) {
   return _then(_User(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as int,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as Role,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
+as DateTime,emailVerified: null == emailVerified ? _self.emailVerified : emailVerified // ignore: cast_nullable_to_non_nullable
+as bool,confirmationToken: freezed == confirmationToken ? _self.confirmationToken : confirmationToken // ignore: cast_nullable_to_non_nullable
+as String?,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

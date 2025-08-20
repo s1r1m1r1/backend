@@ -12,6 +12,8 @@ abstract class User with _$User {
     required String email,
     required Role role,
     required DateTime createdAt,
+    @Default(false) bool emailVerified,
+    String? confirmationToken,
     @Default('') String password,
   }) = _User;
 

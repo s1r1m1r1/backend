@@ -11,7 +11,9 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
   UserDao(super.db);
 
   Future<UserEntry> insert(UserTableCompanion companion) async {
-    return into(userTable).insertReturning(companion, mode: InsertMode.insertOrFail);
+    return into(
+      userTable,
+    ).insertReturning(companion, mode: InsertMode.insertOrFail);
   }
 
   Future<int> updateUser(int userId, UserTableCompanion companion) async {
@@ -32,13 +34,35 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
     return query.get();
   }
 
-  Future<UserEntry?> getUser({int? userId, String? email}) async {
-    if (userId == null && email == null) {
+  Future<UserEntry?> getUser({
+    int? userId,
+    String? email,
+    String? confirmationToken,
+  }) async {
+    if (userId == null && email == null && confirmationToken == null) {
       return null;
     }
     final query = userTable.select();
     if (userId != null) query.where((t) => t.id.equals(userId));
     if (email != null) query.where((t) => t.email.equals(email));
+    if (confirmationToken != null)
+      query.where((t) => t.confirmationToken.equals(confirmationToken));
     return query.getSingleOrNull();
+  }
+
+  Future<UserEntry?> findByConfirmationToken(String token) async {
+    final query = select(userTable)
+      ..where((t) => t.confirmationToken.equals(token));
+    return query.getSingleOrNull();
+  }
+
+  Future<void> updateEmailConfirmed(int userId) async {
+    final companion = UserTableCompanion(
+      emailVerified: const Value(true),
+      confirmationToken: const Value(null),
+    );
+    await (update(
+      userTable,
+    )..where((t) => t.id.equals(userId))).write(companion);
   }
 }

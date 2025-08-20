@@ -13,6 +13,7 @@ import 'package:backend/db_client/db_client.dart' as _i946;
 import 'package:backend/db_client/db_module.dart' as _i459;
 import 'package:backend/game/unit_datasource.dart' as _i845;
 import 'package:backend/game/unit_repository.dart' as _i850;
+import 'package:backend/user/mailing_service.dart' as _i176;
 import 'package:backend/user/password_hash_service.dart' as _i405;
 import 'package:backend/user/session_datasource.dart' as _i1057;
 import 'package:backend/user/session_repository.dart' as _i854;
@@ -36,6 +37,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i405.PasswordHasherService>(
       () => const _i405.PasswordHasherService(),
     );
+    gh.lazySingleton<_i176.MailingService>(() => _i176.MailingServiceImpl());
     gh.lazySingleton<_i1057.SessionDatasource>(
       () => _i1057.SessionSqliteDatasourceImpl(gh<_i946.DbClient>()),
     );
@@ -54,20 +56,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i854.SessionRepository>(
       () => _i854.SessionRepositoryImpl(gh<_i1057.SessionDatasource>()),
     );
-    gh.lazySingleton<_i850.UnitRepository>(
-      () => _i850.UnitRepositoryImpl(gh<_i845.UnitDatasource>()),
-    );
     gh.lazySingleton<_i470.UserRepository>(
       () => _i470.UserRepositoryImpl(
         gh<_i625.UserDataSource>(),
         gh<_i405.PasswordHasherService>(),
+        gh<_i176.MailingService>(),
       ),
+    );
+    gh.lazySingleton<_i850.UnitRepository>(
+      () => _i850.UnitRepositoryImpl(gh<_i845.UnitDatasource>()),
     );
     gh.lazySingleton<_i199.ActiveUsersBloc>(
       () => _i199.ActiveUsersBloc(
         gh<_i850.UnitRepository>(),
         gh<_i854.SessionRepository>(),
-        gh<_i470.UserRepository>(),
       ),
     );
     return this;

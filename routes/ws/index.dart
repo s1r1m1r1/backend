@@ -24,7 +24,7 @@ Future<Response> onRequest(RequestContext context) async {
         try {
           final freezed = ToServer.decoded(message);
           switch (freezed) {
-            case WithToken_TS(:final token):
+            case WithTokenTS(:final token):
               // 1. Authenticate the token
               activeUsersBloc.add(
                 ActiveUsersEvent.join(
@@ -34,7 +34,7 @@ Future<Response> onRequest(RequestContext context) async {
                 ),
               );
               break;
-            case WithRefresh_TS(:final refresh):
+            case WithRefreshTS(:final refresh):
               activeUsersBloc.add(
                 ActiveUsersEvent.join(
                   channel: channel,
@@ -44,7 +44,7 @@ Future<Response> onRequest(RequestContext context) async {
               );
 
               break;
-            case NewLetter_TS(:final letter, :final roomId):
+            case NewLetterTS(:final letter, :final roomId):
               final blocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               if (session == null) {
@@ -61,7 +61,7 @@ Future<Response> onRequest(RequestContext context) async {
                 session,
                 letter,
               );
-            case DeleteLetter_TS(:final roomId, :final letterId):
+            case DeleteLetterTS(:final roomId, :final letterId):
               final blocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               if (session == null) {
@@ -78,7 +78,7 @@ Future<Response> onRequest(RequestContext context) async {
                 'main' /*dto.roomId*/,
                 letterId,
               );
-            case JoinLetters_TS(:final roomId):
+            case JoinLettersTS(:final roomId):
               final letterBlocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               final disposer = activeUsersBloc.getDisposer(channel);

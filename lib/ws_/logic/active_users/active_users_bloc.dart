@@ -7,7 +7,6 @@ import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
 import 'package:backend/user/session.dart';
 import 'package:backend/user/session_repository.dart';
-import 'package:backend/user/user_repository.dart';
 import 'package:backend/ws_/logic/active_users/active_sessions_mixin.dart';
 import 'package:backend/ws_/model/web_socket_disposer.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
@@ -24,18 +23,13 @@ part 'active_users_bloc.freezed.dart';
 
 const _timeoutDuration = Duration(milliseconds: 100);
 
-// active_users_bloc.dart
 @lazySingleton
 class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
     with ActiveUsersMixin {
   final UnitRepository _unitRepository;
-  final UserRepository _userRepository;
   final SessionRepository _sessionRepository;
-  ActiveUsersBloc(
-    this._unitRepository,
-    this._sessionRepository,
-    this._userRepository,
-  ) : super(const ActiveUsersState([])) {
+  ActiveUsersBloc(this._unitRepository, this._sessionRepository)
+    : super(const ActiveUsersState([])) {
     on<_RemoveUser>(_removeUser);
     on<_JoinEvent>(_onJoin, transformer: sequential());
   }
@@ -101,7 +95,7 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
       subscribe(channel);
       disposer?.shouldUnsubscribe.add(() => unsubscribe(channel));
 
-      channel.sink.add(gameSession.toEncodedTokens());
+      channel.sink.add(gameSession.encodedSession());
       emit(ActiveUsersState(getListGameSessions()));
     } on TimeoutException {
       channel.sink.add(
