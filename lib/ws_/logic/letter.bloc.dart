@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/ws_/letters_repository.dart';
 import 'package:backend/ws_/model/web_socket_disposer.dart';
@@ -47,6 +48,7 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
         emit(LetterState.newLetter(roomId, newLetter));
       }
     } on ApiException catch (e, s) {
+      addError(e, s);
     } on Object catch (e, s) {
       addError(e, s);
       /*
@@ -68,7 +70,10 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
       _letterCache.removeAt(index);
       emit(LetterState.deleted(roomId, event.letterId));
     } catch (e, s) {
-      // event.channel.sink
+      debugLog('$e $s');
+      event.channel.sink.add(
+        ToClient.statusError(error: WsServerError.letterNotRemoved).toJson(),
+      );
     }
   }
 

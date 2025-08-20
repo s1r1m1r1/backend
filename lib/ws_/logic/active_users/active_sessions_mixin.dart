@@ -2,8 +2,6 @@ import 'package:backend/ws_/model/web_socket_disposer.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:backend/user/session.dart';
 
-// typedef WsActiveSessions = Map<WebSocketChannel, GameSession>;
-
 mixin class ActiveUsersMixin {
   // value userId
   final channel_useridKV = <WebSocketChannel, int>{};
@@ -12,6 +10,7 @@ mixin class ActiveUsersMixin {
 
   final shouldUnsubscribeKV = <WebSocketChannel, WebSocketDisposer>{};
 
+  // список активных сессий
   List<GameSession> getListGameSessions() {
     return userid_sessionKV.values.toList();
   }
@@ -25,10 +24,6 @@ mixin class ActiveUsersMixin {
     return userid_channelKV[userId];
   }
 
-  // void addDisposer(WebSocketChannel channel, WebSocketDisposer disposer) {
-  //   shouldUnsubscribeKV[channel] = WebSocketDisposer();
-  // }
-
   void addSession(WebSocketChannel channel, GameSession session) {
     channel_useridKV[channel] = session.user.userId;
     userid_sessionKV[session.user.userId] = session;
@@ -36,6 +31,9 @@ mixin class ActiveUsersMixin {
     shouldUnsubscribeKV[channel] = WebSocketDisposer();
   }
 
+  // 1) удалить сессию
+  // вызывается при закрытии соединения
+  // важно что disposer должен оставаться в Map чтобы завершить подписки корректно
   void removeSession(WebSocketChannel channel) {
     final userId = channel_useridKV[channel];
     userid_sessionKV.remove(userId);
@@ -43,10 +41,14 @@ mixin class ActiveUsersMixin {
     channel_useridKV.remove(channel);
   }
 
+  // получить disposer
+  // вызывается каждый раз при новой подписке , для хранения unsubscribe
+  // 2) также вызывается для удаления сессии с отпиской от всех событий
   WebSocketDisposer? getDisposer(WebSocketChannel channel) {
     return shouldUnsubscribeKV[channel];
   }
 
+  // 3) важно удалить disposer только после отписки от всех событий
   void removeDisposer(WebSocketChannel channel) {
     shouldUnsubscribeKV.remove(channel);
   }

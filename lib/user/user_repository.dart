@@ -9,26 +9,48 @@ import 'package:backend/models/user.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/user/password_hash_service.dart';
 import 'package:backend/user/user_datasource.dart';
+import 'package:backend/user/mailing_service.dart';
 
 abstract class UserRepository {
-  Future<User?> getUser({int? userId, String? email});
+  Future<User?> getUser({
+    int? userId,
+    String? email,
+    String? confirmationToken,
+  });
 
   Future<User> createUser(EmailCredentialDto createUserDto);
 
   Future<User> loginUser(EmailCredentialDto loginUserDto);
+
+  Future<User> confirmEmail(String confirmationToken);
 }
 
 @LazySingleton(as: UserRepository)
 class UserRepositoryImpl extends UserRepository {
-  UserRepositoryImpl(this._datasource, this.passwordHasherService);
+  UserRepositoryImpl(
+    this._datasource,
+    this.passwordHasherService,
+    this.mailingService,
+  );
   final UserDataSource _datasource;
 
   /// The password hasher service used to hash and check passwords
   final PasswordHasherService passwordHasherService;
 
+  /// The mailing service used to send emails
+  final MailingService mailingService;
+
   @override
-  Future<User?> getUser({int? userId, String? email}) async {
-    final result = await _datasource.getUser(userId: userId, email: email);
+  Future<User?> getUser({
+    int? userId,
+    String? email,
+    String? confirmationToken,
+  }) async {
+    final result = await _datasource.getUser(
+      userId: userId,
+      email: email,
+      confirmationToken: confirmationToken,
+    );
     return result;
   }
 
@@ -52,6 +74,12 @@ class UserRepositoryImpl extends UserRepository {
     final user = await _datasource.createUser(
       createUserDto.copyWith(password: hashedPassword),
     );
+    if (user.confirmationToken != null) {
+      debugLog('${yellow}createUser email confirmationToken${reset}');
+      mailingService.sendConfirmationEmail(user.email, user.confirmationToken!);
+    } else {
+      debugLog('${yellow}createUser email no confirmationToken${reset}');
+    }
 
     debugLog('createUser email next 3');
     return user;
@@ -80,5 +108,28 @@ class UserRepositoryImpl extends UserRepository {
     }
     debugLog('loginUser Success  passwd ');
     return user;
+  }
+
+  @override
+  Future<User> confirmEmail(String confirmationToken) async {
+    final user = await _datasource.getUser(
+      confirmationToken: confirmationToken,
+    );
+
+    if (user == null) {
+      throw ApiException.notFound(message: 'Invalid confirmation token');
+    }
+
+    if (user.emailVerified) {
+      throw ApiException.badRequest(message: 'Email already verified');
+    }
+
+    final updatedUser = await _datasource.updateUser(
+      user.userId,
+      emailVerified: true,
+      confirmationToken: null,
+    );
+
+    return updatedUser;
   }
 }

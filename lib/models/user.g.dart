@@ -11,6 +11,8 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   email: json['email'] as String,
   role: $enumDecode(_$RoleEnumMap, json['role']),
   createdAt: DateTime.parse(json['createdAt'] as String),
+  emailVerified: json['emailVerified'] as bool? ?? false,
+  confirmationToken: json['confirmationToken'] as String?,
   password: json['password'] as String? ?? '',
 );
 
@@ -19,6 +21,8 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'email': instance.email,
   'role': _$RoleEnumMap[instance.role]!,
   'createdAt': instance.createdAt.toIso8601String(),
+  'emailVerified': instance.emailVerified,
+  'confirmationToken': instance.confirmationToken,
   'password': instance.password,
 };
 

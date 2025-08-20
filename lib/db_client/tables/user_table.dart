@@ -14,6 +14,9 @@ class UserTable extends Table {
   TextColumn get role => textEnum<Role>().withDefault(const Constant('user'))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn? get deletedAt => dateTime().nullable()();
+
+  BoolColumn get emailVerified => boolean().withDefault(const Constant(false))();
+  TextColumn get confirmationToken => text().nullable()();
 }
 
 

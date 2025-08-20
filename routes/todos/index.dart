@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/todo/todo.repository.dart';
@@ -55,6 +56,7 @@ FutureOr<Response> postTodo(RequestContext context) async {
     final result = await todoRepo.createTodo(validated);
     return Response.json(body: result.toJson());
   } on ApiException catch (e, stack) {
+    debugLog("store errors${e.errors} ${stack}");
     // stdout.writeln('store errors${e.errors} ${stack}');
     return Response.json(
       body: {'message': e.toString(), "errors": e.errors},

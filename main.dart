@@ -18,6 +18,7 @@ Future<void> init(InternetAddress ip, int port) async {
 Future<HttpServer> run(Handler handler, InternetAddress ip, int port) async {
   try {
     stdout.writeln('START FROG');
+    stdout.writeln('${Platform.environment['SMTP_HOST']}');
   } catch (e) {
     print('Failed');
     exit(1);

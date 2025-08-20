@@ -5,14 +5,24 @@ import 'package:backend/db_client/db_client.dart'
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
-
+import 'package:uuid/uuid.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/user.dart';
 
 abstract class UserDataSource {
-  Future<User?> getUser({int? userId, String? email});
+  Future<User?> getUser({
+    int? userId,
+    String? email,
+    String? confirmationToken,
+  });
 
   Future<User> createUser(EmailCredentialDto user);
+
+  Future<User> updateUser(
+    int userId, {
+    bool? emailVerified,
+    String? confirmationToken,
+  });
 }
 
 @LazySingleton(as: UserDataSource)
@@ -25,11 +35,14 @@ class UserDataSourceImpl implements UserDataSource {
         '$magenta createUser email ${user.email} p: ${user.password} $reset',
       );
       // await _databaseConnection.connect();
+      const uuid = Uuid();
+      final confirmationToken = uuid.v4();
       final entry = await _db.userDao.insert(
         UserTableCompanion(
           email: Value(user.email),
           password: Value(user.password),
           createdAt: Value(DateTime.now()),
+          confirmationToken: Value(confirmationToken),
         ),
       );
       // count rows
@@ -38,6 +51,8 @@ class UserDataSourceImpl implements UserDataSource {
         email: entry.email,
         createdAt: entry.createdAt,
         role: entry.role,
+        emailVerified: entry.emailVerified,
+        confirmationToken: entry.confirmationToken,
       );
     } on Object catch (e, stack) {
       debugLog('$red createUser exception ${e.runtimeType} $stack $reset');
@@ -51,9 +66,17 @@ class UserDataSourceImpl implements UserDataSource {
   }
 
   @override
-  Future<User?> getUser({int? userId, String? email}) async {
+  Future<User?> getUser({
+    int? userId,
+    String? email,
+    String? confirmationToken,
+  }) async {
     // await _databaseConnection.connect();
-    final entry = await _db.userDao.getUser(userId: userId, email: email);
+    final entry = await _db.userDao.getUser(
+      userId: userId,
+      email: email,
+      confirmationToken: confirmationToken,
+    );
     if (entry == null) return null;
     return User(
       userId: entry.id,
@@ -61,6 +84,33 @@ class UserDataSourceImpl implements UserDataSource {
       password: entry.password,
       createdAt: entry.createdAt,
       role: entry.role,
+      emailVerified: entry.emailVerified,
+      confirmationToken: entry.confirmationToken,
+    );
+  }
+
+  @override
+  Future<User> updateUser(
+    int userId, {
+    bool? emailVerified,
+    String? confirmationToken,
+  }) async {
+    await _db.userDao.updateUser(
+      userId,
+      UserTableCompanion(
+        emailVerified: Value.absentIfNull(emailVerified),
+        confirmationToken: Value(confirmationToken),
+      ),
+    );
+    final entry = await _db.userDao.getUser(userId: userId);
+    return User(
+      userId: entry!.id,
+      email: entry.email,
+      password: entry.password,
+      createdAt: entry.createdAt,
+      role: entry.role,
+      emailVerified: entry.emailVerified,
+      confirmationToken: entry.confirmationToken,
     );
   }
 }
