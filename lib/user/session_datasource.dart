@@ -12,7 +12,11 @@ import 'package:injectable/injectable.dart';
 
 //--------------------------------------------------------------
 abstract class SessionDatasource {
-  FutureOr<Session?> getSession({String? token, String? refreshToken, int? userId});
+  FutureOr<Session?> getSession({
+    String? token,
+    String? refreshToken,
+    int? userId,
+  });
   FutureOr<bool> insertSession(Session session);
   FutureOr<bool> updateSession(Session session);
   FutureOr<bool> deleteSession(int userId);
@@ -43,7 +47,8 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
 
   @override
   FutureOr<bool> updateSession(Session session) async {
-    await _dao.insertRow(
+    if (session.id == null) return false;
+    await _dao.updateRow(
       SessionTableCompanion(
         id: Value(session.id!),
         token: Value(session.token),
@@ -64,23 +69,44 @@ class SessionSqliteDatasourceImpl implements SessionDatasource {
   }
 
   @override
-  FutureOr<Session?> getSession({String? token, String? refreshToken, int? userId}) async {
-    debugLog('$red fetch getSession: t: $token, r: $refreshToken, u: $userId $reset');
-    final entry = await _dao.getSession(refreshToken: refreshToken, token: token, userId: userId);
+  FutureOr<Session?> getSession({
+    String? token,
+    String? refreshToken,
+    int? userId,
+  }) async {
+    debugLog(
+      '$magenta fetch getSession:$reset t: $token, r: $refreshToken, u: $userId ',
+    );
+    if (token == null && refreshToken == null && userId == null) {
+      return null;
+    }
+    final entry = await _dao.getSession(
+      refreshToken: refreshToken,
+      token: token,
+      userId: userId,
+    );
+
+    debugLog('$green getSession $reset  $entry ');
+
     if (entry == null) {
-      debugLog('$red getSession: entry is null $reset');
       return null;
     }
     final user = await _db.userDao.getUser(userId: entry.userId);
     if (user == null) {
-      debugLog('$red getSession: user is null $reset');
+      debugLog('$red getSession user not found $reset');
       return null;
     }
 
     return Session(
+      id: entry.id,
       createdAt: entry.createdAt,
       token: entry.token,
-      user: User(userId: user.id, email: user.email, role: user.role, createdAt: user.createdAt),
+      user: User(
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+      ),
       tokenExpiryDate: entry.expiryDate,
       refreshToken: entry.refreshToken,
       refreshTokenExpiry: entry.refreshTokenExpiry,

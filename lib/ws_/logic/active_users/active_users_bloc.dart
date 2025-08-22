@@ -26,6 +26,8 @@ const _timeoutDuration = Duration(milliseconds: 100);
 @lazySingleton
 class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
     with ActiveUsersMixin {
+  static const loggerName = 'ActiveUsersBloc';
+
   final UnitRepository _unitRepository;
   final SessionRepository _sessionRepository;
   ActiveUsersBloc(this._unitRepository, this._sessionRepository)
@@ -47,6 +49,7 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
             refreshToken: isRefresh ? event.token : null,
           )
           .timeout(_timeoutDuration);
+      debugLog('$green ActiveUsersBloc$reset result session: $session');
       if (session == null) {
         channel.sink.add(
           ToClient.statusError(error: WsServerError.sessionExpired).encoded(),
@@ -55,7 +58,7 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
       }
 
       final isValid = _sessionRepository.validateToken(session);
-      if (isValid) {
+      if (!isValid) {
         channel.sink.add(
           ToClient.statusError(
             error: isRefresh

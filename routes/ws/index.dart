@@ -17,12 +17,12 @@ Future<Response> onRequest(RequestContext context) async {
       (message) async {
         debugLog('$green ON MESSAGE: $reset');
         if (message is! String) {
-          debugLog('$red [WebSocket] Message is not a string. $reset');
           return;
         }
 
         try {
           final freezed = ToServer.decoded(message);
+          debugLog('$green ON MESSAGE: $freezed $reset');
           switch (freezed) {
             case WithTokenTS(:final token):
               // 1. Authenticate the token
@@ -44,7 +44,7 @@ Future<Response> onRequest(RequestContext context) async {
               );
 
               break;
-            case NewLetterTS(:final letter, :final roomId):
+            case NewLetterTS(:final letter, :final room, :final sender):
               final blocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               if (session == null) {
@@ -61,7 +61,7 @@ Future<Response> onRequest(RequestContext context) async {
                 session,
                 letter,
               );
-            case DeleteLetterTS(:final roomId, :final letterId):
+            case DeleteLetterTS(:final sender, :final letterId):
               final blocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               if (session == null) {
@@ -78,7 +78,7 @@ Future<Response> onRequest(RequestContext context) async {
                 'main' /*dto.roomId*/,
                 letterId,
               );
-            case JoinLettersTS(:final roomId):
+            case JoinLettersTS(:final token, :final room):
               final letterBlocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               final disposer = activeUsersBloc.getDisposer(channel);

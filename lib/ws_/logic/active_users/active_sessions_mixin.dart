@@ -7,6 +7,7 @@ mixin class ActiveUsersMixin {
   final channel_useridKV = <WebSocketChannel, int>{};
   final userid_sessionKV = <int, GameSession>{};
   final userid_channelKV = <int, WebSocketChannel>{};
+  // final userid_tokenKV = <int, String>{};
 
   final shouldUnsubscribeKV = <WebSocketChannel, WebSocketDisposer>{};
 

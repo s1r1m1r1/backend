@@ -4,10 +4,13 @@ import 'package:backend/db_client/dao/unit_dao.dart';
 import 'package:backend/db_client/tables/character_table.dart';
 import 'package:backend/db_client/tables/selected_unit_table.dart';
 import 'package:backend/db_client/tables/unit_table.dart';
+import 'package:backend/user/password_hash_service.dart';
+import 'package:get_it/get_it.dart';
 
 import 'dao/letters_dao.dart';
 import 'dao/session_dao.dart';
 import 'dao/todo_dao.dart';
+import 'tables/fake_user_table.dart';
 import 'tables/todo_table.dart';
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:drift/drift.dart';
@@ -34,6 +37,7 @@ part 'db_client.g.dart';
   tables: [
     TodoTable,
     UserTable,
+    FakeUserTable,
     SessionTable,
     LetterTable,
     RoomTable,
@@ -43,7 +47,16 @@ part 'db_client.g.dart';
     UnitTable,
     SelectedUnitTable,
   ],
-  daos: [TodoDao, UserDao, SessionDao, LettersDao, RoomDao, ConfigDao, GameDao, UnitDao],
+  daos: [
+    TodoDao,
+    UserDao,
+    SessionDao,
+    LettersDao,
+    RoomDao,
+    ConfigDao,
+    GameDao,
+    UnitDao,
+  ],
 )
 class DbClient extends _$DbClient {
   DbClient(super.e);
@@ -98,17 +111,23 @@ class DbClient extends _$DbClient {
         if (details.wasCreated) {
           // Create a bunch of default values so the app doesn't look too empty
           // on the first start.
-          final devChat = await into(
-            roomTable,
-          ).insertReturning(RoomTableCompanion.insert(name: 'dev-chat', type: RoomType.chat));
-          final testChat = await into(
-            roomTable,
-          ).insertReturning(RoomTableCompanion.insert(name: 'test-chat', type: RoomType.chat));
-          final devCounter = await into(
-            roomTable,
-          ).insertReturning(RoomTableCompanion.insert(name: 'dev-counter', type: RoomType.counter));
+          final devChat = await into(roomTable).insertReturning(
+            RoomTableCompanion.insert(name: 'dev-chat', type: RoomType.chat),
+          );
+          final testChat = await into(roomTable).insertReturning(
+            RoomTableCompanion.insert(name: 'test-chat', type: RoomType.chat),
+          );
+          final devCounter = await into(roomTable).insertReturning(
+            RoomTableCompanion.insert(
+              name: 'dev-counter',
+              type: RoomType.counter,
+            ),
+          );
           final testCounter = await into(roomTable).insertReturning(
-            RoomTableCompanion.insert(name: 'test-counter', type: RoomType.counter),
+            RoomTableCompanion.insert(
+              name: 'test-counter',
+              type: RoomType.counter,
+            ),
           );
           await into(wsConfigTable).insert(
             WsConfigTableCompanion.insert(
@@ -126,6 +145,15 @@ class DbClient extends _$DbClient {
               letterRoom: testChat.name,
               counterRoom: testCounter.name,
               version: 1,
+            ),
+          );
+          await into(userTable).insert(
+            UserTableCompanion.insert(
+              email: 'admin@admin.dev',
+              role: Value(Role.admin),
+              password: GetIt.I.get<PasswordHasherService>().hashPassword(
+                'admin_password',
+              ),
             ),
           );
         }

@@ -18,11 +18,14 @@ abstract class UserRepository {
     String? confirmationToken,
   });
 
+  Future<FakeUserDto> createFakeUser(EmailCredentialDto createUserDto);
   Future<User> createUser(EmailCredentialDto createUserDto);
 
   Future<User> loginUser(EmailCredentialDto loginUserDto);
 
   Future<User> confirmEmail(String confirmationToken);
+
+  Future<List<FakeUserDto>> getListFakes();
 }
 
 @LazySingleton(as: UserRepository)
@@ -55,7 +58,10 @@ class UserRepositoryImpl extends UserRepository {
   }
 
   @override
-  Future<User> createUser(EmailCredentialDto createUserDto) async {
+  Future<User> createUser(
+    EmailCredentialDto createUserDto, {
+    Role role = Role.user,
+  }) async {
     debugLog('createUser - email ${createUserDto.email}');
     final userExist = await _datasource.getUser(email: createUserDto.email);
 
@@ -131,5 +137,21 @@ class UserRepositoryImpl extends UserRepository {
     );
 
     return updatedUser;
+  }
+
+  //----------------------------------------------------------------
+  @override
+  Future<FakeUserDto> createFakeUser(EmailCredentialDto createUserDto) async {
+    final user = await createUser(createUserDto, role: Role.fake);
+    final fakeUser = await _datasource.createFakeUser(
+      user.userId,
+      createUserDto,
+    );
+    return fakeUser;
+  }
+
+  @override
+  Future<List<FakeUserDto>> getListFakes() {
+    return _datasource.getListFakes();
   }
 }

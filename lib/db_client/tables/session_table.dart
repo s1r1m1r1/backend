@@ -7,7 +7,8 @@ class SessionTable extends Table {
 
   TextColumn get token => text()();
 
-  IntColumn get userId => integer().references(UserTable, #id)(); // foreign key userId
+  IntColumn get userId =>
+      integer().references(UserTable, #id)(); // foreign key userId
 
   DateTimeColumn get expiryDate => dateTime()();
 
