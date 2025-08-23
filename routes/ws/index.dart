@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
@@ -10,7 +11,6 @@ import 'package:sha_red/sha_red.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
-    debugLog('$green ON Request 1 $protocol $reset');
     final activeUsersBloc = context.read<ActiveUsersBloc>();
 
     channel.stream.listen(
@@ -20,6 +20,8 @@ Future<Response> onRequest(RequestContext context) async {
           return;
         }
 
+        // activeUsersBloc.add(ActiveUsersEvent.removeUser(channel));
+
         try {
           final freezed = ToServer.decoded(message);
           debugLog('$green ON MESSAGE: $freezed $reset');
@@ -27,24 +29,11 @@ Future<Response> onRequest(RequestContext context) async {
             case WithTokenTS(:final token):
               // 1. Authenticate the token
               activeUsersBloc.add(
-                ActiveUsersEvent.join(
-                  channel: channel,
-                  token: token,
-                  isRefresh: false,
-                ),
+                ActiveUsersEvent.join(channel: channel, token: token),
               );
               break;
-            case WithRefreshTS(:final refresh):
-              activeUsersBloc.add(
-                ActiveUsersEvent.join(
-                  channel: channel,
-                  token: refresh,
-                  isRefresh: true,
-                ),
-              );
 
-              break;
-            case NewLetterTS(:final letter, :final room, :final sender):
+            case NewLetterTS(:final letter, :final room):
               final blocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               if (session == null) {
@@ -61,7 +50,7 @@ Future<Response> onRequest(RequestContext context) async {
                 session,
                 letter,
               );
-            case DeleteLetterTS(:final sender, :final letterId):
+            case DeleteLetterTS(:final letterId):
               final blocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               if (session == null) {
@@ -78,7 +67,7 @@ Future<Response> onRequest(RequestContext context) async {
                 'main' /*dto.roomId*/,
                 letterId,
               );
-            case JoinLettersTS(:final token, :final room):
+            case JoinLettersTS(:final room):
               final letterBlocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               final disposer = activeUsersBloc.getDisposer(channel);

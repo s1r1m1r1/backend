@@ -42,12 +42,8 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
   ) async {
     final channel = event.channel;
     try {
-      final isRefresh = event.isRefresh;
       final session = await _sessionRepository
-          .getSession(
-            token: isRefresh ? null : event.token,
-            refreshToken: isRefresh ? event.token : null,
-          )
+          .getSession(token: event.token)
           .timeout(_timeoutDuration);
       debugLog('$green ActiveUsersBloc$reset result session: $session');
       if (session == null) {
@@ -60,11 +56,7 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
       final isValid = _sessionRepository.validateToken(session);
       if (!isValid) {
         channel.sink.add(
-          ToClient.statusError(
-            error: isRefresh
-                ? WsServerError.sessionExpired
-                : WsServerError.invalidToken,
-          ).encoded(),
+          ToClient.statusError(error: WsServerError.invalidToken).encoded(),
         );
         return;
       }
