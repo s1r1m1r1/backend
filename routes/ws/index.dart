@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
@@ -20,11 +19,10 @@ Future<Response> onRequest(RequestContext context) async {
           return;
         }
 
-        // activeUsersBloc.add(ActiveUsersEvent.removeUser(channel));
-
         try {
           final freezed = ToServer.decoded(message);
           debugLog('$green ON MESSAGE: $freezed $reset');
+          debugLog('$green ON MESSAGE: ${freezed.runtimeType} $reset');
           switch (freezed) {
             case WithTokenTS(:final token):
               // 1. Authenticate the token
@@ -33,7 +31,23 @@ Future<Response> onRequest(RequestContext context) async {
               );
               break;
 
-            case NewLetterTS(:final letter, :final room):
+            case NewLetterTS(:final letter):
+              final blocManager = context.read<LetterBlocManager>();
+              final session = activeUsersBloc.getSession(channel);
+              if (session == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+
+                debugLog('$red [WebSocket]newLetter unauthorized: $reset');
+                return;
+              }
+
+              debugLog('$red [WebSocket]newLetter go: $reset');
+              blocManager.newLetter(channel, session, letter);
+            case DeleteLetterTS(:final letterId, :final roomId):
               final blocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               if (session == null) {
@@ -44,30 +58,9 @@ Future<Response> onRequest(RequestContext context) async {
                 );
                 return;
               }
-              blocManager.newLetter(
-                channel,
-                'main' /*dto.roomId*/,
-                session,
-                letter,
-              );
-            case DeleteLetterTS(:final letterId):
-              final blocManager = context.read<LetterBlocManager>();
-              final session = activeUsersBloc.getSession(channel);
-              if (session == null) {
-                channel.sink.add(
-                  ToClient.statusError(
-                    error: WsServerError.unauthorized,
-                  ).encoded(),
-                );
-                return;
-              }
-              blocManager.removeLetter(
-                channel,
-                session,
-                'main' /*dto.roomId*/,
-                letterId,
-              );
-            case JoinLettersTS(:final room):
+
+              blocManager.removeLetter(channel, session, roomId, letterId);
+            case JoinLettersTS(:final roomId):
               final letterBlocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               final disposer = activeUsersBloc.getDisposer(channel);
@@ -79,12 +72,7 @@ Future<Response> onRequest(RequestContext context) async {
                 );
                 return;
               }
-              letterBlocManager.subscribe(
-                channel,
-                session,
-                disposer,
-                'main' /*room.roomId*/,
-              );
+              letterBlocManager.subscribe(channel, session, disposer, roomId);
           }
         } catch (e, s) {
           debugLog('$red [WebSocket] Error: $e $s $reset');

@@ -14,23 +14,19 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ActiveUsersEvent {
 
- WebSocketChannel get channel;
+
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActiveUsersEvent&&(identical(other.channel, channel) || other.channel == channel));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActiveUsersEvent);
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,channel);
+int get hashCode => runtimeType.hashCode;
 
-@override
-String toString() {
-  return 'ActiveUsersEvent(channel: $channel)';
-}
 
 
 }
@@ -42,11 +38,39 @@ String toString() {
 /// @nodoc
 
 
+class _SetRoomIdEvent extends ActiveUsersEvent {
+  const _SetRoomIdEvent(this.roomId): super._();
+  
+
+ final  int roomId;
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SetRoomIdEvent&&(identical(other.roomId, roomId) || other.roomId == roomId));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,roomId);
+
+
+
+}
+
+
+
+
+/// @nodoc
+
+
 class _JoinEvent extends ActiveUsersEvent {
   const _JoinEvent({required this.channel, required this.token}): super._();
   
 
-@override final  WebSocketChannel channel;
+ final  WebSocketChannel channel;
  final  String token;
 
 
@@ -61,10 +85,6 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,channel,token);
 
-@override
-String toString() {
-  return 'ActiveUsersEvent.join(channel: $channel, token: $token)';
-}
 
 
 }
@@ -79,7 +99,7 @@ class _RemoveUser extends ActiveUsersEvent {
   const _RemoveUser(this.channel): super._();
   
 
-@override final  WebSocketChannel channel;
+ final  WebSocketChannel channel;
 
 
 
@@ -93,10 +113,6 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,channel);
 
-@override
-String toString() {
-  return 'ActiveUsersEvent.removeUser(channel: $channel)';
-}
 
 
 }

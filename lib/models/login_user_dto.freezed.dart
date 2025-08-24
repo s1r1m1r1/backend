@@ -35,10 +35,6 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,email,password);
 
-@override
-String toString() {
-  return 'LoginUserDto(email: $email, password: $password)';
-}
 
 
 }
@@ -107,10 +103,6 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,email,password);
 
-@override
-String toString() {
-  return 'LoginUserDto(email: $email, password: $password)';
-}
 
 
 }

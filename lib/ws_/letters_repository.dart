@@ -14,7 +14,7 @@ class LettersRepository {
     try {
       final entry = await _db.lettersDao.insertRow(
         LetterTableCompanion(
-          chatRoomId: Value(dto.chatRoomId),
+          chatRoomId: Value(dto.roomId),
           content: Value(dto.content),
           senderId: Value(dto.senderId),
           createdAt: Value(DateTime.now()),
@@ -48,6 +48,7 @@ class LettersRepository {
 
       return messages.map(
         (i) => LetterDto(
+          id: i.id,
           chatRoomId: i.chatRoomId,
           content: i.content,
           senderId: i.senderId,
@@ -65,6 +66,7 @@ class LettersRepository {
 
       return messages.map(
         (i) => LetterDto(
+          id: i.id,
           chatRoomId: i.chatRoomId,
           content: i.content,
           senderId: i.senderId,

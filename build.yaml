@@ -4,6 +4,7 @@ targets:
       # https://github.com/rrousselGit/freezed#changing-the-behavior-for-the-entire-project
       freezed:
         options:
+          to_string_override: false
           map:
             map: false
             map_or_null: false

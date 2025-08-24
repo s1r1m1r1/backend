@@ -19,7 +19,7 @@ final _letterRepository = GetIt.I.get<LettersRepository>();
 final _counterRepository = CounterRepository();
 final _chatRoomRepository = ChatRoomRepository(_db);
 
-final _roomManager = GetIt.I.get<LetterBlocManager>()..createRoom('main');
+final _roomManager = GetIt.I.get<LetterBlocManager>();
 
 final _unitRepository = UnitRepositoryImpl(UnitDatasourceImpl(_db));
 

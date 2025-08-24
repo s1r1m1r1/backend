@@ -105,9 +105,9 @@ class GameSession extends Session implements IGameSession {
 }
 
 extension GameSessionExt on GameSession {
-  String encodedSession() {
+  String encodedSession(int roomId) {
     final dto = ToClient.joinedServer(
-      mainRoomId: 'main',
+      mainRoomId: roomId,
       user: user.toDto(),
       unit: unit.toDto(),
       tokens: TokensDto(accessToken: token, refreshToken: refreshToken),

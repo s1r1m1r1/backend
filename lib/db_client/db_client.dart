@@ -29,7 +29,6 @@ import 'package:backend/db_client/tables/room_member_table.dart';
 import 'package:backend/db_client/tables/letter_table.dart';
 import 'package:backend/db_client/tables/session_table.dart';
 import 'package:backend/db_client/tables/user_table.dart';
-import 'package:backend/models/enums.dart';
 
 part 'db_client.g.dart';
 
@@ -111,30 +110,17 @@ class DbClient extends _$DbClient {
         if (details.wasCreated) {
           // Create a bunch of default values so the app doesn't look too empty
           // on the first start.
-          final devChat = await into(roomTable).insertReturning(
-            RoomTableCompanion.insert(name: 'dev-chat', type: RoomType.chat),
-          );
-          final testChat = await into(roomTable).insertReturning(
-            RoomTableCompanion.insert(name: 'test-chat', type: RoomType.chat),
-          );
-          final devCounter = await into(roomTable).insertReturning(
-            RoomTableCompanion.insert(
-              name: 'dev-counter',
-              type: RoomType.counter,
-            ),
-          );
-          final testCounter = await into(roomTable).insertReturning(
-            RoomTableCompanion.insert(
-              name: 'test-counter',
-              type: RoomType.counter,
-            ),
-          );
+          final devChat = await into(
+            roomTable,
+          ).insertReturning(RoomTableCompanion.insert(name: 'dev-chat'));
+          final testChat = await into(
+            roomTable,
+          ).insertReturning(RoomTableCompanion.insert(name: 'test-chat'));
           await into(wsConfigTable).insert(
             WsConfigTableCompanion.insert(
               name: 'user',
               role: Value(Role.user),
               letterRoom: devChat.name,
-              counterRoom: devCounter.name,
               version: 1,
             ),
           );
@@ -143,7 +129,6 @@ class DbClient extends _$DbClient {
               name: 'test',
               role: Value(Role.tester),
               letterRoom: testChat.name,
-              counterRoom: testCounter.name,
               version: 1,
             ),
           );

@@ -70,8 +70,8 @@ class SessionRepositoryImpl implements SessionRepository {
     int? userId,
   }) async {
     final session = await sessionDatasource.getSession(
-      refreshToken: refreshToken,
       token: token,
+      refreshToken: refreshToken,
       userId: userId,
     );
     return session;

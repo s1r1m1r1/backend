@@ -48,7 +48,6 @@ FutureOr<Response> signup(RequestContext context) async {
           refreshToken: session.refreshToken,
         ),
       ).toJson(),
-
       statusCode: HttpStatus.accepted,
     );
   } on ApiException catch (e, stack) {
