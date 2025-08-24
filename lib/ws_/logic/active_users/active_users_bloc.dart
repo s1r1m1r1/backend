@@ -26,10 +26,12 @@ const _timeoutDuration = Duration(milliseconds: 100);
 @lazySingleton
 class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
     with ActiveUsersMixin {
+  static const loggerName = 'ActiveUsersBloc';
   final UnitRepository _unitRepository;
   final SessionRepository _sessionRepository;
   ActiveUsersBloc(this._unitRepository, this._sessionRepository)
-    : super(const ActiveUsersState([])) {
+    : super(const ActiveUsersState()) {
+    on<_SetRoomIdEvent>(_onSetRoom);
     on<_RemoveUser>(_removeUser);
     on<_JoinEvent>(_onJoin, transformer: sequential());
   }
@@ -40,13 +42,10 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
   ) async {
     final channel = event.channel;
     try {
-      final isRefresh = event.isRefresh;
       final session = await _sessionRepository
-          .getSession(
-            token: isRefresh ? null : event.token,
-            refreshToken: isRefresh ? event.token : null,
-          )
+          .getSession(token: event.token)
           .timeout(_timeoutDuration);
+      debugLog('$green ActiveUsersBloc$reset result session: $session');
       if (session == null) {
         channel.sink.add(
           ToClient.statusError(error: WsServerError.sessionExpired).encoded(),
@@ -55,13 +54,9 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
       }
 
       final isValid = _sessionRepository.validateToken(session);
-      if (isValid) {
+      if (!isValid) {
         channel.sink.add(
-          ToClient.statusError(
-            error: isRefresh
-                ? WsServerError.sessionExpired
-                : WsServerError.invalidToken,
-          ).encoded(),
+          ToClient.statusError(error: WsServerError.invalidToken).encoded(),
         );
         return;
       }
@@ -94,9 +89,8 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
       final WebSocketDisposer? disposer = getDisposer(channel);
       subscribe(channel);
       disposer?.shouldUnsubscribe.add(() => unsubscribe(channel));
-
-      channel.sink.add(gameSession.encodedSession());
-      emit(ActiveUsersState(getListGameSessions()));
+      channel.sink.add(gameSession.encodedSession(state.roomId));
+      emit(state.copyWith(gameSessions: getListGameSessions()));
     } on TimeoutException {
       channel.sink.add(
         ToClient.statusError(error: WsServerError.timeout).encoded(),
@@ -118,6 +112,13 @@ class ActiveUsersBloc extends BroadcastBloc<ActiveUsersEvent, ActiveUsersState>
     disposer?.dispose();
     event.channel.sink.close(1000, 'Removed');
     removeDisposer(event.channel);
-    emit(ActiveUsersState(getListGameSessions()));
+    emit(state.copyWith(gameSessions: getListGameSessions()));
+  }
+
+  FutureOr<void> _onSetRoom(
+    _SetRoomIdEvent event,
+    Emitter<ActiveUsersState> emit,
+  ) {
+    emit(ActiveUsersState(roomId: event.roomId));
   }
 }

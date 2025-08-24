@@ -3,11 +3,15 @@ import 'dart:convert';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/user/session.dart';
 import 'package:backend/ws_/letters_repository.dart';
+import 'package:backend/ws_/logic/active_users/active_sessions_mixin.dart';
+import 'package:backend/ws_/logic/active_users/active_users_bloc.dart';
 import 'package:backend/ws_/model/web_socket_disposer.dart';
 import 'package:broadcast_bloc/broadcast_bloc.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sha_red/sha_red.dart';
 export 'package:bloc/bloc.dart';
 
@@ -16,25 +20,28 @@ export 'package:bloc/bloc.dart';
 part 'letter.event.dart';
 part 'letter.state.dart';
 part 'letter.guard.dart';
+part 'letter.bloc.freezed.dart';
 
 class LetterBloc extends _LetterBloc with LetterBlocGuard {
-  LetterBloc(super.roomId, super.lettersRepository);
+  LetterBloc(super.lettersRepository);
 }
 
 // letter_bloc.dart
 class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
-  final String roomId;
   final LettersRepository _lettersRepository;
   final _letterCache = <LetterDto>[];
 
-  _LetterBloc(this.roomId, LettersRepository lettersRepository)
+  _LetterBloc(LettersRepository lettersRepository)
     : _lettersRepository = lettersRepository,
-      super(const LetterState.initial()) {
+      super(const LetterState.hasRoom(-1)) {
+    on<_SetRoomLE>(_onSetRoom);
     on<_SubscribeLE>(_onSubscribe);
     on<_RemoveLetterLE>(_onRemoveLetter);
     on<_NewLetterLE>(_onNewLetter);
   }
-
+  void _onSetRoom(_SetRoomLE event, Emitter<LetterState> emit) {
+    emit(LetterState.hasRoom(event.roomId));
+  }
   // --- Event Handlers ---
 
   Future<void> _onNewLetter(
@@ -44,8 +51,9 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
     try {
       final newLetter = await _lettersRepository.createLetter(event.dto);
       if (newLetter != null) {
+        debugLog('new letter: for ');
         _letterCache.add(newLetter);
-        emit(LetterState.newLetter(roomId, newLetter));
+        emit(LetterState.newLetter(state.roomId, newLetter));
       }
     } on ApiException catch (e, s) {
       addError(e, s);
@@ -63,12 +71,18 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
     Emitter<LetterState> emit,
   ) async {
     try {
+      final indexLetter = _letterCache.indexWhere(
+        (i) => i.id == event.letterId,
+      );
+      if (indexLetter == -1) return;
+      final letter = _letterCache[indexLetter];
+      if (letter.senderId != event.session.unit.id) return;
       final deletedId = await _lettersRepository.deleteLetter(event.letterId);
       if (deletedId == -1) return;
       final index = _letterCache.indexWhere((i) => i.id == deletedId);
       if (index == -1) return;
       _letterCache.removeAt(index);
-      emit(LetterState.deleted(roomId, event.letterId));
+      emit(LetterState.deleted(roomId: state.roomId, letterId: event.letterId));
     } catch (e, s) {
       debugLog('$e $s');
       event.channel.sink.add(
@@ -81,7 +95,7 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
 
   String _lettersJSON() {
     final body = ToClient.letters(
-      LetterHistoryPayload(roomId, _letterCache),
+      LetterHistoryPayload(state.roomId, _letterCache),
     ).toJson();
     return jsonEncode(body);
   }

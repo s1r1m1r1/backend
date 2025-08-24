@@ -1,3 +1,4 @@
+import 'package:backend/core/debug_log.dart';
 import 'package:backend/user/session.dart';
 import 'package:backend/ws_/logic/letter.bloc.dart';
 import 'package:backend/ws_/letters_repository.dart';
@@ -10,22 +11,23 @@ import 'package:sha_red/sha_red.dart';
 class LetterBlocManager {
   LetterBlocManager(this._lettersRepository);
   final LettersRepository _lettersRepository;
-  final _map = <String, LetterBloc>{};
+  // main rooms
+  final _map = <int, LetterBloc>{};
 
-  @Deprecated('dev fix')
-  LetterBloc? getBloc(String roomName) => _map[roomName];
+  LetterBloc? getBloc(int roomId) => _map[roomId];
 
-  void createRoom(String name) {
-    _map[name] = LetterBloc(name, _lettersRepository);
+  void createRoom(int roomId) {
+    _map[roomId] = LetterBloc(_lettersRepository)
+      ..add(LetterEvent.setRoom(roomId));
   }
 
   void subscribe(
     WebSocketChannel channel,
     Session session,
     WebSocketDisposer disposer,
-    String roomName,
+    int roomId,
   ) {
-    final bloc = _map[roomName];
+    final bloc = _map[roomId];
     if (bloc == null) return;
 
     final hasAccess = bloc.hasAccess(session.user.role);
@@ -36,23 +38,25 @@ class LetterBlocManager {
 
   void newLetter(
     WebSocketChannel channel,
-    String roomId,
-    Session session,
+    GameSession session,
     CreateLetterDto letter,
   ) {
-    final bloc = _map[roomId];
-    if (bloc == null) return;
+    final bloc = _map[letter.roomId];
+    if (bloc == null) {
+      debugLog('not found bloc');
+      return;
+    }
 
     final hasAccess = bloc.hasAccess(session.user.role);
     if (hasAccess) {
-      bloc.add(LetterEvent.newLetter(channel, letter));
+      bloc.add(LetterEvent.newLetter(channel, session, letter));
     }
   }
 
   void removeLetter(
     WebSocketChannel channel,
-    Session session,
-    String roomId,
+    GameSession session,
+    int roomId,
     int letterId,
   ) {
     final bloc = _map[roomId];
@@ -60,7 +64,7 @@ class LetterBlocManager {
 
     final hasAccess = bloc.hasAccess(session.user.role);
     if (hasAccess) {
-      bloc.add(LetterEvent.removeLetter(channel, letterId));
+      bloc.add(LetterEvent.removeLetter(channel, session, letterId));
     }
   }
 }

@@ -10,41 +10,44 @@ import 'package:sha_red/sha_red.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
-    debugLog('$green ON Request 1 $protocol $reset');
     final activeUsersBloc = context.read<ActiveUsersBloc>();
 
     channel.stream.listen(
       (message) async {
         debugLog('$green ON MESSAGE: $reset');
         if (message is! String) {
-          debugLog('$red [WebSocket] Message is not a string. $reset');
           return;
         }
 
         try {
           final freezed = ToServer.decoded(message);
+          debugLog('$green ON MESSAGE: $freezed $reset');
+          debugLog('$green ON MESSAGE: ${freezed.runtimeType} $reset');
           switch (freezed) {
             case WithTokenTS(:final token):
               // 1. Authenticate the token
               activeUsersBloc.add(
-                ActiveUsersEvent.join(
-                  channel: channel,
-                  token: token,
-                  isRefresh: false,
-                ),
+                ActiveUsersEvent.join(channel: channel, token: token),
               );
               break;
-            case WithRefreshTS(:final refresh):
-              activeUsersBloc.add(
-                ActiveUsersEvent.join(
-                  channel: channel,
-                  token: refresh,
-                  isRefresh: true,
-                ),
-              );
 
-              break;
-            case NewLetterTS(:final letter, :final roomId):
+            case NewLetterTS(:final letter):
+              final blocManager = context.read<LetterBlocManager>();
+              final session = activeUsersBloc.getSession(channel);
+              if (session == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+
+                debugLog('$red [WebSocket]newLetter unauthorized: $reset');
+                return;
+              }
+
+              debugLog('$red [WebSocket]newLetter go: $reset');
+              blocManager.newLetter(channel, session, letter);
+            case DeleteLetterTS(:final letterId, :final roomId):
               final blocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
               if (session == null) {
@@ -55,29 +58,8 @@ Future<Response> onRequest(RequestContext context) async {
                 );
                 return;
               }
-              blocManager.newLetter(
-                channel,
-                'main' /*dto.roomId*/,
-                session,
-                letter,
-              );
-            case DeleteLetterTS(:final roomId, :final letterId):
-              final blocManager = context.read<LetterBlocManager>();
-              final session = activeUsersBloc.getSession(channel);
-              if (session == null) {
-                channel.sink.add(
-                  ToClient.statusError(
-                    error: WsServerError.unauthorized,
-                  ).encoded(),
-                );
-                return;
-              }
-              blocManager.removeLetter(
-                channel,
-                session,
-                'main' /*dto.roomId*/,
-                letterId,
-              );
+
+              blocManager.removeLetter(channel, session, roomId, letterId);
             case JoinLettersTS(:final roomId):
               final letterBlocManager = context.read<LetterBlocManager>();
               final session = activeUsersBloc.getSession(channel);
@@ -90,12 +72,7 @@ Future<Response> onRequest(RequestContext context) async {
                 );
                 return;
               }
-              letterBlocManager.subscribe(
-                channel,
-                session,
-                disposer,
-                'main' /*room.roomId*/,
-              );
+              letterBlocManager.subscribe(channel, session, disposer, roomId);
           }
         } catch (e, s) {
           debugLog('$red [WebSocket] Error: $e $s $reset');

@@ -1,13 +1,12 @@
 import '../db_client.dart';
+import '../tables/fake_user_table.dart';
 import '../tables/user_table.dart';
 import 'package:drift/drift.dart';
 
 part 'user_dao.g.dart';
 
-@DriftAccessor(tables: [UserTable])
+@DriftAccessor(tables: [UserTable, FakeUserTable])
 class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
-  // this constructor is required so that the main database can create an instance
-  // of this object.
   UserDao(super.db);
 
   Future<UserEntry> insert(UserTableCompanion companion) async {
@@ -64,5 +63,23 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
     await (update(
       userTable,
     )..where((t) => t.id.equals(userId))).write(companion);
+  }
+
+  Future<FakeUserEntry> insertFakeUser(FakeUserTableCompanion companion) async {
+    return into(
+      fakeUserTable,
+    ).insertReturning(companion, mode: InsertMode.insertOrFail);
+  }
+
+  Future<Iterable<(FakeUserEntry, UserEntry)>> getListFakes() async {
+    final query = await fakeUserTable.select().join([
+      leftOuterJoin(userTable, userTable.id.equalsExp(fakeUserTable.userId)),
+    ]).get();
+    final list = query.map((row) {
+      final entry = row.readTable(fakeUserTable);
+      final category = row.readTable(userTable);
+      return (entry, category);
+    });
+    return list;
   }
 }

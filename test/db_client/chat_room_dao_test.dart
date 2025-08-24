@@ -27,11 +27,18 @@ void main() {
     // Insert a user
     final user = await dao
         .into(db.userTable)
-        .insertReturning(UserTableCompanion.insert(email: 'alice@mail.com', password: '123456'));
-    final room = await dao.insertRoom(RoomTableCompanion.insert(name: 'test1', type: RoomType.chat));
+        .insertReturning(
+          UserTableCompanion.insert(
+            email: 'alice@mail.com',
+            password: '123456',
+          ),
+        );
+    final room = await dao.insertRoom(RoomTableCompanion.insert(name: 'test1'));
     expect(room, isNotNull);
     // Insert a chat_room_user
-    await dao.insertMember(RoomMemberTableCompanion.insert(chatRoomId: room!.id, userId: user.id));
+    await dao.insertMember(
+      RoomMemberTableCompanion.insert(chatRoomId: room!.id, userId: user.id),
+    );
 
     final usersBefore = await dao.getListMember(room.id);
     expect(usersBefore.length, 1);
@@ -48,13 +55,19 @@ void main() {
     // Insert a user
     final user = await db
         .into(db.userTable)
-        .insertReturning(UserTableCompanion.insert(email: 'bob@mail.net', password: '123456'));
+        .insertReturning(
+          UserTableCompanion.insert(email: 'bob@mail.net', password: '123456'),
+        );
     final room = await db
         .into(db.roomTable)
-        .insertReturning(RoomTableCompanion.insert(name: 'test1', type: RoomType.chat));
+        .insertReturning(RoomTableCompanion.insert(name: 'test1'));
 
     // Insert a chat_room_user
-    await db.into(db.roomMemberTable).insert(RoomMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id));
+    await db
+        .into(db.roomMemberTable)
+        .insert(
+          RoomMemberTableCompanion.insert(chatRoomId: room.id, userId: user.id),
+        );
 
     final usersBefore = await dao.getListMember(room.id);
     expect(usersBefore.length, 1);
@@ -63,7 +76,9 @@ void main() {
     await (db.delete(db.userTable)..where((t) => t.id.equals(user.id))).go();
 
     final usersAfter = await dao.getListMember(room.id);
-    final userTest = await (db.select(db.userTable)..where((tbl) => tbl.id.equals(user.id))).getSingleOrNull();
+    final userTest = await (db.select(
+      db.userTable,
+    )..where((tbl) => tbl.id.equals(user.id))).getSingleOrNull();
     expect(userTest, null);
     expect(usersAfter.length, 0);
   });
@@ -72,21 +87,32 @@ void main() {
     // Insert a user
     final user = await db
         .into(db.userTable)
-        .insertReturning(UserTableCompanion.insert(email: 'bob@mail.net', password: '123456'));
+        .insertReturning(
+          UserTableCompanion.insert(email: 'bob@mail.net', password: '123456'),
+        );
 
     // Insert a chat room
     final chatRoom = await db
         .into(db.roomTable)
-        .insertReturning(RoomTableCompanion.insert(name: 'Room 2', type: RoomType.chat));
+        .insertReturning(RoomTableCompanion.insert(name: 'Room 2'));
 
     // Insert a chat_room_user
-    await db.into(db.roomMemberTable).insert(RoomMemberTableCompanion.insert(chatRoomId: chatRoom.id, userId: user.id));
+    await db
+        .into(db.roomMemberTable)
+        .insert(
+          RoomMemberTableCompanion.insert(
+            chatRoomId: chatRoom.id,
+            userId: user.id,
+          ),
+        );
 
     // Delete the chat_room_user
     await dao.deleteMember(chatRoom.id, user.id);
 
     // User should still exist
-    final userTest = await (db.select(db.userTable)..where((t) => t.id.equals(user.id))).getSingleOrNull();
+    final userTest = await (db.select(
+      db.userTable,
+    )..where((t) => t.id.equals(user.id))).getSingleOrNull();
     expect(userTest!.email, 'bob@mail.net');
   });
 }

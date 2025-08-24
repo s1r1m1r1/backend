@@ -7,6 +7,5 @@ class WsConfigTable extends Table {
   TextColumn get name => text()();
   TextColumn get role => textEnum<Role>().withDefault(const Constant('user'))();
   TextColumn get letterRoom => text()();
-  TextColumn get counterRoom => text()();
   IntColumn get version => integer()();
 }

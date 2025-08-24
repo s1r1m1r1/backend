@@ -23,19 +23,21 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
     return into(sessionTable).insert(toCompanion, mode: InsertMode.replace);
   }
 
-  FutureOr<SessionEntry?> getSession({String? token, String? refreshToken, int? userId}) async {
-    if (token == null && refreshToken == null && userId == null) {
-      debugLog('$red getSession: token, refreshToken, userId are null $reset');
-      return null;
-    }
-
+  FutureOr<SessionEntry?> getSession({
+    String? token,
+    String? refreshToken,
+    int? userId,
+  }) async {
     debugLog(
-      '$red getSession: token: $token, refreshToken: $refreshToken, userId: $userId  $reset',
+      '$red getSession: token: ${token ?? 'null'} , refreshToken: ${refreshToken ?? null}, userId: ${userId ?? null}  $reset',
     );
     final query = select(sessionTable);
-    if (token != null) query.where((t) => t.token.equals(token));
-    if (refreshToken != null) query.where((t) => t.refreshToken.equals(refreshToken));
-    if (userId != null) query.where((t) => t.userId.equals(userId));
+    if (token != null)
+      query.where((t) => t.token.equals(token));
+    else if (refreshToken != null)
+      query.where((t) => t.refreshToken.equals(refreshToken));
+    else if (userId != null)
+      query.where((t) => t.userId.equals(userId));
     return query.getSingleOrNull();
   }
 

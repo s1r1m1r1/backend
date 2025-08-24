@@ -11,7 +11,6 @@ part of 'user.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$User {
 
@@ -22,16 +21,17 @@ mixin _$User {
 @pragma('vm:prefer-inline')
 $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$identity);
 
-  /// Serializes this User to a JSON map.
-  Map<String, dynamic> toJson();
-
-
 
 
 @override
-String toString() {
-  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, emailVerified: $emailVerified, confirmationToken: $confirmationToken, password: $password)';
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.role, role) || other.role == role)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.emailVerified, emailVerified) || other.emailVerified == emailVerified)&&(identical(other.confirmationToken, confirmationToken) || other.confirmationToken == confirmationToken)&&(identical(other.password, password) || other.password == password));
 }
+
+
+@override
+int get hashCode => Object.hash(runtimeType,userId,email,role,createdAt,emailVerified,confirmationToken,password);
+
 
 
 }
@@ -76,11 +76,11 @@ as String,
 
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _User extends User {
   const _User({required this.userId, required this.email, required this.role, required this.createdAt, this.emailVerified = false, this.confirmationToken, this.password = ''}): super._();
-  factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  
 
 @override final  int userId;
 @override final  String email;
@@ -96,17 +96,17 @@ class _User extends User {
 @pragma('vm:prefer-inline')
 _$UserCopyWith<_User> get copyWith => __$UserCopyWithImpl<_User>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$UserToJson(this, );
-}
-
 
 
 @override
-String toString() {
-  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, emailVerified: $emailVerified, confirmationToken: $confirmationToken, password: $password)';
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.email, email) || other.email == email)&&(identical(other.role, role) || other.role == role)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.emailVerified, emailVerified) || other.emailVerified == emailVerified)&&(identical(other.confirmationToken, confirmationToken) || other.confirmationToken == confirmationToken)&&(identical(other.password, password) || other.password == password));
 }
+
+
+@override
+int get hashCode => Object.hash(runtimeType,userId,email,role,createdAt,emailVerified,confirmationToken,password);
+
 
 
 }
