@@ -27,6 +27,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => runtimeType.hashCode;
 
+@override
+String toString() {
+  return 'LetterEvent()';
+}
 
 
 }
@@ -64,6 +68,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,roomId);
 
+@override
+String toString() {
+  return 'LetterEvent.setRoom(roomId: $roomId)';
+}
 
 
 }
@@ -104,11 +112,10 @@ as int,
 
 
 class _NewLetterLE implements LetterEvent {
-  const _NewLetterLE(this.channel, this.session, this.dto);
+  const _NewLetterLE(this.channel, this.dto);
   
 
- final  WebSocketChannel channel;
- final  GameSession session;
+ final  SessionChannel channel;
  final  CreateLetterDto dto;
 
 /// Create a copy of LetterEvent
@@ -121,13 +128,17 @@ _$NewLetterLECopyWith<_NewLetterLE> get copyWith => __$NewLetterLECopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NewLetterLE&&(identical(other.channel, channel) || other.channel == channel)&&(identical(other.session, session) || other.session == session)&&(identical(other.dto, dto) || other.dto == dto));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NewLetterLE&&(identical(other.channel, channel) || other.channel == channel)&&(identical(other.dto, dto) || other.dto == dto));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,channel,session,dto);
+int get hashCode => Object.hash(runtimeType,channel,dto);
 
+@override
+String toString() {
+  return 'LetterEvent.newLetter(channel: $channel, dto: $dto)';
+}
 
 
 }
@@ -137,7 +148,7 @@ abstract mixin class _$NewLetterLECopyWith<$Res> implements $LetterEventCopyWith
   factory _$NewLetterLECopyWith(_NewLetterLE value, $Res Function(_NewLetterLE) _then) = __$NewLetterLECopyWithImpl;
 @useResult
 $Res call({
- WebSocketChannel channel, GameSession session, CreateLetterDto dto
+ SessionChannel channel, CreateLetterDto dto
 });
 
 
@@ -154,11 +165,10 @@ class __$NewLetterLECopyWithImpl<$Res>
 
 /// Create a copy of LetterEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? session = null,Object? dto = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? dto = null,}) {
   return _then(_NewLetterLE(
 null == channel ? _self.channel : channel // ignore: cast_nullable_to_non_nullable
-as WebSocketChannel,null == session ? _self.session : session // ignore: cast_nullable_to_non_nullable
-as GameSession,null == dto ? _self.dto : dto // ignore: cast_nullable_to_non_nullable
+as SessionChannel,null == dto ? _self.dto : dto // ignore: cast_nullable_to_non_nullable
 as CreateLetterDto,
   ));
 }
@@ -179,11 +189,10 @@ $CreateLetterDtoCopyWith<$Res> get dto {
 
 
 class _SubscribeLE implements LetterEvent {
-  const _SubscribeLE(this.channel, this.disposer);
+  const _SubscribeLE(this.channel);
   
 
- final  WebSocketChannel channel;
- final  WebSocketDisposer disposer;
+ final  SessionChannel channel;
 
 /// Create a copy of LetterEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -195,13 +204,17 @@ _$SubscribeLECopyWith<_SubscribeLE> get copyWith => __$SubscribeLECopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubscribeLE&&(identical(other.channel, channel) || other.channel == channel)&&(identical(other.disposer, disposer) || other.disposer == disposer));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubscribeLE&&(identical(other.channel, channel) || other.channel == channel));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,channel,disposer);
+int get hashCode => Object.hash(runtimeType,channel);
 
+@override
+String toString() {
+  return 'LetterEvent.subscribe(channel: $channel)';
+}
 
 
 }
@@ -211,7 +224,7 @@ abstract mixin class _$SubscribeLECopyWith<$Res> implements $LetterEventCopyWith
   factory _$SubscribeLECopyWith(_SubscribeLE value, $Res Function(_SubscribeLE) _then) = __$SubscribeLECopyWithImpl;
 @useResult
 $Res call({
- WebSocketChannel channel, WebSocketDisposer disposer
+ SessionChannel channel
 });
 
 
@@ -228,11 +241,10 @@ class __$SubscribeLECopyWithImpl<$Res>
 
 /// Create a copy of LetterEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? disposer = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? channel = null,}) {
   return _then(_SubscribeLE(
 null == channel ? _self.channel : channel // ignore: cast_nullable_to_non_nullable
-as WebSocketChannel,null == disposer ? _self.disposer : disposer // ignore: cast_nullable_to_non_nullable
-as WebSocketDisposer,
+as SessionChannel,
   ));
 }
 
@@ -243,11 +255,10 @@ as WebSocketDisposer,
 
 
 class _RemoveLetterLE implements LetterEvent {
-  const _RemoveLetterLE(this.channel, this.session, this.letterId);
+  const _RemoveLetterLE(this.channel, this.letterId);
   
 
- final  WebSocketChannel channel;
- final  GameSession session;
+ final  SessionChannel channel;
  final  int letterId;
 
 /// Create a copy of LetterEvent
@@ -260,13 +271,17 @@ _$RemoveLetterLECopyWith<_RemoveLetterLE> get copyWith => __$RemoveLetterLECopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RemoveLetterLE&&(identical(other.channel, channel) || other.channel == channel)&&(identical(other.session, session) || other.session == session)&&(identical(other.letterId, letterId) || other.letterId == letterId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RemoveLetterLE&&(identical(other.channel, channel) || other.channel == channel)&&(identical(other.letterId, letterId) || other.letterId == letterId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,channel,session,letterId);
+int get hashCode => Object.hash(runtimeType,channel,letterId);
 
+@override
+String toString() {
+  return 'LetterEvent.removeLetter(channel: $channel, letterId: $letterId)';
+}
 
 
 }
@@ -276,7 +291,7 @@ abstract mixin class _$RemoveLetterLECopyWith<$Res> implements $LetterEventCopyW
   factory _$RemoveLetterLECopyWith(_RemoveLetterLE value, $Res Function(_RemoveLetterLE) _then) = __$RemoveLetterLECopyWithImpl;
 @useResult
 $Res call({
- WebSocketChannel channel, GameSession session, int letterId
+ SessionChannel channel, int letterId
 });
 
 
@@ -293,11 +308,10 @@ class __$RemoveLetterLECopyWithImpl<$Res>
 
 /// Create a copy of LetterEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? session = null,Object? letterId = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? channel = null,Object? letterId = null,}) {
   return _then(_RemoveLetterLE(
 null == channel ? _self.channel : channel // ignore: cast_nullable_to_non_nullable
-as WebSocketChannel,null == session ? _self.session : session // ignore: cast_nullable_to_non_nullable
-as GameSession,null == letterId ? _self.letterId : letterId // ignore: cast_nullable_to_non_nullable
+as SessionChannel,null == letterId ? _self.letterId : letterId // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -326,6 +340,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,roomId);
 
+@override
+String toString() {
+  return 'LetterState(roomId: $roomId)';
+}
 
 
 }
@@ -389,6 +407,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,roomId);
 
+@override
+String toString() {
+  return 'LetterState.hasRoom(roomId: $roomId)';
+}
 
 
 }
@@ -452,6 +474,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,roomId,letter);
 
+@override
+String toString() {
+  return 'LetterState.newLetter(roomId: $roomId, letter: $letter)';
+}
 
 
 }
@@ -525,6 +551,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,roomId,letterId);
 
+@override
+String toString() {
+  return 'LetterState.deleted(roomId: $roomId, letterId: $letterId)';
+}
 
 
 }

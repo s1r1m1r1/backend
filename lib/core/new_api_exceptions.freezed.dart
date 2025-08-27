@@ -33,6 +33,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(errors),statusCode);
 
+@override
+String toString() {
+  return 'ApiException(message: $message, errors: $errors, statusCode: $statusCode)';
+}
 
 
 }
@@ -108,6 +112,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
+@override
+String toString() {
+  return 'ApiException.badRequest(message: $message, errors: $errors, statusCode: $statusCode)';
+}
 
 
 }
@@ -182,6 +190,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
+@override
+String toString() {
+  return 'ApiException.notFound(message: $message, errors: $errors, statusCode: $statusCode)';
+}
 
 
 }
@@ -256,6 +268,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
+@override
+String toString() {
+  return 'ApiException.unauthorized(message: $message, errors: $errors, statusCode: $statusCode)';
+}
 
 
 }
@@ -330,6 +346,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
+@override
+String toString() {
+  return 'ApiException.forbidden(message: $message, errors: $errors, statusCode: $statusCode)';
+}
 
 
 }
@@ -404,6 +424,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
+@override
+String toString() {
+  return 'ApiException.conflict(message: $message, errors: $errors, statusCode: $statusCode)';
+}
 
 
 }
@@ -478,6 +502,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
+@override
+String toString() {
+  return 'ApiException.unprocessableContent(message: $message, errors: $errors, statusCode: $statusCode)';
+}
 
 
 }
@@ -553,6 +581,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_errors),statusCode);
 
+@override
+String toString() {
+  return 'ApiException.internalServerError(message: $message, errors: $errors, statusCode: $statusCode)';
+}
 
 
 }

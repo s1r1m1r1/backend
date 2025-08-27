@@ -11,6 +11,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:backend/db_client/db_client.dart' as _i946;
 import 'package:backend/db_client/db_module.dart' as _i459;
+import 'package:backend/features/arena/arena_repository.dart' as _i918;
 import 'package:backend/game/unit_datasource.dart' as _i845;
 import 'package:backend/game/unit_repository.dart' as _i850;
 import 'package:backend/user/mailing_service.dart' as _i176;
@@ -41,6 +42,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1057.SessionDatasource>(
       () => _i1057.SessionSqliteDatasourceImpl(gh<_i946.DbClient>()),
     );
+    gh.lazySingleton<_i918.ArenaRepository>(() => _i918.ArenaRepositoryImpl());
     gh.lazySingleton<_i878.LettersRepository>(
       () => _i878.LettersRepository(gh<_i946.DbClient>()),
     );

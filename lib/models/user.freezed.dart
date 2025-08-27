@@ -32,6 +32,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,userId,email,role,createdAt,emailVerified,confirmationToken,password);
 
+@override
+String toString() {
+  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, emailVerified: $emailVerified, confirmationToken: $confirmationToken, password: $password)';
+}
 
 
 }
@@ -107,6 +111,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,userId,email,role,createdAt,emailVerified,confirmationToken,password);
 
+@override
+String toString() {
+  return 'User(userId: $userId, email: $email, role: $role, createdAt: $createdAt, emailVerified: $emailVerified, confirmationToken: $confirmationToken, password: $password)';
+}
 
 
 }
