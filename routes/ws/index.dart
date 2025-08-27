@@ -33,7 +33,7 @@ Future<Response> onRequest(RequestContext context) async {
 
             case NewLetterTS(:final letter):
               final blocManager = context.read<LetterBlocManager>();
-              final session = activeUsersBloc.getSession(channel);
+              final session = activeUsersBloc.sessionFromWSChannel(channel);
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
@@ -46,10 +46,10 @@ Future<Response> onRequest(RequestContext context) async {
               }
 
               debugLog('$red [WebSocket]newLetter go: $reset');
-              blocManager.newLetter(channel, session, letter);
+              blocManager.newLetter(session, letter);
             case DeleteLetterTS(:final letterId, :final roomId):
               final blocManager = context.read<LetterBlocManager>();
-              final session = activeUsersBloc.getSession(channel);
+              final session = activeUsersBloc.sessionFromWSChannel(channel);
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
@@ -59,12 +59,11 @@ Future<Response> onRequest(RequestContext context) async {
                 return;
               }
 
-              blocManager.removeLetter(channel, session, roomId, letterId);
+              blocManager.removeLetter(session, roomId, letterId);
             case JoinLettersTS(:final roomId):
               final letterBlocManager = context.read<LetterBlocManager>();
-              final session = activeUsersBloc.getSession(channel);
-              final disposer = activeUsersBloc.getDisposer(channel);
-              if (session == null || disposer == null) {
+              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
                     error: WsServerError.unauthorized,
@@ -72,7 +71,13 @@ Future<Response> onRequest(RequestContext context) async {
                 );
                 return;
               }
-              letterBlocManager.subscribe(channel, session, disposer, roomId);
+              letterBlocManager.subscribe(session, roomId);
+            case CreateBattleRoomTS():
+              break;
+            case JoinBattleRoomTS():
+              break;
+            case LeaveBattleRoom():
+              break;
           }
         } catch (e, s) {
           debugLog('$red [WebSocket] Error: $e $s $reset');

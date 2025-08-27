@@ -1,6 +1,6 @@
 part of 'active_users_bloc.dart';
 
-class ActiveUsersState extends Equatable {
+class ActiveUsersState extends Equatable implements BroadcastState {
   const ActiveUsersState({
     this.gameSessions = const <GameSession>[],
     this.roomId = -1,
@@ -18,18 +18,15 @@ class ActiveUsersState extends Equatable {
     );
   }
 
-  /// jsonEncode(this)
   @override
-  String toString() {
-    final asMap = ToClient.onlineUsers(
+  ToClient? toClient() {
+    return ToClient.onlineUsers(
       OnlineMemberPayload(
         roomId: roomId,
         members: gameSessions
             .map((i) => OnlineMemberDto(i.unit.id, i.unit.name))
             .toList(),
       ),
-    ).toJson();
-    final json = jsonEncode(asMap);
-    return json;
+    );
   }
 }

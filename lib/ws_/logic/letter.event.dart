@@ -4,17 +4,10 @@ part of 'letter.bloc.dart';
 abstract class LetterEvent with _$LetterEvent {
   const factory LetterEvent.setRoom(int roomId) = _SetRoomLE;
   const factory LetterEvent.newLetter(
-    WebSocketChannel channel,
-    GameSession session,
+    SessionChannel channel,
     CreateLetterDto dto,
   ) = _NewLetterLE;
-  const factory LetterEvent.subscribe(
-    WebSocketChannel channel,
-    WebSocketDisposer disposer,
-  ) = _SubscribeLE;
-  const factory LetterEvent.removeLetter(
-    WebSocketChannel channel,
-    GameSession session,
-    int letterId,
-  ) = _RemoveLetterLE;
+  const factory LetterEvent.subscribe(SessionChannel channel) = _SubscribeLE;
+  const factory LetterEvent.removeLetter(SessionChannel channel, int letterId) =
+      _RemoveLetterLE;
 }

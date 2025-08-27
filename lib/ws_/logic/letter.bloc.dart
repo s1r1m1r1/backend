@@ -1,16 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:backend/core/broadcast_bloc.dart';
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
+import 'package:backend/core/session_channel.dart';
 import 'package:backend/user/session.dart';
 import 'package:backend/ws_/letters_repository.dart';
-import 'package:backend/ws_/logic/active_users/active_sessions_mixin.dart';
-import 'package:backend/ws_/logic/active_users/active_users_bloc.dart';
 import 'package:backend/ws_/model/web_socket_disposer.dart';
-import 'package:broadcast_bloc/broadcast_bloc.dart';
-import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
-import 'package:equatable/equatable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sha_red/sha_red.dart';
 export 'package:bloc/bloc.dart';
@@ -76,7 +72,7 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
       );
       if (indexLetter == -1) return;
       final letter = _letterCache[indexLetter];
-      if (letter.senderId != event.session.unit.id) return;
+      if (letter.senderId != event.channel.session.unit.id) return;
       final deletedId = await _lettersRepository.deleteLetter(event.letterId);
       if (deletedId == -1) return;
       final index = _letterCache.indexWhere((i) => i.id == deletedId);
@@ -85,19 +81,18 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
       emit(LetterState.deleted(roomId: state.roomId, letterId: event.letterId));
     } catch (e, s) {
       debugLog('$e $s');
-      event.channel.sink.add(
-        ToClient.statusError(error: WsServerError.letterNotRemoved).toJson(),
+      event.channel.sinkAdd(
+        ToClient.statusError(error: WsServerError.letterNotRemoved),
       );
     }
   }
 
   // --- Helper Methods ---
 
-  String _lettersJSON() {
-    final body = ToClient.letters(
+  ToClient _lettersDTO() {
+    return ToClient.letterHistory(
       LetterHistoryPayload(state.roomId, _letterCache),
-    ).toJson();
-    return jsonEncode(body);
+    );
   }
 
   FutureOr<void> _onSubscribe(
@@ -106,9 +101,9 @@ class _LetterBloc extends BroadcastBloc<LetterEvent, LetterState> {
   ) async {
     try {
       final channel = event.channel;
-      channel.sink.add(_lettersJSON());
+      channel.sinkAdd(_lettersDTO());
       subscribe(channel);
-      event.disposer.shouldUnsubscribe.add(() => unsubscribe(channel));
+      event.channel.shouldUnsubscribe.add(() => unsubscribe(channel));
     } catch (e, s) {
       addError(e, s);
     }

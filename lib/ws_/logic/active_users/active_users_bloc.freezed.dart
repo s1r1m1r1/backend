@@ -27,6 +27,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => runtimeType.hashCode;
 
+@override
+String toString() {
+  return 'ActiveUsersEvent()';
+}
 
 
 }
@@ -56,6 +60,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,roomId);
 
+@override
+String toString() {
+  return 'ActiveUsersEvent.setRoomId(roomId: $roomId)';
+}
 
 
 }
@@ -85,6 +93,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,channel,token);
 
+@override
+String toString() {
+  return 'ActiveUsersEvent.join(channel: $channel, token: $token)';
+}
 
 
 }
@@ -113,6 +125,10 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,channel);
 
+@override
+String toString() {
+  return 'ActiveUsersEvent.removeUser(channel: $channel)';
+}
 
 
 }

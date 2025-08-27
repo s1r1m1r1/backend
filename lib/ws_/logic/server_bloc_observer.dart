@@ -1,6 +1,6 @@
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:broadcast_bloc/broadcast_bloc.dart';
+import 'package:bloc/bloc.dart';
 
 class ServerBlocObserver extends BlocObserver {
   @override

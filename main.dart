@@ -4,7 +4,7 @@ import 'package:backend/db_client/db_client.dart';
 import 'package:backend/ws_/logic/active_users/active_users_bloc.dart';
 import 'package:backend/ws_/logic/letter.bloc_manager.dart';
 import 'package:backend/ws_/logic/server_bloc_observer.dart';
-import 'package:broadcast_bloc/broadcast_bloc.dart';
+import 'package:bloc/bloc.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sha_red/sha_red.dart';

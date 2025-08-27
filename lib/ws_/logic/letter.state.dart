@@ -1,7 +1,7 @@
 part of 'letter.bloc.dart';
 
 @freezed
-sealed class LetterState with _$LetterState {
+sealed class LetterState with _$LetterState implements BroadcastState {
   const LetterState._();
   const factory LetterState.hasRoom(int roomId) = _HasRoomState;
   const factory LetterState.newLetter(int roomId, LetterDto letter) =
@@ -12,23 +12,17 @@ sealed class LetterState with _$LetterState {
   }) = _DeletedLetterState;
 
   @override
-  String toString() {
+  ToClient? toClient() {
     switch (this) {
       case _HasRoomState():
-        return 'LetterState: roomId: roomId';
+        return null;
       case _NewLetterState(:final roomId, :final letter):
-        final body = ToClient.onLetter(
-          LastLetterPayload(roomId, letter),
-        ).toJson();
-        final encoded = jsonEncode(body);
-        return encoded;
+        return ToClient.onLetter(LastLetterPayload(roomId, letter));
 
       case _DeletedLetterState(:final roomId, :final letterId):
-        final body = ToClient.deletedLetter(
+        return ToClient.deletedLetter(
           IdLetterPayload(roomId: roomId, letterId: letterId),
-        ).toJson();
-        final encoded = jsonEncode(body);
-        return encoded;
+        );
     }
   }
 }
