@@ -3,7 +3,13 @@ import 'package:injectable/injectable.dart';
 
 import 'inject.config.dart';
 
+final getIt = GetIt.instance;
+
 @InjectableInit(preferRelativeImports: false)
-configInjector(GetIt getIt, {String? env, EnvironmentFilter? environmentFilter}) {
+configInjector(
+  GetIt getIt, {
+  String? env,
+  EnvironmentFilter? environmentFilter,
+}) {
   return getIt.init(environmentFilter: environmentFilter, environment: env);
 }

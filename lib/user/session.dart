@@ -1,6 +1,3 @@
-// The mixin remains the same.
-import 'dart:convert';
-
 import 'package:backend/game/unit.dart';
 import 'package:backend/models/user.dart';
 import 'package:equatable/equatable.dart';

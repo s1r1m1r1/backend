@@ -34,9 +34,32 @@ FutureOr<Response> refresh(RequestContext context) async {
         statusCode: HttpStatus.unauthorized,
       );
     }
-    stdout.writeln(
-      '$magenta [refresh] Session found for userId: ${session.user} $reset',
-    );
+
+    final isValidToken = sessionRepository.validateRefreshToken(session);
+    final isValidRefresh = sessionRepository.validateRefreshToken(session);
+
+    if (!isValidRefresh) {
+      return Response.json(
+        body: {'message': 'Invalid or expired refresh token'},
+        statusCode: HttpStatus.unauthorized,
+      );
+    }
+
+    if (isValidToken && isValidRefresh) {
+      final unitRepo = context.read<UnitRepository>();
+      final unitDto = await unitRepo.getSelectedUnit(session.user.userId);
+      return Response.json(
+        body: SessionDto(
+          user: session.user.toDto(),
+          tokens: TokensDto(
+            accessToken: session.token,
+            refreshToken: session.refreshToken,
+          ),
+          unit: unitDto,
+        ).toJson(),
+        statusCode: HttpStatus.accepted,
+      );
+    }
     final newSession = await sessionRepository.updateSession(
       session,
     ); // Implement this

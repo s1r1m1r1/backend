@@ -1,5 +1,4 @@
 import 'package:backend/core/session_channel.dart';
-import 'package:backend/ws_/model/web_socket_disposer.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:backend/user/session.dart';
 

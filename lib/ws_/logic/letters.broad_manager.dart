@@ -1,22 +1,21 @@
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/session_channel.dart';
-import 'package:backend/ws_/logic/letter.bloc.dart';
 import 'package:backend/ws_/letters_repository.dart';
+import 'package:backend/ws_/logic/letters.broad.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
 @lazySingleton
-class LetterBlocManager {
-  LetterBlocManager(this._lettersRepository);
+class LettersBroadManager {
+  LettersBroadManager(this._lettersRepository);
   final LettersRepository _lettersRepository;
   // main rooms
-  final _rooms = <int, LetterBloc>{};
+  final _rooms = <int, LettersBroad>{};
 
-  LetterBloc? getBloc(int roomId) => _rooms[roomId];
+  LettersBroad? getBloc(int roomId) => _rooms[roomId];
 
   void createRoom(int roomId) {
-    _rooms[roomId] = LetterBloc(_lettersRepository)
-      ..add(LetterEvent.setRoom(roomId));
+    _rooms[roomId] = LettersBroad(_lettersRepository, roomId);
   }
 
   void subscribe(SessionChannel channel, int roomId) {
@@ -25,7 +24,7 @@ class LetterBlocManager {
 
     final hasAccess = bloc.hasAccess(channel.session.user.role);
     if (hasAccess) {
-      bloc.add(LetterEvent.subscribe(channel));
+      bloc.subscribeChannel(channel);
     }
   }
 
@@ -38,7 +37,7 @@ class LetterBlocManager {
 
     final hasAccess = bloc.hasAccess(channel.session.user.role);
     if (hasAccess) {
-      bloc.add(LetterEvent.newLetter(channel, letter));
+      bloc.newLetter(channel, letter);
     }
   }
 
@@ -48,7 +47,7 @@ class LetterBlocManager {
 
     final hasAccess = bloc.hasAccess(channel.session.user.role);
     if (hasAccess) {
-      bloc.add(LetterEvent.removeLetter(channel, letterId));
+      bloc.removeLetter(channel, letterId);
     }
   }
 }
