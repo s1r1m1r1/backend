@@ -21,8 +21,9 @@ import 'package:backend/user/session_repository.dart' as _i854;
 import 'package:backend/user/user_datasource.dart' as _i625;
 import 'package:backend/user/user_repository.dart' as _i470;
 import 'package:backend/ws_/letters_repository.dart' as _i878;
-import 'package:backend/ws_/logic/active_users/active_users_bloc.dart' as _i199;
-import 'package:backend/ws_/logic/letter.bloc_manager.dart' as _i288;
+import 'package:backend/ws_/logic/active_users/active_users.broad_manager.dart'
+    as _i152;
+import 'package:backend/ws_/logic/letters.broad_manager.dart' as _i912;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
@@ -46,8 +47,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i878.LettersRepository>(
       () => _i878.LettersRepository(gh<_i946.DbClient>()),
     );
-    gh.lazySingleton<_i288.LetterBlocManager>(
-      () => _i288.LetterBlocManager(gh<_i878.LettersRepository>()),
+    gh.lazySingleton<_i912.LettersBroadManager>(
+      () => _i912.LettersBroadManager(gh<_i878.LettersRepository>()),
     );
     gh.lazySingleton<_i625.UserDataSource>(
       () => _i625.UserDataSourceImpl(gh<_i946.DbClient>()),
@@ -68,8 +69,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i850.UnitRepository>(
       () => _i850.UnitRepositoryImpl(gh<_i845.UnitDatasource>()),
     );
-    gh.lazySingleton<_i199.ActiveUsersBloc>(
-      () => _i199.ActiveUsersBloc(
+    gh.lazySingleton<_i152.ActiveUsersBroadManager>(
+      () => _i152.ActiveUsersBroadManager(
         gh<_i850.UnitRepository>(),
         gh<_i854.SessionRepository>(),
       ),

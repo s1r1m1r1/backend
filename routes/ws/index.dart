@@ -2,15 +2,16 @@ import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/ws_/logic/active_users/active_users_bloc.dart';
-import 'package:backend/ws_/logic/letter.bloc_manager.dart';
+import 'package:backend/ws_/logic/active_users/active_users.broad_manager.dart';
+import 'package:backend/ws_/logic/letters.broad_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
-    final activeUsersBloc = context.read<ActiveUsersBloc>();
+    final _manager = context.read<ActiveUsersBroadManager>();
+    final activeUsersBloc = _manager.getBloc();
 
     channel.stream.listen(
       (message) async {
@@ -26,13 +27,11 @@ Future<Response> onRequest(RequestContext context) async {
           switch (freezed) {
             case WithTokenTS(:final token):
               // 1. Authenticate the token
-              activeUsersBloc.add(
-                ActiveUsersEvent.join(channel: channel, token: token),
-              );
+              activeUsersBloc.join(channel, token);
               break;
 
             case NewLetterTS(:final letter):
-              final blocManager = context.read<LetterBlocManager>();
+              final blocManager = context.read<LettersBroadManager>();
               final session = activeUsersBloc.sessionFromWSChannel(channel);
               if (session == null) {
                 channel.sink.add(
@@ -45,10 +44,10 @@ Future<Response> onRequest(RequestContext context) async {
                 return;
               }
 
-              debugLog('$red [WebSocket]newLetter go: $reset');
               blocManager.newLetter(session, letter);
+
             case DeleteLetterTS(:final letterId, :final roomId):
-              final blocManager = context.read<LetterBlocManager>();
+              final blocManager = context.read<LettersBroadManager>();
               final session = activeUsersBloc.sessionFromWSChannel(channel);
               if (session == null) {
                 channel.sink.add(
@@ -61,7 +60,7 @@ Future<Response> onRequest(RequestContext context) async {
 
               blocManager.removeLetter(session, roomId, letterId);
             case JoinLettersTS(:final roomId):
-              final letterBlocManager = context.read<LetterBlocManager>();
+              final letterBlocManager = context.read<LettersBroadManager>();
               final session = activeUsersBloc.sessionFromWSChannel(channel);
               if (session == null) {
                 channel.sink.add(
@@ -84,7 +83,7 @@ Future<Response> onRequest(RequestContext context) async {
         }
       },
       onDone: () async {
-        activeUsersBloc.add(ActiveUsersEvent.removeUser(channel));
+        activeUsersBloc.removeUser(channel);
       },
 
       cancelOnError: true,

@@ -1,21 +1,32 @@
 import 'dart:async';
 
+import 'package:backend/core/bloc_id.dart';
 import 'package:backend/user/session.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
-import 'package:sha_red/sha_red.dart';
 
 typedef LateCallback = FutureOr<void> Function();
 
-class SessionChannel {
+abstract class ISessionChannel {
+  int get userId;
+  void replaceChannel(WebSocketChannel channel);
+  abstract final Map<BlocId, LateCallback> shouldUnsubscribe;
+  void sinkAdd(String encodedJson);
+  void onSubscriptionCancel(BlocId id);
+  void dispose();
+}
+
+class SessionChannel extends ISessionChannel {
   SessionChannel(this.session, WebSocketChannel channel)
     : lastActiveTime = DateTime.now(),
       _channel = channel;
 
   final GameSession session;
+  @override
   int get userId => session.user.userId;
   WebSocketChannel? _channel;
   WebSocketChannel? get channel => _channel;
-  final shouldUnsubscribe = <LateCallback>[];
+  @override
+  final shouldUnsubscribe = <BlocId, LateCallback>{};
 
   DateTime lastActiveTime;
 
@@ -23,13 +34,16 @@ class SessionChannel {
     _channel = channel;
   }
 
-  void sinkAdd(ToClient toClient) {
-    _channel?.sink.add(toClient.encoded());
+  @override
+  void sinkAdd(String encodedJson) {
+    _channel?.sink.add(encodedJson);
   }
 
+  @override
   void dispose() {
-    for (final callback in shouldUnsubscribe) {
-      callback.call();
+    for (final entry in shouldUnsubscribe.entries) {
+      entry.value.call();
+      shouldUnsubscribe.remove(entry.key);
     }
     shouldUnsubscribe.clear();
   }
@@ -43,4 +57,9 @@ class SessionChannel {
       other is SessionChannel &&
           runtimeType == other.runtimeType &&
           userId == other.userId;
+
+  @override
+  void onSubscriptionCancel(BlocId id) {
+    shouldUnsubscribe.remove(id);
+  }
 }

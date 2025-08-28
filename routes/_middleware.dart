@@ -3,11 +3,11 @@ import 'package:backend/game/unit_repository.dart';
 import 'package:backend/ws_/chat_room_repository.dart';
 
 import 'package:backend/ws_/counter_repository.dart';
-import 'package:backend/ws_/logic/letter.bloc_manager.dart';
 import 'package:backend/ws_/letters_repository.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/user/session_repository.dart';
 import 'package:backend/user/user_repository.dart';
+import 'package:backend/ws_/logic/letters.broad_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:get_it/get_it.dart';
 // import 'package:drift/native.dart';
@@ -19,7 +19,7 @@ final _letterRepository = GetIt.I.get<LettersRepository>();
 final _counterRepository = CounterRepository();
 final _chatRoomRepository = ChatRoomRepository(_db);
 
-final _roomManager = GetIt.I.get<LetterBlocManager>();
+final _roomManager = GetIt.I.get<LettersBroadManager>();
 
 final _unitRepository = UnitRepositoryImpl(UnitDatasourceImpl(_db));
 
@@ -32,7 +32,7 @@ Handler middleware(Handler handler) {
       .use(provider<LettersRepository>((_) => _letterRepository))
       .use(provider<CounterRepository>((_) => _counterRepository))
       .use(provider<ChatRoomRepository>((_) => _chatRoomRepository))
-      .use(provider<LetterBlocManager>((_) => _roomManager))
+      .use(provider<LettersBroadManager>((_) => _roomManager))
       .use(provider<UnitRepository>((_) => _unitRepository));
 
   // return handler(updatedContext);
