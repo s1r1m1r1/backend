@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:backend/core/bloc_id.dart';
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/core/session_channel.dart';
 import 'package:backend/core/broadcast.dart';
-import 'package:backend/ws_/letters_repository.dart';
+import 'package:backend/features/chat/letters_repository.dart';
 import 'package:sha_red/sha_red.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -25,13 +24,12 @@ class _LettersBroad extends Broadcast<LetterTC> {
   final LettersRepository _lettersRepository;
   final _lock = Lock();
   final _letterCache = <LetterDto>[];
-  static const family = '_LetterBroadcast';
   @override
-  late BlocId blocId;
+  late BroadcastId blocId;
 
   _LettersBroad(LettersRepository lettersRepository, int roomId)
     : _lettersRepository = lettersRepository {
-    blocId = BlocId(family: family, id: roomId);
+    blocId = BroadcastId(family: BroadcastFamily.letters, id: roomId);
   }
 
   @override
@@ -104,9 +102,12 @@ class _LettersBroad extends Broadcast<LetterTC> {
   FutureOr<void> subscribeChannel(SessionChannel channel) async {
     _lock.synchronized(() async {
       try {
-        channel.sinkAdd(_lettersDTO().encoded());
         subscribe(channel);
         channel.shouldUnsubscribe[blocId] = () => unsubscribe(channel);
+        channel.sinkAdd(_lettersDTO().encoded());
+        channel.sinkAdd(
+          ToClient.broadcastInfo(channel.getJoinedBroads().toList()).encoded(),
+        );
       } catch (e, s) {
         addError(e, s);
       }

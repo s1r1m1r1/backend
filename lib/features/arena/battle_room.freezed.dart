@@ -157,4 +157,150 @@ as bool,
 
 }
 
+/// @nodoc
+mixin _$EdictGroup {
+
+ int get id; List<int> get unitIds; DateTime get createdAt; DateTime? get battleStartIn; bool get isFighting;
+/// Create a copy of EdictGroup
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$EdictGroupCopyWith<EdictGroup> get copyWith => _$EdictGroupCopyWithImpl<EdictGroup>(this as EdictGroup, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EdictGroup&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other.unitIds, unitIds)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.battleStartIn, battleStartIn) || other.battleStartIn == battleStartIn)&&(identical(other.isFighting, isFighting) || other.isFighting == isFighting));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(unitIds),createdAt,battleStartIn,isFighting);
+
+@override
+String toString() {
+  return 'EdictGroup(id: $id, unitIds: $unitIds, createdAt: $createdAt, battleStartIn: $battleStartIn, isFighting: $isFighting)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $EdictGroupCopyWith<$Res>  {
+  factory $EdictGroupCopyWith(EdictGroup value, $Res Function(EdictGroup) _then) = _$EdictGroupCopyWithImpl;
+@useResult
+$Res call({
+ int id, List<int> unitIds, DateTime createdAt, DateTime? battleStartIn, bool isFighting
+});
+
+
+
+
+}
+/// @nodoc
+class _$EdictGroupCopyWithImpl<$Res>
+    implements $EdictGroupCopyWith<$Res> {
+  _$EdictGroupCopyWithImpl(this._self, this._then);
+
+  final EdictGroup _self;
+  final $Res Function(EdictGroup) _then;
+
+/// Create a copy of EdictGroup
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? unitIds = null,Object? createdAt = null,Object? battleStartIn = freezed,Object? isFighting = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,unitIds: null == unitIds ? _self.unitIds : unitIds // ignore: cast_nullable_to_non_nullable
+as List<int>,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,battleStartIn: freezed == battleStartIn ? _self.battleStartIn : battleStartIn // ignore: cast_nullable_to_non_nullable
+as DateTime?,isFighting: null == isFighting ? _self.isFighting : isFighting // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+
+/// @nodoc
+
+
+class _EdictGroup implements EdictGroup {
+  const _EdictGroup({required this.id, final  List<int> unitIds = const [], required this.createdAt, this.battleStartIn, this.isFighting = false}): _unitIds = unitIds;
+  
+
+@override final  int id;
+ final  List<int> _unitIds;
+@override@JsonKey() List<int> get unitIds {
+  if (_unitIds is EqualUnmodifiableListView) return _unitIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_unitIds);
+}
+
+@override final  DateTime createdAt;
+@override final  DateTime? battleStartIn;
+@override@JsonKey() final  bool isFighting;
+
+/// Create a copy of EdictGroup
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$EdictGroupCopyWith<_EdictGroup> get copyWith => __$EdictGroupCopyWithImpl<_EdictGroup>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EdictGroup&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other._unitIds, _unitIds)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.battleStartIn, battleStartIn) || other.battleStartIn == battleStartIn)&&(identical(other.isFighting, isFighting) || other.isFighting == isFighting));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(_unitIds),createdAt,battleStartIn,isFighting);
+
+@override
+String toString() {
+  return 'EdictGroup(id: $id, unitIds: $unitIds, createdAt: $createdAt, battleStartIn: $battleStartIn, isFighting: $isFighting)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$EdictGroupCopyWith<$Res> implements $EdictGroupCopyWith<$Res> {
+  factory _$EdictGroupCopyWith(_EdictGroup value, $Res Function(_EdictGroup) _then) = __$EdictGroupCopyWithImpl;
+@override @useResult
+$Res call({
+ int id, List<int> unitIds, DateTime createdAt, DateTime? battleStartIn, bool isFighting
+});
+
+
+
+
+}
+/// @nodoc
+class __$EdictGroupCopyWithImpl<$Res>
+    implements _$EdictGroupCopyWith<$Res> {
+  __$EdictGroupCopyWithImpl(this._self, this._then);
+
+  final _EdictGroup _self;
+  final $Res Function(_EdictGroup) _then;
+
+/// Create a copy of EdictGroup
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? unitIds = null,Object? createdAt = null,Object? battleStartIn = freezed,Object? isFighting = null,}) {
+  return _then(_EdictGroup(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,unitIds: null == unitIds ? _self._unitIds : unitIds // ignore: cast_nullable_to_non_nullable
+as List<int>,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,battleStartIn: freezed == battleStartIn ? _self.battleStartIn : battleStartIn // ignore: cast_nullable_to_non_nullable
+as DateTime?,isFighting: null == isFighting ? _self.isFighting : isFighting // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
 // dart format on

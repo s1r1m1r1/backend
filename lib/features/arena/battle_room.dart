@@ -11,3 +11,14 @@ abstract class BattleRoom with _$BattleRoom {
     @Default(false) bool isFighting,
   }) = _BattleRoom;
 }
+
+@freezed
+abstract class EdictGroup with _$EdictGroup {
+  const factory EdictGroup({
+    required int id,
+    @Default([]) List<int> unitIds,
+    required DateTime createdAt,
+    DateTime? battleStartIn,
+    @Default(false) bool isFighting,
+  }) = _EdictGroup;
+}

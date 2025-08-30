@@ -9,6 +9,6 @@ void watchRecords(LogRecord rec) {
 
   if (kDebugMode) {
     // Logger(Unit.loggerName).level = Level.ALL;
+    debugLog('${rec.level.color}:${rec.loggerName}: ${rec.message}');
   }
-  debugLog('${rec.level.color}:${rec.loggerName}: ${rec.message}');
 }

@@ -4,7 +4,7 @@ import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/models/user.dart';
-import 'package:backend/user/session.dart';
+import 'package:backend/features/auth/session.dart';
 import 'package:drift/drift.dart' show Value;
 
 import 'package:backend/db_client/dao/session_dao.dart';

@@ -1,11 +1,30 @@
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/session_channel.dart';
-import 'package:backend/ws_/letters_repository.dart';
-import 'package:backend/ws_/logic/letters.broad.dart';
+import 'package:backend/features/chat/letters_repository.dart';
+import 'package:backend/features/chat/letters.broad.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 
-@lazySingleton
+@module
+abstract class LettersBroadManagerModule {
+  @prod
+  @lazySingleton
+  LettersBroadManager prodLettersManager(LettersRepository rep) {
+    final manager = LettersBroadManager(rep);
+    manager.createRoom(1);
+    return manager;
+  }
+
+  @test
+  @dev
+  @lazySingleton
+  LettersBroadManager devLettersManager(LettersRepository rep) {
+    final manager = LettersBroadManager(rep);
+    manager.createRoom(2);
+    return manager;
+  }
+}
+
 class LettersBroadManager {
   LettersBroadManager(this._lettersRepository);
   final LettersRepository _lettersRepository;
