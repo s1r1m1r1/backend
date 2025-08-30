@@ -2,16 +2,17 @@ import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/ws_/logic/active_users/active_users.broad_manager.dart';
-import 'package:backend/ws_/logic/letters.broad_manager.dart';
+import 'package:backend/features/arena/arena.broadcast.dart';
+import 'package:backend/features/online/active_users/active_users.broadcast.dart';
+import 'package:backend/features/chat/letters.broad_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
-    final _manager = context.read<ActiveUsersBroadManager>();
-    final activeUsersBloc = _manager.getBloc();
+    final activeUsersBloc = context.read<ActiveUsersBroad>();
+    final arenaBroadcast = context.read<ArenaBroadcast>();
 
     channel.stream.listen(
       (message) async {
@@ -77,6 +78,64 @@ Future<Response> onRequest(RequestContext context) async {
               break;
             case LeaveBattleRoom():
               break;
+            case GetJoinedBroadsTS():
+              activeUsersBloc.infoJoinedBroads(channel);
+            case CreateNewEdictTS():
+              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              if (session == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+                return;
+              }
+              arenaBroadcast.createEdict(session);
+              break;
+            case JoinEdictTS():
+              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              if (session == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+                return;
+              }
+              arenaBroadcast.createEdict(session);
+            case LeaveEdictTS():
+              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              if (session == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+                return;
+              }
+              arenaBroadcast.createEdict(session);
+            case JoinArenaTS():
+              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              if (session == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+                return;
+              }
+              arenaBroadcast.subscribeChannel(session);
+            case LeaveArenaTS():
+              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              if (session == null) {
+                channel.sink.add(
+                  ToClient.statusError(
+                    error: WsServerError.unauthorized,
+                  ).encoded(),
+                );
+                return;
+              }
+              arenaBroadcast.leaveArena(session);
           }
         } catch (e, s) {
           debugLog('$red [WebSocket] Error: $e $s $reset');

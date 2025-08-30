@@ -4,10 +4,10 @@ import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/user.dart';
-import 'package:backend/user/hash_extension.dart';
-import 'package:backend/user/session_datasource.dart';
+import 'package:backend/features/auth/hash_extension.dart';
+import 'package:backend/features/auth/session_datasource.dart';
 
-import 'package:backend/user/session.dart';
+import 'package:backend/features/auth/session.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class SessionRepository {

@@ -1,17 +1,17 @@
 import 'dart:async';
 
-import 'package:backend/core/bloc_id.dart';
-import 'package:backend/user/session.dart';
+import 'package:backend/features/auth/session.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
+import 'package:sha_red/sha_red.dart';
 
 typedef LateCallback = FutureOr<void> Function();
 
 abstract class ISessionChannel {
   int get userId;
   void replaceChannel(WebSocketChannel channel);
-  abstract final Map<BlocId, LateCallback> shouldUnsubscribe;
+  abstract final Map<BroadcastId, LateCallback> shouldUnsubscribe;
   void sinkAdd(String encodedJson);
-  void onSubscriptionCancel(BlocId id);
+  void onSubscriptionCancel(BroadcastId id);
   void dispose();
 }
 
@@ -26,7 +26,7 @@ class SessionChannel extends ISessionChannel {
   WebSocketChannel? _channel;
   WebSocketChannel? get channel => _channel;
   @override
-  final shouldUnsubscribe = <BlocId, LateCallback>{};
+  final shouldUnsubscribe = <BroadcastId, LateCallback>{};
 
   DateTime lastActiveTime;
 
@@ -59,7 +59,12 @@ class SessionChannel extends ISessionChannel {
           userId == other.userId;
 
   @override
-  void onSubscriptionCancel(BlocId id) {
+  void onSubscriptionCancel(BroadcastId id) {
     shouldUnsubscribe.remove(id);
+  }
+
+  Iterable<BroadcastId> getJoinedBroads() {
+    final keys = shouldUnsubscribe.keys.toList();
+    return keys;
   }
 }

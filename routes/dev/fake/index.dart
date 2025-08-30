@@ -6,8 +6,8 @@ import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/models/validation/email_password_ext.dart';
-import 'package:backend/user/http_check_session_.dart';
-import 'package:backend/user/user_repository.dart';
+import 'package:backend/features/auth/http_check_session_.dart';
+import 'package:backend/features/auth/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:sha_red/sha_red.dart';
 

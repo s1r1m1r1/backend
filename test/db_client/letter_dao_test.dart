@@ -1,6 +1,5 @@
 import '../../lib/db_client/dao/letters_dao.dart';
 import '../../lib/db_client/db_client.dart';
-import '../../lib/models/enums.dart';
 import 'package:drift/native.dart';
 import 'package:test/test.dart';
 

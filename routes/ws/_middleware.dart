@@ -1,12 +1,10 @@
-import 'package:backend/ws_/logic/active_users/active_users.broad_manager.dart';
+import 'package:backend/features/arena/arena.broadcast.dart';
+import 'package:backend/features/online/active_users/active_users.broadcast.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:get_it/get_it.dart';
 
-// for all users , create one for all
-final _activeUsersBloc = GetIt.I.get<ActiveUsersBroadManager>();
-// Handler middleware(Handler handler) {
-//   return sessionMiddleware(handler, addToContext: [_addToContext]);
-// }
+final _activeUsersBloc = GetIt.I.get<ActiveUsersBroad>();
+final _arenaBroadcast = GetIt.I.get<ArenaBroadcast>();
 
 Handler middleware(Handler handler) {
   // return sessionMiddleware(handler, addToContext: [_addToContext]);
@@ -17,8 +15,11 @@ Handler middleware(Handler handler) {
 }
 
 RequestContext _addToContext(RequestContext context) {
-  var updatedContext = context.provide<ActiveUsersBroadManager>(
+  var updatedContext = context.provide<ActiveUsersBroad>(
     () => _activeUsersBloc,
+  );
+  updatedContext = updatedContext.provide<ArenaBroadcast>(
+    () => _arenaBroadcast,
   );
   return updatedContext;
 }

@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/game/unit_repository.dart';
-import 'package:backend/user/http_check_session_.dart';
+import 'package:backend/features/auth/http_check_session_.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -35,7 +35,10 @@ FutureOr<Response> getSelectedUnit(RequestContext context) async {
     return Response.json(body: dto.toJson());
   } on ApiException catch (e, stack) {
     stdout.writeln('$yellow geListUnit $reset ${e.statusCode} ${stack}');
-    return Response.json(body: {'message': e.toString()}, statusCode: e.statusCode);
+    return Response.json(
+      body: {'message': e.toString()},
+      statusCode: e.statusCode,
+    );
   } on Object catch (e, stack) {
     stdout.writeln('$yellow getListUnit $reset UNKNOWN ERROR ${stack}');
     return Response.json(

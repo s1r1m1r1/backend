@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/game/unit_repository.dart';
-import 'package:backend/user/http_check_session_.dart';
+import 'package:backend/features/auth/http_check_session_.dart';
 import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/models/validation/map_to_int.dart';
 import 'package:dart_frog/dart_frog.dart';
@@ -34,7 +34,10 @@ FutureOr<Response> getUnit(RequestContext context, String id) async {
     final user = record.$1;
     final characterRepo = context.read<UnitRepository>();
     final characterId = mapToInt(id);
-    final dto = await characterRepo.getUnit(userId: user.userId, characterId: characterId);
+    final dto = await characterRepo.getUnit(
+      userId: user.userId,
+      characterId: characterId,
+    );
     if (dto != null) return Response.json(body: dto.toJson());
     return Response(statusCode: HttpStatus.notFound);
   } on ApiException catch (e, stack) {
@@ -88,7 +91,10 @@ FutureOr<Response> deleteUnit(RequestContext context, String id) async {
     final uRepo = context.read<UnitRepository>();
     final characterId = mapToInt(id);
 
-    final res = await uRepo.deleteUnit(userId: user.userId, characterId: characterId);
+    final res = await uRepo.deleteUnit(
+      userId: user.userId,
+      characterId: characterId,
+    );
     if (res == 0) {
       return Response(statusCode: HttpStatus.notFound);
     }

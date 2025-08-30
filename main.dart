@@ -1,30 +1,20 @@
 import 'dart:io';
-import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/inject.dart';
 import 'package:backend/core/broadcast.dart';
-import 'package:backend/db_client/db_client.dart';
-import 'package:backend/ws_/logic/active_users/active_users.broad_manager.dart';
-import 'package:backend/ws_/logic/broadcast_observer.dart';
-import 'package:backend/ws_/logic/letters.broad_manager.dart';
-import 'package:backend/ws_/logic/server_bloc_observer.dart';
-import 'package:bloc/bloc.dart';
+import 'package:backend/core/broadcast_observer.dart';
+import 'package:backend/core/watch_records.dart';
 import 'package:dart_frog/dart_frog.dart';
-import 'package:sha_red/sha_red.dart';
+import 'package:injectable/injectable.dart';
+import 'package:logging/logging.dart';
 // import 'package:logging/logging.dart';
 
 // инициализация зависимостей один раз, во время  hot-reload  не перезапускается
 Future<void> init(InternetAddress ip, int port) async {
-  Bloc.observer = ServerBlocObserver();
+  hierarchicalLoggingEnabled = true;
   Broadcast.observer = ServerBroadcastObserver();
+  Logger.root.onRecord.listen(watchRecords);
 
-  configInjector(getIt);
-  final tables = await getIt<DbClient>().configDao.getListConfig();
-  final indexRoom = tables.indexWhere((i) => i.role == Role.user);
-  if (indexRoom == -1) exit(1);
-  debugLog('INDEX START ${indexRoom}');
-  final roomId = tables[indexRoom].id;
-  getIt<ActiveUsersBroadManager>()..createRoom(roomId);
-  getIt<LettersBroadManager>()..createRoom(roomId);
+  configInjector(getIt, env: Environment.dev);
 }
 
 /// Основная функция запуска сервера Dart Frog.
@@ -37,17 +27,6 @@ Future<HttpServer> run(Handler handler, InternetAddress ip, int port) async {
     print('Failed');
     exit(1);
   }
-  /*
-  final chain = Platform.script.resolve('certificates/server_chain.pem').toFilePath();
-  final key = Platform.script.resolve('certificates/server_key.pem').toFilePath();
-  // Создаем контекст безопасности для использования SSL/TLS.
-  final securityContext = SecurityContext()
-    ..useCertificateChain(chain)
-    ..usePrivateKey(key, password: 'MyPowerfulFrogPassword');
-   
-  // Запускаем сервер Dart Frog с указанным обработчиком, IP-адресом, портом и контекстом безопасности.
-  return serve(handler, ip, port, securityContext: securityContext);
-*/
 
   /// Scope correct works when hot-reload
   print('START');
