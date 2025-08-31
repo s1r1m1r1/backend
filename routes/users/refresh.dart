@@ -2,10 +2,9 @@ import 'dart:async' show FutureOr;
 import 'dart:io';
 
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/game/unit_repository.dart';
 import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/features/auth/session_repository.dart';
+import 'package:backend/modules/auth/session_repository.dart';
 import 'package:dart_frog/dart_frog.dart' as frog;
 import 'package:dart_frog/dart_frog.dart';
 import 'package:sha_red/sha_red.dart';
@@ -46,16 +45,10 @@ FutureOr<Response> refresh(RequestContext context) async {
     }
 
     if (isValidToken && isValidRefresh) {
-      final unitRepo = context.read<UnitRepository>();
-      final unitDto = await unitRepo.getSelectedUnit(session.user.userId);
       return Response.json(
-        body: SessionDto(
-          user: session.user.toDto(),
-          tokens: TokensDto(
-            accessToken: session.token,
-            refreshToken: session.refreshToken,
-          ),
-          unit: unitDto,
+        body: TokensDto(
+          accessToken: session.token,
+          refreshToken: session.refreshToken,
         ).toJson(),
         statusCode: HttpStatus.accepted,
       );
@@ -67,16 +60,10 @@ FutureOr<Response> refresh(RequestContext context) async {
       '$magenta [refresh] New session issued: accessToken=${newSession.token}, refreshToken=${newSession.refreshToken} $reset',
     );
 
-    final unitRepo = context.read<UnitRepository>();
-    final unitDto = await unitRepo.getSelectedUnit(session.user.userId);
     return Response.json(
-      body: SessionDto(
-        user: session.user.toDto(),
-        tokens: TokensDto(
-          accessToken: session.token,
-          refreshToken: session.refreshToken,
-        ),
-        unit: unitDto,
+      body: TokensDto(
+        accessToken: session.token,
+        refreshToken: session.refreshToken,
       ).toJson(),
 
       statusCode: HttpStatus.accepted,

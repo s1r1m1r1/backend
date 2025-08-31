@@ -4,7 +4,7 @@ import 'package:backend/db_client/dao/unit_dao.dart';
 import 'package:backend/db_client/tables/character_table.dart';
 import 'package:backend/db_client/tables/selected_unit_table.dart';
 import 'package:backend/db_client/tables/unit_table.dart';
-import 'package:backend/features/auth/password_hash_service.dart';
+import 'package:backend/modules/auth/password_hash_service.dart';
 import 'package:get_it/get_it.dart';
 
 import 'dao/letters_dao.dart';

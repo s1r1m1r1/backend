@@ -4,11 +4,10 @@ import 'dart:io';
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/game/unit_repository.dart';
 import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/models/validation/email_password_ext.dart';
-import 'package:backend/features/auth/session_repository.dart';
-import 'package:backend/features/auth/user_repository.dart';
+import 'package:backend/modules/auth/session_repository.dart';
+import 'package:backend/modules/auth/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:sha_red/sha_red.dart';
 import 'package:stack_trace/stack_trace.dart';
@@ -40,18 +39,11 @@ FutureOr<Response> login(RequestContext context) async {
     stdout.writeln(
       '$magenta login return ${newSession.token} , ${newSession.refreshToken} $reset',
     );
-    final unitRepo = context.read<UnitRepository>();
-    final unitDto = await unitRepo.getSelectedUnit(user.userId);
     return Response.json(
-      body: SessionDto(
-        user: newSession.user.toDto(),
-        tokens: TokensDto(
-          accessToken: newSession.token,
-          refreshToken: newSession.refreshToken,
-        ),
-        unit: unitDto,
+      body: TokensDto(
+        accessToken: newSession.token,
+        refreshToken: newSession.refreshToken,
       ).toJson(),
-
       statusCode: HttpStatus.accepted,
     );
     // return _signAndSendToken(user);

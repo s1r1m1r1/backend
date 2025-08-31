@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/game/unit_repository.dart';
-import 'package:backend/features/auth/http_check_session_.dart';
+import 'package:backend/modules/auth/http_check_session_.dart';
 import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/models/validation/map_to_int.dart';
 import 'package:dart_frog/dart_frog.dart';

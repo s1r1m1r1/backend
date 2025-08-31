@@ -6,9 +6,9 @@ import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/session_channel.dart';
 import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
-import 'package:backend/features/auth/session.dart';
-import 'package:backend/features/auth/session_repository.dart';
-import 'package:backend/features/online/active_users/active_sessions_mixin.dart';
+import 'package:backend/modules/auth/session.dart';
+import 'package:backend/modules/auth/session_repository.dart';
+import 'package:backend/modules/game/domain/active_sessions_repository.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
@@ -21,29 +21,46 @@ abstract class ActiveUsersBroadcastModule {
   @prod
   @lazySingleton
   ActiveUsersBroad prodBroadcast(
+    ActiveUsersRepository activeUsersRepository,
     UnitRepository unitRepository,
     SessionRepository sessionRepository,
-  ) => ActiveUsersBroad(unitRepository, sessionRepository, 1);
+  ) => ActiveUsersBroad(
+    activeUsersRepository,
+    unitRepository,
+    sessionRepository,
+    1,
+  );
 
   @test
   @dev
   @lazySingleton
   ActiveUsersBroad devBroadcast(
+    ActiveUsersRepository activeUsersRepository,
     UnitRepository unitRepository,
     SessionRepository sessionRepository,
-  ) => ActiveUsersBroad(unitRepository, sessionRepository, 2);
+  ) => ActiveUsersBroad(
+    activeUsersRepository,
+    unitRepository,
+    sessionRepository,
+    2,
+  );
 }
 
-class ActiveUsersBroad extends Broadcast<ToClient> with ActiveUsersMixin {
+class ActiveUsersBroad extends Broadcast<ToClient> {
   final UnitRepository _unitRepository;
   final SessionRepository _sessionRepository;
+  final ActiveUsersRepository _activeUsersRepository;
   final _lock = Lock();
 
   @override
   late BroadcastId blocId;
 
-  ActiveUsersBroad(this._unitRepository, this._sessionRepository, int id)
-    : blocId = BroadcastId(family: BroadcastFamily.activeUsers, id: id);
+  ActiveUsersBroad(
+    this._activeUsersRepository,
+    this._unitRepository,
+    this._sessionRepository,
+    int id,
+  ) : blocId = BroadcastId(family: BroadcastFamily.activeUsers, id: id);
 
   FutureOr<void> join(WebSocketChannel channel, String token) async {
     _lock.synchronized(() async {
@@ -77,9 +94,8 @@ class ActiveUsersBroad extends Broadcast<ToClient> with ActiveUsersMixin {
         return;
       }
       debugLog('$green ActiveUsersBloc$reset 3');
-      final SessionChannel? sessionChannel = getSessionChannel(
-        session.user.userId,
-      );
+      final SessionChannel? sessionChannel = _activeUsersRepository
+          .getSessionChannel(session.user.userId);
       debugLog('$green ActiveUsersBloc$reset 4');
       if (sessionChannel != null && sessionChannel.channel != channel) {
         final previousChannel = sessionChannel.channel;
@@ -109,8 +125,10 @@ class ActiveUsersBroad extends Broadcast<ToClient> with ActiveUsersMixin {
       }
       debugLog('$green ActiveUsersBloc$reset 7');
       final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-      addSession(channel, gameSession);
-      final newSessionChannel = getSessionChannel(gameSession.user.userId);
+      _activeUsersRepository.addSession(channel, gameSession);
+      final newSessionChannel = _activeUsersRepository.getSessionChannel(
+        gameSession.user.userId,
+      );
       if (newSessionChannel == null) return;
       subscribe(newSessionChannel);
       newSessionChannel.shouldUnsubscribe[blocId] = () =>
@@ -138,11 +156,11 @@ class ActiveUsersBroad extends Broadcast<ToClient> with ActiveUsersMixin {
     _lock.synchronized(() async {
       try {
         debugLog('$green ActiveUsersBloc$reset infoJoinedBroads');
-        final userId = getUserId(channel);
+        final userId = _activeUsersRepository.getUserId(channel);
         if (userId == null) return;
 
         debugLog('$green ActiveUsersBloc$reset infoJoinedBroads 2');
-        final sessionChannel = getSessionChannel(userId);
+        final sessionChannel = _activeUsersRepository.getSessionChannel(userId);
         final boards = sessionChannel?.getJoinedBroads().toList();
         channel.sink.add(ToClient.broadcastInfo(boards ?? []).encoded());
       } catch (e, s) {
@@ -154,12 +172,12 @@ class ActiveUsersBroad extends Broadcast<ToClient> with ActiveUsersMixin {
   void removeUser(WebSocketChannel channel) {
     _lock.synchronized(() async {
       try {
-        final userId = getUserId(channel);
+        final userId = _activeUsersRepository.getUserId(channel);
         if (userId == null) return;
-        final sessionChannel = getSessionChannel(userId);
+        final sessionChannel = _activeUsersRepository.getSessionChannel(userId);
         sessionChannel?.dispose();
-        removeChannelID(channel);
-        removeIDsession(userId);
+        _activeUsersRepository.removeChannelID(channel);
+        _activeUsersRepository.removeIDsession(userId);
         channel.sink.add(ToClient.terminatedAllBroadcast().encoded());
         _onlineBroadcast();
       } catch (e, s) {
@@ -173,7 +191,8 @@ class ActiveUsersBroad extends Broadcast<ToClient> with ActiveUsersMixin {
       ToClient.onlineUsers(
         OnlineMemberPayload(
           roomId: blocId.id,
-          members: getListGameSessions()
+          members: _activeUsersRepository
+              .getListGameSessions()
               .map((i) => OnlineMemberDto(i.unit.id, i.unit.name))
               .toList(),
         ),

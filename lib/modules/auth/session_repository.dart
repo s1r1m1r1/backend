@@ -4,10 +4,10 @@ import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/user.dart';
-import 'package:backend/features/auth/hash_extension.dart';
-import 'package:backend/features/auth/session_datasource.dart';
+import 'package:backend/modules/auth/hash_extension.dart';
+import 'package:backend/modules/auth/session_datasource.dart';
 
-import 'package:backend/features/auth/session.dart';
+import 'package:backend/modules/auth/session.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class SessionRepository {
@@ -19,6 +19,8 @@ abstract class SessionRepository {
     String? refreshToken,
     int? userId,
   });
+
+  Future<Session?> fakeSession(int userId);
 
   bool validateToken(Session session);
   bool validateRefreshToken(Session session);
@@ -112,5 +114,10 @@ class SessionRepositoryImpl implements SessionRepository {
   @override
   bool validateRefreshToken(Session session) {
     return session.refreshTokenExpiry.isAfter(_now());
+  }
+
+  @override
+  Future<Session?> fakeSession(int userId) async {
+    return null;
   }
 }

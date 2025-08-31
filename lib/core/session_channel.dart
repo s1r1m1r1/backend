@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:backend/features/auth/session.dart';
+import 'package:backend/modules/auth/session.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
 
@@ -16,19 +16,26 @@ abstract class ISessionChannel {
 }
 
 class SessionChannel extends ISessionChannel {
-  SessionChannel(this.session, WebSocketChannel channel)
-    : lastActiveTime = DateTime.now(),
-      _channel = channel;
+  SessionChannel._(this.session, this._channel);
+  factory SessionChannel.fromChannel(
+    GameSession session,
+    WebSocketChannel channel,
+  ) => SessionChannel._(session, channel);
+
+  // factory SessionChannel.bot(this.session) =>SessionChannel(session.null);
 
   final GameSession session;
+
   @override
   int get userId => session.user.userId;
+
   WebSocketChannel? _channel;
   WebSocketChannel? get channel => _channel;
+
   @override
   final shouldUnsubscribe = <BroadcastId, LateCallback>{};
 
-  DateTime lastActiveTime;
+  DateTime? lastActiveTime;
 
   void replaceChannel(WebSocketChannel channel) {
     _channel = channel;

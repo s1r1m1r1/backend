@@ -1,8 +1,15 @@
 import 'package:backend/core/session_channel.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
-import 'package:backend/features/auth/session.dart';
+import 'package:backend/modules/auth/session.dart';
+import 'package:injectable/injectable.dart';
 
-mixin class ActiveUsersMixin {
+@module
+abstract class ActiveSessionsModule {
+  @lazySingleton
+  ActiveUsersRepository activeUsersRepository() => ActiveUsersRepository();
+}
+
+class ActiveUsersRepository {
   //  userId
   final channel_idKV = <WebSocketChannel, int>{};
   final id_sessionChannelKV = <int, SessionChannel>{};
@@ -31,7 +38,7 @@ mixin class ActiveUsersMixin {
   }
 
   void addSession(WebSocketChannel channel, GameSession session) {
-    final sessionChannel = SessionChannel(session, channel);
+    final sessionChannel = SessionChannel.fromChannel(session, channel);
     id_sessionChannelKV[session.user.userId] = sessionChannel;
     channel_idKV[channel] = sessionChannel.userId;
   }

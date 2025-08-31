@@ -1,7 +1,7 @@
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/session_channel.dart';
-import 'package:backend/features/chat/letters_repository.dart';
-import 'package:backend/features/chat/letters.broad.dart';
+import 'package:backend/modules/game/domain/letters_repository.dart';
+import 'package:backend/modules/game/letters.broad.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 

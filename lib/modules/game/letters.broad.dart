@@ -4,7 +4,7 @@ import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/core/session_channel.dart';
 import 'package:backend/core/broadcast.dart';
-import 'package:backend/features/chat/letters_repository.dart';
+import 'package:backend/modules/game/domain/letters_repository.dart';
 import 'package:sha_red/sha_red.dart';
 import 'package:synchronized/synchronized.dart';
 
