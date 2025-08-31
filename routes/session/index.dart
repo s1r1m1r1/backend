@@ -5,7 +5,7 @@ import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/game/unit_repository.dart';
-import 'package:backend/features/auth/http_check_session_.dart';
+import 'package:backend/modules/auth/http_check_session_.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:sha_red/sha_red.dart';
 
@@ -31,14 +31,7 @@ FutureOr<Response> getSession(RequestContext context) async {
     final record = await checkSession(context);
     final unitRepo = context.read<UnitRepository>();
     final unit = await unitRepo.getSelectedUnit(record.$1.userId);
-    final dto = SessionDto(
-      user: record.$1.toDto(),
-      tokens: TokensDto(
-        accessToken: record.$2.token,
-        refreshToken: record.$2.refreshToken,
-      ),
-      unit: unit,
-    );
+    final dto = SessionDto(user: record.$1.toDto(), unit: unit);
     return Response.json(body: dto.toJson());
   } on ApiException catch (e, stack) {
     debugLog('$yellow geListUnit $reset ${e.statusCode} ${stack}');

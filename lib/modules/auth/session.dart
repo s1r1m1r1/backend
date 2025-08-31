@@ -7,8 +7,12 @@ abstract class IGameSession {
   abstract final Unit unit;
 }
 
+abstract class ISession {
+  abstract final User user;
+}
+
 // The base Session class without the unit.
-class Session extends Equatable {
+class Session extends Equatable implements ISession {
   const Session({
     this.id,
     required this.token,
@@ -51,54 +55,21 @@ class Session extends Equatable {
 }
 
 // The GameSession class with the unit, extending Session.
-class GameSession extends Session implements IGameSession {
-  const GameSession({
-    int? id,
-    required String token,
-    required User user,
-    required DateTime tokenExpiryDate,
-    required DateTime createdAt,
-    required String refreshToken,
-    required DateTime refreshTokenExpiry,
-    required this.unit,
-  }) : super(
-         id: id,
-         token: token,
-         user: user,
-         tokenExpiryDate: tokenExpiryDate,
-         createdAt: createdAt,
-         refreshToken: refreshToken,
-         refreshTokenExpiry: refreshTokenExpiry,
-       );
+class GameSession implements ISession, IGameSession {
+  const GameSession({required this.user, required this.unit});
 
   factory GameSession.fromSession(Session session, Unit unit) {
-    return GameSession(
-      id: session.id,
-      token: session.token,
-      user: session.user,
-      tokenExpiryDate: session.tokenExpiryDate,
-      createdAt: session.createdAt,
-      refreshToken: session.refreshToken,
-      refreshTokenExpiry: session.refreshTokenExpiry,
-      unit: unit,
-    );
+    return GameSession(user: session.user, unit: unit);
   }
 
   GameSession changeUnit(Unit unit) {
-    return GameSession(
-      id: id,
-      token: token,
-      user: user,
-      tokenExpiryDate: tokenExpiryDate,
-      createdAt: createdAt,
-      refreshToken: refreshToken,
-      refreshTokenExpiry: refreshTokenExpiry,
-      unit: unit,
-    );
+    return GameSession(user: user, unit: unit);
   }
 
   @override
   final Unit unit;
+  @override
+  final User user;
 }
 
 extension GameSessionExt on GameSession {
@@ -107,7 +78,6 @@ extension GameSessionExt on GameSession {
       mainRoomId: roomId,
       user: user.toDto(),
       unit: unit.toDto(),
-      tokens: TokensDto(accessToken: token, refreshToken: refreshToken),
     );
   }
 }

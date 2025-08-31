@@ -5,8 +5,8 @@ import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/serializers/parse_json.dart';
 import 'package:backend/core/log_colors.dart';
 import 'package:backend/models/validation/email_password_ext.dart';
-import 'package:backend/features/auth/session_repository.dart';
-import 'package:backend/features/auth/user_repository.dart';
+import 'package:backend/modules/auth/session_repository.dart';
+import 'package:backend/modules/auth/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart' as frog;
 import 'package:dart_frog/dart_frog.dart';
 import 'package:sha_red/sha_red.dart';
@@ -41,12 +41,9 @@ FutureOr<Response> signup(RequestContext context) async {
     );
 
     return Response.json(
-      body: SessionDto(
-        user: session.user.toDto(),
-        tokens: TokensDto(
-          accessToken: session.token,
-          refreshToken: session.refreshToken,
-        ),
+      body: TokensDto(
+        accessToken: session.token,
+        refreshToken: session.refreshToken,
       ).toJson(),
       statusCode: HttpStatus.accepted,
     );

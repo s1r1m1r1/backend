@@ -7,9 +7,9 @@ import 'package:sha_red/sha_red.dart';
 import 'package:backend/core/new_api_exceptions.dart';
 import 'package:backend/models/user.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/features/auth/password_hash_service.dart';
-import 'package:backend/features/auth/user_datasource.dart';
-import 'package:backend/features/auth/mailing_service.dart';
+import 'package:backend/modules/auth/password_hash_service.dart';
+import 'package:backend/modules/auth/user_datasource.dart';
+import 'package:backend/modules/auth/mailing_service.dart';
 
 abstract class UserRepository {
   Future<User?> getUser({

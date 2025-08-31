@@ -1,11 +1,11 @@
 import 'package:backend/game/unit_datasource.dart';
 import 'package:backend/game/unit_repository.dart';
 
-import 'package:backend/features/chat/letters_repository.dart';
+import 'package:backend/modules/game/domain/letters_repository.dart';
 import 'package:backend/db_client/db_client.dart';
-import 'package:backend/features/auth/session_repository.dart';
-import 'package:backend/features/auth/user_repository.dart';
-import 'package:backend/features/chat/letters.broad_manager.dart';
+import 'package:backend/modules/auth/session_repository.dart';
+import 'package:backend/modules/auth/user_repository.dart';
+import 'package:backend/modules/game/letters.broad_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:get_it/get_it.dart';
 // import 'package:drift/native.dart';

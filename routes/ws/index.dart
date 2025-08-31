@@ -1,18 +1,21 @@
 import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
+import 'package:backend/core/inject.dart';
 import 'package:backend/core/log_colors.dart';
-import 'package:backend/features/arena/arena.broadcast.dart';
-import 'package:backend/features/online/active_users/active_users.broadcast.dart';
-import 'package:backend/features/chat/letters.broad_manager.dart';
+import 'package:backend/modules/game/arena.broadcast.dart';
+import 'package:backend/modules/game/active_users.broadcast.dart';
+import 'package:backend/modules/game/domain/active_sessions_repository.dart';
+import 'package:backend/modules/game/letters.broad_manager.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((channel, protocol) {
-    final activeUsersBloc = context.read<ActiveUsersBroad>();
-    final arenaBroadcast = context.read<ArenaBroadcast>();
+    final activeUsersBloc = getIt<ActiveUsersBroad>();
+    final activeUsersRepository = getIt<ActiveUsersRepository>();
+    final arenaBroadcast = getIt<ArenaBroadcast>();
 
     channel.stream.listen(
       (message) async {
@@ -33,7 +36,9 @@ Future<Response> onRequest(RequestContext context) async {
 
             case NewLetterTS(:final letter):
               final blocManager = context.read<LettersBroadManager>();
-              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              final session = activeUsersRepository.sessionFromWSChannel(
+                channel,
+              );
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
@@ -49,7 +54,9 @@ Future<Response> onRequest(RequestContext context) async {
 
             case DeleteLetterTS(:final letterId, :final roomId):
               final blocManager = context.read<LettersBroadManager>();
-              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              final session = activeUsersRepository.sessionFromWSChannel(
+                channel,
+              );
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
@@ -62,7 +69,9 @@ Future<Response> onRequest(RequestContext context) async {
               blocManager.removeLetter(session, roomId, letterId);
             case JoinLettersTS(:final roomId):
               final letterBlocManager = context.read<LettersBroadManager>();
-              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              final session = activeUsersRepository.sessionFromWSChannel(
+                channel,
+              );
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
@@ -81,7 +90,9 @@ Future<Response> onRequest(RequestContext context) async {
             case GetJoinedBroadsTS():
               activeUsersBloc.infoJoinedBroads(channel);
             case CreateNewEdictTS():
-              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              final session = activeUsersRepository.sessionFromWSChannel(
+                channel,
+              );
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
@@ -93,7 +104,9 @@ Future<Response> onRequest(RequestContext context) async {
               arenaBroadcast.createEdict(session);
               break;
             case JoinEdictTS():
-              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              final session = activeUsersRepository.sessionFromWSChannel(
+                channel,
+              );
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
@@ -104,7 +117,9 @@ Future<Response> onRequest(RequestContext context) async {
               }
               arenaBroadcast.createEdict(session);
             case LeaveEdictTS():
-              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              final session = activeUsersRepository.sessionFromWSChannel(
+                channel,
+              );
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
@@ -115,7 +130,9 @@ Future<Response> onRequest(RequestContext context) async {
               }
               arenaBroadcast.createEdict(session);
             case JoinArenaTS():
-              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              final session = activeUsersRepository.sessionFromWSChannel(
+                channel,
+              );
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(
@@ -126,7 +143,9 @@ Future<Response> onRequest(RequestContext context) async {
               }
               arenaBroadcast.subscribeChannel(session);
             case LeaveArenaTS():
-              final session = activeUsersBloc.sessionFromWSChannel(channel);
+              final session = activeUsersRepository.sessionFromWSChannel(
+                channel,
+              );
               if (session == null) {
                 channel.sink.add(
                   ToClient.statusError(

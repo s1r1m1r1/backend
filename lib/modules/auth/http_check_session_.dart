@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/features/auth/session.dart';
-import 'package:backend/features/auth/session_repository.dart';
+import 'package:backend/modules/auth/session.dart';
+import 'package:backend/modules/auth/session_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 import 'package:backend/models/user.dart';
-import 'package:backend/features/auth/user_repository.dart';
+import 'package:backend/modules/auth/user_repository.dart';
 
 import '../../core/log_colors.dart';
 

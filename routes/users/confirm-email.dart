@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/features/auth/user_repository.dart';
+import 'package:backend/modules/auth/user_repository.dart';
 import 'package:dart_frog/dart_frog.dart';
 
 Future<Response> onRequest(RequestContext context) async {
