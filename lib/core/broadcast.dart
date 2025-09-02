@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:backend/core/session_channel.dart';
+import 'package:backend/modules/game/session_channel.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sha_red/sha_red.dart';
 
-abstract class Broadcast<S extends JsonMessage> with BroadcastMixin<S> {
+abstract class Broadcast<T extends ToClient> extends IBroadcast<T> {
   static BroadcastObserver? observer;
   Broadcast() {
     observer?.onCreate(this);
@@ -23,7 +23,7 @@ abstract class Broadcast<S extends JsonMessage> with BroadcastMixin<S> {
   }
 
   @override
-  void broadcast(S message) {
+  void broadcast(T message) {
     super.broadcast(message);
   }
 
@@ -35,17 +35,17 @@ abstract class Broadcast<S extends JsonMessage> with BroadcastMixin<S> {
   }
 }
 
-mixin BroadcastMixin<S extends JsonMessage> implements Disposable {
+abstract class IBroadcast<T extends ToClient> implements Disposable {
   // userId
   final channels = <int, ISessionChannel>{};
   abstract BroadcastId blocId;
 
   @mustCallSuper
-  void broadcast(S message) {
-    final encodedJson = message.encoded();
+  void broadcast(T message) {
+    final jsonBarrel = message.jsonBarrel();
     Broadcast.observer?.onBroadcast(this, message.encoded());
     for (final channel in channels.values) {
-      channel.sinkAdd(encodedJson);
+      channel.sinkAdd(jsonBarrel);
     }
   }
 
@@ -91,7 +91,7 @@ abstract class BroadcastObserver {
   void onDispose(Broadcast trick) {}
 
   @mustCallSuper
-  void onBroadcast(BroadcastMixin broadcast, Object? message) {}
+  void onBroadcast(IBroadcast broadcast, Object? message) {}
 }
 
 abstract class Disposable {

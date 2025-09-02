@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:backend/core/broadcast.dart';
-import 'package:backend/core/session_channel.dart';
+import 'package:backend/modules/game/session_channel.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
 import 'package:synchronized/synchronized.dart';
@@ -79,7 +79,7 @@ class ArenaBroadcast extends Broadcast<ToClient> {
     subscribe(channel);
     channel.shouldUnsubscribe[blocId] = () => unsubscribe(channel);
     channel.sinkAdd(
-      ToClient.broadcastInfo(channel.getJoinedBroads().toList()).encoded(),
+      ToClient.broadcastInfo(channel.getJoinedBroads().toList()).jsonBarrel(),
     );
     // channel.sinkAdd();
   }
@@ -88,6 +88,6 @@ class ArenaBroadcast extends Broadcast<ToClient> {
     final userId = session.userId;
     final channel = channels[userId];
     channel?.onSubscriptionCancel(blocId);
-    channel?.sinkAdd(ToClient.terminatedBroadcast(blocId).encoded());
+    channel?.sinkAdd(ToClient.terminatedBroadcast(blocId).jsonBarrel());
   }
 }

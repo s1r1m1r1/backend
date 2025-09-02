@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/new_api_exceptions.dart';
-import 'package:backend/core/session_channel.dart';
+import 'package:backend/modules/game/session_channel.dart';
 import 'package:backend/core/broadcast.dart';
 import 'package:backend/modules/game/domain/letters_repository.dart';
 import 'package:sha_red/sha_red.dart';
@@ -85,7 +85,9 @@ class _LettersBroad extends Broadcast<LetterTC> {
       } catch (e, s) {
         debugLog('$e $s');
         channel.sinkAdd(
-          ToClient.statusError(error: WsServerError.letterNotRemoved).encoded(),
+          ToClient.statusError(
+            error: WsServerError.letterNotRemoved,
+          ).jsonBarrel(),
         );
       }
     });
@@ -104,9 +106,11 @@ class _LettersBroad extends Broadcast<LetterTC> {
       try {
         subscribe(channel);
         channel.shouldUnsubscribe[blocId] = () => unsubscribe(channel);
-        channel.sinkAdd(_lettersDTO().encoded());
+        channel.sinkAdd(_lettersDTO().jsonBarrel());
         channel.sinkAdd(
-          ToClient.broadcastInfo(channel.getJoinedBroads().toList()).encoded(),
+          ToClient.broadcastInfo(
+            channel.getJoinedBroads().toList(),
+          ).jsonBarrel(),
         );
       } catch (e, s) {
         addError(e, s);
