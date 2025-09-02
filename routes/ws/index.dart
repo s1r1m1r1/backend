@@ -7,17 +7,18 @@ import 'package:backend/modules/game/arena.broadcast.dart';
 import 'package:backend/modules/game/active_users.broadcast.dart';
 import 'package:backend/modules/game/domain/active_sessions_repository.dart';
 import 'package:backend/modules/game/letters.broad_manager.dart';
+import 'package:backend/modules/game/session_channel.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:sha_red/sha_red.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  final handler = webSocketHandler((channel, protocol) {
+  final handler = webSocketHandler((webSocketChannel, protocol) {
     final activeUsersBloc = getIt<ActiveUsersBroad>();
     final activeUsersRepository = getIt<ActiveUsersRepository>();
     final arenaBroadcast = getIt<ArenaBroadcast>();
-
-    channel.stream.listen(
+    final channel = SinkChannel(webSocketChannel);
+    webSocketChannel.stream.listen(
       (message) async {
         debugLog('$green ON MESSAGE: $reset');
         if (message is! String) {
@@ -36,14 +37,14 @@ Future<Response> onRequest(RequestContext context) async {
 
             case NewLetterTS(:final letter):
               final blocManager = context.read<LettersBroadManager>();
-              final session = activeUsersRepository.sessionFromWSChannel(
+              final session = await activeUsersRepository.sessionFromWSChannel(
                 channel,
               );
               if (session == null) {
-                channel.sink.add(
+                channel.sinkAdd(
                   ToClient.statusError(
                     error: WsServerError.unauthorized,
-                  ).encoded(),
+                  ).jsonBarrel(),
                 );
 
                 debugLog('$red [WebSocket]newLetter unauthorized: $reset');
@@ -54,14 +55,14 @@ Future<Response> onRequest(RequestContext context) async {
 
             case DeleteLetterTS(:final letterId, :final roomId):
               final blocManager = context.read<LettersBroadManager>();
-              final session = activeUsersRepository.sessionFromWSChannel(
+              final session = await activeUsersRepository.sessionFromWSChannel(
                 channel,
               );
               if (session == null) {
-                channel.sink.add(
+                channel.sinkAdd(
                   ToClient.statusError(
                     error: WsServerError.unauthorized,
-                  ).encoded(),
+                  ).jsonBarrel(),
                 );
                 return;
               }
@@ -69,14 +70,14 @@ Future<Response> onRequest(RequestContext context) async {
               blocManager.removeLetter(session, roomId, letterId);
             case JoinLettersTS(:final roomId):
               final letterBlocManager = context.read<LettersBroadManager>();
-              final session = activeUsersRepository.sessionFromWSChannel(
+              final session = await activeUsersRepository.sessionFromWSChannel(
                 channel,
               );
               if (session == null) {
-                channel.sink.add(
+                channel.sinkAdd(
                   ToClient.statusError(
                     error: WsServerError.unauthorized,
-                  ).encoded(),
+                  ).jsonBarrel(),
                 );
                 return;
               }
@@ -90,71 +91,73 @@ Future<Response> onRequest(RequestContext context) async {
             case GetJoinedBroadsTS():
               activeUsersBloc.infoJoinedBroads(channel);
             case CreateNewEdictTS():
-              final session = activeUsersRepository.sessionFromWSChannel(
+              final session = await activeUsersRepository.sessionFromWSChannel(
                 channel,
               );
               if (session == null) {
-                channel.sink.add(
+                channel.sinkAdd(
                   ToClient.statusError(
                     error: WsServerError.unauthorized,
-                  ).encoded(),
+                  ).jsonBarrel(),
                 );
                 return;
               }
               arenaBroadcast.createEdict(session);
               break;
             case JoinEdictTS():
-              final session = activeUsersRepository.sessionFromWSChannel(
+              final session = await activeUsersRepository.sessionFromWSChannel(
                 channel,
               );
               if (session == null) {
-                channel.sink.add(
+                channel.sinkAdd(
                   ToClient.statusError(
                     error: WsServerError.unauthorized,
-                  ).encoded(),
+                  ).jsonBarrel(),
                 );
                 return;
               }
               arenaBroadcast.createEdict(session);
             case LeaveEdictTS():
-              final session = activeUsersRepository.sessionFromWSChannel(
+              final session = await activeUsersRepository.sessionFromWSChannel(
                 channel,
               );
               if (session == null) {
-                channel.sink.add(
+                channel.sinkAdd(
                   ToClient.statusError(
                     error: WsServerError.unauthorized,
-                  ).encoded(),
+                  ).jsonBarrel(),
                 );
                 return;
               }
               arenaBroadcast.createEdict(session);
             case JoinArenaTS():
-              final session = activeUsersRepository.sessionFromWSChannel(
+              final session = await activeUsersRepository.sessionFromWSChannel(
                 channel,
               );
               if (session == null) {
-                channel.sink.add(
+                channel.sinkAdd(
                   ToClient.statusError(
                     error: WsServerError.unauthorized,
-                  ).encoded(),
+                  ).jsonBarrel(),
                 );
                 return;
               }
               arenaBroadcast.subscribeChannel(session);
             case LeaveArenaTS():
-              final session = activeUsersRepository.sessionFromWSChannel(
+              final session = await activeUsersRepository.sessionFromWSChannel(
                 channel,
               );
               if (session == null) {
-                channel.sink.add(
+                channel.sinkAdd(
                   ToClient.statusError(
                     error: WsServerError.unauthorized,
-                  ).encoded(),
+                  ).jsonBarrel(),
                 );
                 return;
               }
               arenaBroadcast.leaveArena(session);
+            case DisconnectTS():
+              activeUsersBloc.removeUser(channel);
           }
         } catch (e, s) {
           debugLog('$red [WebSocket] Error: $e $s $reset');

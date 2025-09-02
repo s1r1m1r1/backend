@@ -8,7 +8,7 @@ class ServerBroadcastObserver extends BroadcastObserver {
   final _log = Logger(loggerName)..level = Level.ALL;
 
   @override
-  void onBroadcast(BroadcastMixin broadcast, Object? message) {
+  void onBroadcast(IBroadcast broadcast, Object? message) {
     _log.finest(
       '${broadcast.runtimeType} onBroadcast: ${color('${message?.toString()}').yellow()}\n',
     );

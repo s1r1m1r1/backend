@@ -1,9 +1,14 @@
 import 'dart:async';
 
 import 'package:backend/core/broadcast.dart';
-import 'package:backend/core/session_channel.dart';
+import 'package:backend/core/inject.dart';
+import 'package:backend/modules/game/game_bot.dart';
+import 'package:backend/modules/game/session_channel.dart';
+import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
+import 'package:backend/modules/auth/session.dart';
 import 'package:backend/modules/auth/session_repository.dart';
+import 'package:backend/modules/auth/user_repository.dart';
 import 'package:backend/modules/game/domain/active_sessions_repository.dart';
 import 'package:injectable/injectable.dart';
 import 'package:sha_red/sha_red.dart';
@@ -11,14 +16,16 @@ import 'package:synchronized/synchronized.dart';
 
 @injectable
 class CombatBroadcast extends Broadcast<ToClient> {
-  final _lock = Lock();
-  final ActiveUsersRepository _activeUsersRepository;
-  final SessionRepository _sessionRepository;
-  final UnitRepository _unitRepository;
+  late final _lock = Lock();
+  final ActiveUsersRepository _onlineRep;
+  final SessionRepository _sessionRep;
+  final UserRepository _userRep;
+  final UnitRepository _unitRep;
   CombatBroadcast(
-    this._activeUsersRepository,
-    this._sessionRepository,
-    this._unitRepository,
+    this._onlineRep,
+    this._sessionRep,
+    this._unitRep,
+    this._userRep,
     @factoryParam int edictId,
     @factoryParam EdictDto edict,
   ) : blocId = BroadcastId(family: BroadcastFamily.combat, id: edictId),
@@ -28,24 +35,85 @@ class CombatBroadcast extends Broadcast<ToClient> {
   late BroadcastId blocId;
 
   final EdictDto _edict;
+  final combatants = <CombatantDto>[];
+  final teams = <CombatantTeamDto>[];
+  //
+  CombatDto? combatDto;
+  // final GameSession currentSession;
   Timer? _timer;
 
   void subscribeEdict() async {
-    for (final member in _edict.members) {
-      final SessionChannel? session = _activeUsersRepository.getSessionChannel(
+    // final teams = List.generate(
+    //   2,
+    //   (index) => CombatantTeamDto(id: index, combatantIds: const <int>[]),
+    // );
+    for (var i = 0; i < _edict.members.length; i++) {
+      final member = _edict.members[i];
+      SessionChannel? sessionChannel = await _onlineRep.getSessionChannel(
         member.userId,
       );
-      if (session == null) {
-        final unit = await _unitRepository.getSelectedUnit(member.userId);
-        final session = _sessionRepository.getSession(userId: member.userId);
-        // final gameSession = SessionChannel(session!, channel)
-        // final session = (unit);
-        // todo bot for unit
-        continue;
+
+      if (sessionChannel == null) {
+        final gameSession = await _recoverySession(member.userId);
+        if (gameSession == null) continue;
+        final recoverSession = await _sessionRep.getSession(
+          userId: member.userId,
+        );
+        if (recoverSession == null) continue;
+        final bot = getIt<GameBot>();
+        // await _onlineRep.startFromBot(bot, gameSession);
       }
-      subscribe(session);
-      session.shouldUnsubscribe[blocId] = () => unsubscribe(session);
+      sessionChannel ??= await _onlineRep.getSessionChannel(member.userId);
+      if (sessionChannel == null) {
+        throw Exception('Missed session while start combat ');
+      }
+      final uCombatant = CombatantDto(
+        id: i,
+        teamId: 0,
+        unit: sessionChannel.session.unit.toDto(),
+        unitId: sessionChannel.session.unit.id,
+        maxLife: 100,
+        life: 100,
+        damage: 11,
+      );
+      combatants.add(uCombatant);
     }
+    if (combatants.isEmpty) {
+      // удалить комнату
+      return;
+    }
+    if (combatants.length == 1) {
+      final sessionChannel = await _onlineRep.getSessionChannel(
+        combatants.first.unitId,
+      );
+      // if (sessionChannel?.isBot ?? true) {
+      //   // удалить комнату
+      //   return;
+      // }
+      // сообщить пользователю что игра не может начаться
+      sessionChannel!.sinkAdd(
+        ToClient.combatError(
+          error: WsCombatError.notEnoughPlayers,
+        ).jsonBarrel(),
+      );
+      return;
+    }
+    // начинаем игру
+
+    // subscribe(session);
+    // session.shouldUnsubscribe[blocId] = () => unsubscribe(session);
+  }
+
+  FutureOr<GameSession?> _recoverySession(int userId) async {
+    final recoverSession = await _sessionRep.getSession(userId: userId);
+    final unitDto = await _unitRep.getSelectedUnit(userId);
+    if (unitDto == null) return null;
+    if (recoverSession == null) {
+      final user = await _userRep.getUser(userId: userId);
+      if (user == null) return null;
+      return GameSession(user: user, unit: Unit.fromDto(unitDto));
+    }
+    return GameSession(user: recoverSession.user, unit: Unit.fromDto(unitDto));
   }
 
   // void leaveCombat(SessionChannel session) {

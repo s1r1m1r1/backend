@@ -25,6 +25,8 @@ import 'package:backend/modules/game/combat.broadcast.dart' as _i416;
 import 'package:backend/modules/game/domain/active_sessions_repository.dart'
     as _i75;
 import 'package:backend/modules/game/domain/letters_repository.dart' as _i574;
+import 'package:backend/modules/game/domain/ws_bot_repository.dart' as _i1027;
+import 'package:backend/modules/game/game_bot.dart' as _i471;
 import 'package:backend/modules/game/letters.broad_manager.dart' as _i867;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -45,6 +47,7 @@ extension GetItInjectableX on _i174.GetIt {
     final activeSessionsModule = _$ActiveSessionsModule();
     final lettersBroadManagerModule = _$LettersBroadManagerModule();
     final arenaBroadcastModule = _$ArenaBroadcastModule();
+    final botModule = _$BotModule();
     final activeUsersBroadcastModule = _$ActiveUsersBroadcastModule();
     gh.lazySingleton<_i946.DbClient>(() => dbClientModule.dbClient);
     gh.lazySingleton<_i636.PasswordHasherService>(
@@ -53,6 +56,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i75.ActiveUsersRepository>(
       () => activeSessionsModule.activeUsersRepository(),
     );
+    gh.lazySingleton<_i1027.BotRepository>(() => _i1027.BotRepository());
     gh.lazySingleton<_i574.LettersRepository>(
       () => _i574.LettersRepository(gh<_i946.DbClient>()),
     );
@@ -96,17 +100,11 @@ extension GetItInjectableX on _i174.GetIt {
       () => arenaBroadcastModule.devArena(),
       registerFor: {_test, _dev},
     );
+    gh.factory<_i471.GameBot>(
+      () => botModule.gameBot(gh<_i1027.BotRepository>()),
+    );
     gh.lazySingleton<_i314.SessionRepository>(
       () => _i314.SessionRepositoryImpl(gh<_i108.SessionDatasource>()),
-    );
-    gh.factoryParam<_i416.CombatBroadcast, int, _i890.EdictDto>(
-      (edictId, edict) => _i416.CombatBroadcast(
-        gh<_i75.ActiveUsersRepository>(),
-        gh<_i314.SessionRepository>(),
-        gh<_i850.UnitRepository>(),
-        edictId,
-        edict,
-      ),
     );
     gh.lazySingleton<_i44.ActiveUsersBroad>(
       () => activeUsersBroadcastModule.prodBroadcast(
@@ -124,6 +122,16 @@ extension GetItInjectableX on _i174.GetIt {
       ),
       registerFor: {_test, _dev},
     );
+    gh.factoryParam<_i416.CombatBroadcast, int, _i890.EdictDto>(
+      (edictId, edict) => _i416.CombatBroadcast(
+        gh<_i75.ActiveUsersRepository>(),
+        gh<_i314.SessionRepository>(),
+        gh<_i850.UnitRepository>(),
+        gh<_i605.UserRepository>(),
+        edictId,
+        edict,
+      ),
+    );
     return this;
   }
 }
@@ -135,5 +143,7 @@ class _$ActiveSessionsModule extends _i75.ActiveSessionsModule {}
 class _$LettersBroadManagerModule extends _i867.LettersBroadManagerModule {}
 
 class _$ArenaBroadcastModule extends _i665.ArenaBroadcastModule {}
+
+class _$BotModule extends _i471.BotModule {}
 
 class _$ActiveUsersBroadcastModule extends _i44.ActiveUsersBroadcastModule {}
