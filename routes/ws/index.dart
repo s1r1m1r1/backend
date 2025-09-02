@@ -17,7 +17,8 @@ Future<Response> onRequest(RequestContext context) async {
     final activeUsersBloc = getIt<ActiveUsersBroad>();
     final activeUsersRepository = getIt<ActiveUsersRepository>();
     final arenaBroadcast = getIt<ArenaBroadcast>();
-    final channel = SinkChannel(webSocketChannel);
+    // start with not authenticated userId -1
+    final channel = SinkChannel(webSocketChannel, -1);
     webSocketChannel.stream.listen(
       (message) async {
         debugLog('$green ON MESSAGE: $reset');
@@ -157,14 +158,15 @@ Future<Response> onRequest(RequestContext context) async {
               }
               arenaBroadcast.leaveArena(session);
             case DisconnectTS():
-              activeUsersBloc.removeUser(channel);
+              activeUsersBloc.replaceByBot(channel);
           }
         } catch (e, s) {
           debugLog('$red [WebSocket] Error: $e $s $reset');
         }
       },
       onDone: () async {
-        activeUsersBloc.removeUser(channel);
+        debugLog('$red [WebSocket] onDone:$reset');
+        activeUsersBloc.replaceByBot(channel);
       },
 
       cancelOnError: true,

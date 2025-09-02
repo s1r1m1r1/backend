@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:backend/modules/auth/session.dart';
+import 'package:backend/modules/game/domain/ws_bot_repository.dart';
 import 'package:backend/modules/game/game_bot.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -14,15 +15,11 @@ abstract class ISessionChannel<S extends ToClient> {
   abstract final Map<BroadcastId, LateCallback> shouldUnsubscribe;
   void sinkAdd(JsonBarrel<S> encodedJson);
   void onSubscriptionCancel(BroadcastId id);
-  void dispose();
+  Future<void> dispose();
 }
 
 class SessionChannel extends ISessionChannel {
-  SessionChannel._(this.session, this._sink);
-  factory SessionChannel.fromChannel(GameSession session, SinkChannel sink) =>
-      SessionChannel._(session, sink);
-  factory SessionChannel.bot(GameSession session, SinkBot sink) =>
-      SessionChannel._(session, sink);
+  SessionChannel(this.session, this._sink);
 
   final GameSession session;
 
@@ -38,6 +35,11 @@ class SessionChannel extends ISessionChannel {
   DateTime? lastActiveTime;
 
   void replaceSink(Sink sink) {
+    // передать userId в sink
+    sink.userId = userId;
+    // сбросить ботов , и userId
+    _sink.dispose();
+    // заменить sink
     _sink = sink;
   }
 
@@ -47,11 +49,13 @@ class SessionChannel extends ISessionChannel {
   }
 
   @override
-  void dispose() {
-    for (final entry in shouldUnsubscribe.entries) {
-      entry.value.call();
+  Future<void> dispose() async {
+    final copy = Map.of(shouldUnsubscribe);
+    await Future.forEach(copy.entries, (entry) async {
+      await entry.value.call();
       shouldUnsubscribe.remove(entry.key);
-    }
+    });
+
     shouldUnsubscribe.clear();
   }
 
@@ -78,14 +82,16 @@ class SessionChannel extends ISessionChannel {
 //-------------------------------------------------------------
 
 abstract class Sink<T extends ToClient> {
+  abstract int userId;
   void sinkAdd(JsonBarrel<T> barrel);
+  void dispose();
 }
 
-@immutable
 class SinkChannel extends Sink<ToClient> {
   final WebSocketChannel _channel;
+  int userId;
   WebSocketChannel get channel => _channel;
-  SinkChannel(this._channel);
+  SinkChannel(this._channel, this.userId);
 
   @override
   void sinkAdd(JsonBarrel<ToClient> barrel) {
@@ -98,15 +104,31 @@ class SinkChannel extends Sink<ToClient> {
 
   @override
   int get hashCode => _channel.hashCode;
+
+  @override
+  void dispose() {
+    userId = -1;
+  }
 }
 
-@immutable
 class SinkBot extends Sink<ToClient> {
-  final GameBot _bot;
-  SinkBot(this._bot);
+  final Bot<ToClient, ToServer> _bot;
+  final BotRepository _botRepository;
+  SinkBot(this._botRepository, this._bot, this.userId) {
+    _bot.botCallback = (ToServer toServer) =>
+        _botRepository.add(this, toServer);
+  }
+
+  int userId;
 
   @override
   void sinkAdd(JsonBarrel<ToClient> barrel) {
     _bot.add(barrel.data);
+  }
+
+  @override
+  void dispose() {
+    userId = -1;
+    _bot.dispose();
   }
 }
