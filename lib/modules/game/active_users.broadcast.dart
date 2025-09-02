@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:backend/core/broadcast.dart';
 import 'package:backend/core/debug_log.dart';
+import 'package:backend/core/inject.dart';
 import 'package:backend/core/log_colors.dart';
+import 'package:backend/modules/game/domain/ws_bot_repository.dart';
+import 'package:backend/modules/game/game_bot.dart';
 import 'package:backend/modules/game/session_channel.dart';
 import 'package:backend/game/unit.dart';
 import 'package:backend/game/unit_repository.dart';
@@ -78,7 +81,6 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
   Future<void> _join(SinkChannel channel, String token) async {
     try {
       final session = await _sessionRepository.getSession(token: token);
-      debugLog('$green ActiveUsersBloc$reset result session: $session');
       if (session == null) {
         channel.sinkAdd(
           ToClient.authError(
@@ -88,7 +90,6 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
         return;
       }
 
-      debugLog('$green ActiveUsersBloc$reset 2');
       final isValid = _sessionRepository.validateToken(session);
       if (!isValid) {
         channel.sinkAdd(
@@ -96,10 +97,8 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
         );
         return;
       }
-      debugLog('$green ActiveUsersBloc$reset 3');
       final SessionChannel? sessionChannel = await _activeUsersRepository
           .getSessionChannel(session.user.userId);
-      debugLog('$green ActiveUsersBloc$reset 4');
       if (sessionChannel != null &&
           sessionChannel.sink is SinkChannel &&
           (sessionChannel.sink as SinkChannel).channel != channel) {
@@ -119,10 +118,8 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
             error: WsAuthError.continueAsNewSession,
           ).jsonBarrel(),
         );
-        debugLog('$green ActiveUsersBloc$reset 5');
       }
 
-      debugLog('$green ActiveUsersBloc$reset 6');
       final unit = await _unitRepository.getSelectedUnit(session.user.userId);
       if (unit == null) {
         channel.sinkAdd(
@@ -130,7 +127,6 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
         );
         return;
       }
-      debugLog('$green ActiveUsersBloc$reset 7');
       final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
       _activeUsersRepository.startFromChannel(channel, gameSession);
       final newSessionChannel = await _activeUsersRepository.getSessionChannel(
@@ -140,7 +136,6 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
       subscribe(newSessionChannel);
       newSessionChannel.shouldUnsubscribe[blocId] = () =>
           unsubscribe(newSessionChannel);
-      debugLog('$green ActiveUsersBloc$reset 8');
       newSessionChannel.sinkAdd(gameSession.sessionDTO(blocId.id).jsonBarrel());
       newSessionChannel.sinkAdd(
         ToClient.broadcastInfo(
@@ -149,8 +144,6 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
       );
 
       await _onlineBroadcast();
-
-      debugLog('$green ActiveUsersBloc$reset 9');
     } on Object catch (e, s) {
       addError(e, s);
       channel.sinkAdd(
@@ -165,8 +158,8 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
     _lock.synchronized(() async {
       try {
         debugLog('$green ActiveUsersBloc$reset infoJoinedBroads');
-        final userId = await _activeUsersRepository.getUserId(channel);
-        if (userId == null) return;
+        final userId = channel.userId;
+        if (userId == -1) return;
 
         debugLog('$green ActiveUsersBloc$reset infoJoinedBroads 2');
         final sessionChannel = await _activeUsersRepository.getSessionChannel(
@@ -180,17 +173,52 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
     });
   }
 
-  void removeUser(SinkChannel channel) {
+  void replaceByBot(Sink sink) {
     _lock.synchronized(() async {
       try {
-        final userId = await _activeUsersRepository.getUserId(channel);
-        if (userId == null) return;
+        final userId = sink.userId;
+        if (userId == -1) {
+          addError(Exception('user id is -1'), StackTrace.current);
+          return;
+        }
+        final session = await _activeUsersRepository.getSessionChannel(userId);
+        if (session == null) {
+          addError(Exception('session is null $userId'), StackTrace.current);
+          return;
+        }
+        debugLog('$green ActiveUsersBloc$reset replaceByBot 1');
+        debugLog('$green ActiveUsersBloc$reset replaceByBot 2');
+        final bot = DisconnectBot();
+        bot.start();
+        session.replaceSink(SinkBot(getIt<BotRepository>(), bot, userId));
+
+        debugLog('$green ActiveUsersBloc$reset replaceByBot 3');
+        await _onlineBroadcast();
+        // _activeUsersRepository.
+      } catch (e, s) {
+        addError(e, s);
+      }
+    });
+  }
+
+  void removeUser(Sink channel) {
+    _lock.synchronized(() async {
+      try {
+        final userId = channel.userId;
+        if (userId == -1) {
+          addError(Exception('userId is -1'), StackTrace.current);
+          return;
+        }
+
         final sessionChannel = await _activeUsersRepository.getSessionChannel(
           userId,
         );
-        sessionChannel?.dispose();
-        _activeUsersRepository.removeChannelID(channel);
-        _activeUsersRepository.removeIDsession(userId);
+        if (sessionChannel == null) {
+          addError(Exception('session is null $userId'), StackTrace.current);
+          return;
+        }
+        await sessionChannel.dispose();
+        await _activeUsersRepository.removeIDsession(userId);
         channel.sinkAdd(ToClient.terminatedAllBroadcast().jsonBarrel());
         _onlineBroadcast();
       } catch (e, s) {
@@ -202,7 +230,13 @@ class ActiveUsersBroad extends Broadcast<ToClient> {
   FutureOr<void> _onlineBroadcast() async {
     final list = await _activeUsersRepository.getListGameSessions();
     final members = list
-        .map((i) => OnlineMemberDto(i.unit.id, i.unit.name))
+        .map(
+          (i) => OnlineMemberDto(
+            i.session.unit.id,
+            i.session.unit.name,
+            i.sink is! SinkChannel,
+          ),
+        )
         .toList();
     broadcast(
       ToClient.onlineUsers(
