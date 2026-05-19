@@ -1,7 +1,7 @@
 import 'package:dto/dto.dart';
 
 abstract class LettersRepository {
-  Future<LetterDto?> createLetter(
+  Future<LetterDto> createLetter(
     String content,
     UserId senderId,
     BroadcastId broadcastId,

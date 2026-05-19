@@ -50,6 +50,7 @@ import 'package:backend/features/game/domain/unit_repository.dart' as _i319;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:mailing/application/mailing_service.dart' as _i834;
+import 'package:mailing/mailing.dart' as _i78;
 
 const String _memory = 'memory';
 const String _prod = 'prod';
@@ -57,10 +58,10 @@ const String _dev = 'dev';
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
-  _i174.GetIt init({
+  Future<_i174.GetIt> init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
-  }) {
+  }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final dbClientModule = _$DbClientModule();
     gh.lazySingleton<_i35.OnlineRepository>(() => _i35.OnlineRepository());
@@ -72,12 +73,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i946.DbClient>(
       () => dbClientModule.file(),
       registerFor: {_prod, _dev},
-    );
-    gh.lazySingleton<_i789.UserRepository>(
-      () => _i894.UserRepositoryImpl(
-        gh<_i946.DbClient>(),
-        gh<_i834.MailingService>(),
-      ),
     );
     gh.lazySingleton<_i958.UserDao>(
       () => dbClientModule.userDao(gh<_i946.DbClient>()),
@@ -105,6 +100,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i319.UnitRepository>(
       () => _i814.UnitRepositoryImpl(gh<_i946.DbClient>()),
+    );
+    gh.lazySingleton<_i789.UserRepository>(
+      () => _i894.UserRepositoryImpl(
+        gh<_i946.DbClient>(),
+        gh<_i834.MailingService>(),
+      ),
     );
     gh.lazySingleton<_i454.SessionRepository>(
       () => _i224.SessionRepositoryImpl(gh<_i946.DbClient>()),
@@ -165,6 +166,7 @@ extension GetItInjectableX on _i174.GetIt {
       );
       return i.createBots().then((_) => i);
     });
+    await _i78.MailingPackageModule().init(gh);
     return this;
   }
 }

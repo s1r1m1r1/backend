@@ -59,7 +59,7 @@ abstract class Broadcast<T extends WsResponse> extends IBroadcast<T> {
   }
 }
 
-abstract class IBroadcast<T extends WsResponse> {
+abstract mixin class IBroadcast<T extends WsResponse> {
   final channels = <String, ISocket>{};
   abstract BroadcastId broadcastId;
 

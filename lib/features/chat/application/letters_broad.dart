@@ -55,8 +55,6 @@ class _LettersBroad extends Broadcast<LetterResponse> {
     }
   }
 
-  // --- Event Handlers ---
-
   void newLetter(GameSocket socket, String content, String n) {
     _lock.synchronized(() async {
       try {
@@ -65,7 +63,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
           _sendLetterError(
             socket,
             n,
-            WsLetterError.invalidContent,
+            .invalidContent,
             [],
             'Letter content must be between 1 and 10000 characters',
           );
@@ -76,17 +74,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
           socket.userId,
           broadcastId,
         );
-        if (newLetter == null) {
-          debugLog('new letter: failed to create');
-          _sendLetterError(
-            socket,
-            n,
-            WsLetterError.internalError,
-            [],
-            'Failed to create letter',
-          );
-          return;
-        }
+
         debugLog('new letter: for ');
         _letterCache.add(newLetter);
         final OnLetterResponse letter =
@@ -98,7 +86,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
         _sendLetterError(
           socket,
           n,
-          WsLetterError.internalError,
+          .internalError,
           [],
           'Failed to create letter: $e',
         );
@@ -107,7 +95,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
         _sendLetterError(
           socket,
           n,
-          WsLetterError.internalError,
+          .internalError,
           [],
           'Failed to create letter: $e',
         );

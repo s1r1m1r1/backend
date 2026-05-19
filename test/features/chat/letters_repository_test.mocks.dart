@@ -61,81 +61,69 @@ class _FakeDatabaseConnectionUser_5 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-class _Fake$RoomTableTable_6 extends _i1.SmartFake
-    implements _i2.$RoomTableTable {
-  _Fake$RoomTableTable_6(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
-class _Fake$UserTableTable_7 extends _i1.SmartFake
-    implements _i2.$UserTableTable {
-  _Fake$UserTableTable_7(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
-class _Fake$LetterTableTable_8 extends _i1.SmartFake
+class _Fake$LetterTableTable_6 extends _i1.SmartFake
     implements _i2.$LetterTableTable {
-  _Fake$LetterTableTable_8(Object parent, Invocation parentInvocation)
+  _Fake$LetterTableTable_6(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeLettersDaoManager_9 extends _i1.SmartFake
+class _FakeLettersDaoManager_7 extends _i1.SmartFake
     implements _i5.LettersDaoManager {
-  _FakeLettersDaoManager_9(Object parent, Invocation parentInvocation)
+  _FakeLettersDaoManager_7(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeFuture_10<T1> extends _i1.SmartFake implements _i6.Future<T1> {
-  _FakeFuture_10(Object parent, Invocation parentInvocation)
+class _FakeFuture_8<T1> extends _i1.SmartFake implements _i6.Future<T1> {
+  _FakeFuture_8(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeInsertStatement_11<T1 extends _i3.Table, D1> extends _i1.SmartFake
+class _FakeInsertStatement_9<T1 extends _i3.Table, D1> extends _i1.SmartFake
     implements _i3.InsertStatement<T1, D1> {
-  _FakeInsertStatement_11(Object parent, Invocation parentInvocation)
+  _FakeInsertStatement_9(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeUpdateStatement_12<T extends _i3.Table, D> extends _i1.SmartFake
+class _FakeUpdateStatement_10<T extends _i3.Table, D> extends _i1.SmartFake
     implements _i3.UpdateStatement<T, D> {
-  _FakeUpdateStatement_12(Object parent, Invocation parentInvocation)
+  _FakeUpdateStatement_10(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeSimpleSelectStatement_13<T1 extends _i3.HasResultSet, D>
+class _FakeSimpleSelectStatement_11<T1 extends _i3.HasResultSet, D>
     extends _i1.SmartFake
     implements _i3.SimpleSelectStatement<T1, D> {
-  _FakeSimpleSelectStatement_13(Object parent, Invocation parentInvocation)
+  _FakeSimpleSelectStatement_11(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeJoinedSelectStatement_14<FirstT extends _i3.HasResultSet, FirstD>
+class _FakeJoinedSelectStatement_12<FirstT extends _i3.HasResultSet, FirstD>
     extends _i1.SmartFake
     implements _i3.JoinedSelectStatement<FirstT, FirstD> {
-  _FakeJoinedSelectStatement_14(Object parent, Invocation parentInvocation)
+  _FakeJoinedSelectStatement_12(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeBaseSelectStatement_15<Row> extends _i1.SmartFake
+class _FakeBaseSelectStatement_13<Row> extends _i1.SmartFake
     implements _i3.BaseSelectStatement<Row> {
-  _FakeBaseSelectStatement_15(Object parent, Invocation parentInvocation)
+  _FakeBaseSelectStatement_13(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeDeleteStatement_16<T1 extends _i3.Table, D1> extends _i1.SmartFake
+class _FakeDeleteStatement_14<T1 extends _i3.Table, D1> extends _i1.SmartFake
     implements _i3.DeleteStatement<T1, D1> {
-  _FakeDeleteStatement_16(Object parent, Invocation parentInvocation)
+  _FakeDeleteStatement_14(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeSelectable_17<T> extends _i1.SmartFake implements _i3.Selectable<T> {
-  _FakeSelectable_17(Object parent, Invocation parentInvocation)
+class _FakeSelectable_15<T> extends _i1.SmartFake implements _i3.Selectable<T> {
+  _FakeSelectable_15(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeGenerationContext_18 extends _i1.SmartFake
+class _FakeGenerationContext_16 extends _i1.SmartFake
     implements _i3.GenerationContext {
-  _FakeGenerationContext_18(Object parent, Invocation parentInvocation)
+  _FakeGenerationContext_16(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -249,44 +237,14 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
           as _i3.DatabaseConnectionUser);
 
   @override
-  _i2.$RoomTableTable get roomTable =>
-      (super.noSuchMethod(
-            Invocation.getter(#roomTable),
-            returnValue: _Fake$RoomTableTable_6(
-              this,
-              Invocation.getter(#roomTable),
-            ),
-            returnValueForMissingStub: _Fake$RoomTableTable_6(
-              this,
-              Invocation.getter(#roomTable),
-            ),
-          )
-          as _i2.$RoomTableTable);
-
-  @override
-  _i2.$UserTableTable get userTable =>
-      (super.noSuchMethod(
-            Invocation.getter(#userTable),
-            returnValue: _Fake$UserTableTable_7(
-              this,
-              Invocation.getter(#userTable),
-            ),
-            returnValueForMissingStub: _Fake$UserTableTable_7(
-              this,
-              Invocation.getter(#userTable),
-            ),
-          )
-          as _i2.$UserTableTable);
-
-  @override
   _i2.$LetterTableTable get letterTable =>
       (super.noSuchMethod(
             Invocation.getter(#letterTable),
-            returnValue: _Fake$LetterTableTable_8(
+            returnValue: _Fake$LetterTableTable_6(
               this,
               Invocation.getter(#letterTable),
             ),
-            returnValueForMissingStub: _Fake$LetterTableTable_8(
+            returnValueForMissingStub: _Fake$LetterTableTable_6(
               this,
               Invocation.getter(#letterTable),
             ),
@@ -297,11 +255,11 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
   _i5.LettersDaoManager get managers =>
       (super.noSuchMethod(
             Invocation.getter(#managers),
-            returnValue: _FakeLettersDaoManager_9(
+            returnValue: _FakeLettersDaoManager_7(
               this,
               Invocation.getter(#managers),
             ),
-            returnValueForMissingStub: _FakeLettersDaoManager_9(
+            returnValueForMissingStub: _FakeLettersDaoManager_7(
               this,
               Invocation.getter(#managers),
             ),
@@ -439,7 +397,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                   ),
                   (T v) => _i6.Future<T>.value(v),
                 ) ??
-                _FakeFuture_10<T>(this, Invocation.method(#doWhenOpened, [fn])),
+                _FakeFuture_8<T>(this, Invocation.method(#doWhenOpened, [fn])),
             returnValueForMissingStub:
                 _i7.ifNotNull(
                   _i7.dummyValueOrNull<T>(
@@ -448,7 +406,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                   ),
                   (T v) => _i6.Future<T>.value(v),
                 ) ??
-                _FakeFuture_10<T>(this, Invocation.method(#doWhenOpened, [fn])),
+                _FakeFuture_8<T>(this, Invocation.method(#doWhenOpened, [fn])),
           )
           as _i6.Future<T>);
 
@@ -458,11 +416,11 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
   ) =>
       (super.noSuchMethod(
             Invocation.method(#into, [table]),
-            returnValue: _FakeInsertStatement_11<T, D>(
+            returnValue: _FakeInsertStatement_9<T, D>(
               this,
               Invocation.method(#into, [table]),
             ),
-            returnValueForMissingStub: _FakeInsertStatement_11<T, D>(
+            returnValueForMissingStub: _FakeInsertStatement_9<T, D>(
               this,
               Invocation.method(#into, [table]),
             ),
@@ -475,11 +433,11 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
   ) =>
       (super.noSuchMethod(
             Invocation.method(#update, [table]),
-            returnValue: _FakeUpdateStatement_12<Tbl, R>(
+            returnValue: _FakeUpdateStatement_10<Tbl, R>(
               this,
               Invocation.method(#update, [table]),
             ),
-            returnValueForMissingStub: _FakeUpdateStatement_12<Tbl, R>(
+            returnValueForMissingStub: _FakeUpdateStatement_10<Tbl, R>(
               this,
               Invocation.method(#update, [table]),
             ),
@@ -493,11 +451,11 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
   }) =>
       (super.noSuchMethod(
             Invocation.method(#select, [table], {#distinct: distinct}),
-            returnValue: _FakeSimpleSelectStatement_13<T, R>(
+            returnValue: _FakeSimpleSelectStatement_11<T, R>(
               this,
               Invocation.method(#select, [table], {#distinct: distinct}),
             ),
-            returnValueForMissingStub: _FakeSimpleSelectStatement_13<T, R>(
+            returnValueForMissingStub: _FakeSimpleSelectStatement_11<T, R>(
               this,
               Invocation.method(#select, [table], {#distinct: distinct}),
             ),
@@ -511,11 +469,11 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
   }) =>
       (super.noSuchMethod(
             Invocation.method(#selectOnly, [table], {#distinct: distinct}),
-            returnValue: _FakeJoinedSelectStatement_14<T, R>(
+            returnValue: _FakeJoinedSelectStatement_12<T, R>(
               this,
               Invocation.method(#selectOnly, [table], {#distinct: distinct}),
             ),
-            returnValueForMissingStub: _FakeJoinedSelectStatement_14<T, R>(
+            returnValueForMissingStub: _FakeJoinedSelectStatement_12<T, R>(
               this,
               Invocation.method(#selectOnly, [table], {#distinct: distinct}),
             ),
@@ -528,12 +486,12 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
   ) =>
       (super.noSuchMethod(
             Invocation.method(#selectExpressions, [columns]),
-            returnValue: _FakeBaseSelectStatement_15<_i3.TypedResult>(
+            returnValue: _FakeBaseSelectStatement_13<_i3.TypedResult>(
               this,
               Invocation.method(#selectExpressions, [columns]),
             ),
             returnValueForMissingStub:
-                _FakeBaseSelectStatement_15<_i3.TypedResult>(
+                _FakeBaseSelectStatement_13<_i3.TypedResult>(
                   this,
                   Invocation.method(#selectExpressions, [columns]),
                 ),
@@ -546,11 +504,11 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
   ) =>
       (super.noSuchMethod(
             Invocation.method(#delete, [table]),
-            returnValue: _FakeDeleteStatement_16<T, D>(
+            returnValue: _FakeDeleteStatement_14<T, D>(
               this,
               Invocation.method(#delete, [table]),
             ),
-            returnValueForMissingStub: _FakeDeleteStatement_16<T, D>(
+            returnValueForMissingStub: _FakeDeleteStatement_14<T, D>(
               this,
               Invocation.method(#delete, [table]),
             ),
@@ -632,7 +590,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
               [query],
               {#variables: variables, #readsFrom: readsFrom},
             ),
-            returnValue: _FakeSelectable_17<_i3.QueryRow>(
+            returnValue: _FakeSelectable_15<_i3.QueryRow>(
               this,
               Invocation.method(
                 #customSelect,
@@ -640,7 +598,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                 {#variables: variables, #readsFrom: readsFrom},
               ),
             ),
-            returnValueForMissingStub: _FakeSelectable_17<_i3.QueryRow>(
+            returnValueForMissingStub: _FakeSelectable_15<_i3.QueryRow>(
               this,
               Invocation.method(
                 #customSelect,
@@ -663,7 +621,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
               [query],
               {#variables: variables, #readsFrom: readsFrom},
             ),
-            returnValue: _FakeSelectable_17<_i3.QueryRow>(
+            returnValue: _FakeSelectable_15<_i3.QueryRow>(
               this,
               Invocation.method(
                 #customSelectQuery,
@@ -671,7 +629,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                 {#variables: variables, #readsFrom: readsFrom},
               ),
             ),
-            returnValueForMissingStub: _FakeSelectable_17<_i3.QueryRow>(
+            returnValueForMissingStub: _FakeSelectable_15<_i3.QueryRow>(
               this,
               Invocation.method(
                 #customSelectQuery,
@@ -714,7 +672,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                   ),
                   (T v) => _i6.Future<T>.value(v),
                 ) ??
-                _FakeFuture_10<T>(
+                _FakeFuture_8<T>(
                   this,
                   Invocation.method(
                     #transaction,
@@ -734,7 +692,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                   ),
                   (T v) => _i6.Future<T>.value(v),
                 ) ??
-                _FakeFuture_10<T>(
+                _FakeFuture_8<T>(
                   this,
                   Invocation.method(
                     #transaction,
@@ -757,7 +715,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                   ),
                   (T v) => _i6.Future<T>.value(v),
                 ) ??
-                _FakeFuture_10<T>(
+                _FakeFuture_8<T>(
                   this,
                   Invocation.method(#exclusively, [action]),
                 ),
@@ -769,7 +727,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                   ),
                   (T v) => _i6.Future<T>.value(v),
                 ) ??
-                _FakeFuture_10<T>(
+                _FakeFuture_8<T>(
                   this,
                   Invocation.method(#exclusively, [action]),
                 ),
@@ -808,7 +766,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                   ),
                   (T v) => _i6.Future<T>.value(v),
                 ) ??
-                _FakeFuture_10<T>(
+                _FakeFuture_8<T>(
                   this,
                   Invocation.method(
                     #runWithInterceptor,
@@ -828,7 +786,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                   ),
                   (T v) => _i6.Future<T>.value(v),
                 ) ??
-                _FakeFuture_10<T>(
+                _FakeFuture_8<T>(
                   this,
                   Invocation.method(
                     #runWithInterceptor,
@@ -851,7 +809,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
               [component],
               {#hasMultipleTables: hasMultipleTables, #startIndex: startIndex},
             ),
-            returnValue: _FakeGenerationContext_18(
+            returnValue: _FakeGenerationContext_16(
               this,
               Invocation.method(
                 #$write,
@@ -862,7 +820,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                 },
               ),
             ),
-            returnValueForMissingStub: _FakeGenerationContext_18(
+            returnValueForMissingStub: _FakeGenerationContext_16(
               this,
               Invocation.method(
                 #$write,
@@ -888,7 +846,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
               [table, insertable],
               {#startIndex: startIndex},
             ),
-            returnValue: _FakeGenerationContext_18(
+            returnValue: _FakeGenerationContext_16(
               this,
               Invocation.method(
                 #$writeInsertable,
@@ -896,7 +854,7 @@ class MockLettersDao extends _i1.Mock implements _i5.LettersDao {
                 {#startIndex: startIndex},
               ),
             ),
-            returnValueForMissingStub: _FakeGenerationContext_18(
+            returnValueForMissingStub: _FakeGenerationContext_16(
               this,
               Invocation.method(
                 #$writeInsertable,

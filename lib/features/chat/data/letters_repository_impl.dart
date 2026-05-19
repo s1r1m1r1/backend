@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:dto/dto.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../core/api_exceptions.dart';
 import '../../../core/debug_log.dart';
 import '../../../db_client/dao/letters_dao.dart';
 import '../../../db_client/db_client.dart';
@@ -13,7 +14,7 @@ class LettersRepositoryImpl implements LettersRepository {
   final LettersDao _lettersDao;
 
   @override
-  Future<LetterDto?> createLetter(
+  Future<LetterDto> createLetter(
     String content,
     UserId senderId,
     BroadcastId broadcastId,
@@ -27,7 +28,7 @@ class LettersRepositoryImpl implements LettersRepository {
         ),
       );
       if (entry?.id == null || entry?.chatRoomId == null) {
-        return null;
+        throw const ApiException.unprocessable();
       }
       debugLog('Creating letter: success');
       return LetterDto(

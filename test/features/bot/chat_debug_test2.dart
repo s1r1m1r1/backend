@@ -28,7 +28,6 @@ import 'package:drift/native.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
-import 'package:synchronized/synchronized.dart';
 
 @GenerateNiceMocks([
   MockSpec<UserRepository>(),
@@ -127,13 +126,6 @@ void main() {
       for (final msg in receivedMessages) {
         stdout.writeln('  - ${msg.runtimeType}');
       }
-      // Check what's in the LettersBroad channels
-      final userBloc = lettersBroadManager._getRoom(Role.user);
-      if (userBloc != null) {
-        stdout.writeln(
-          'LettersBroad channels: ${userBloc.channels.keys.toList()}',
-        );
-      }
     }
 
     await dbClient.close();
@@ -180,13 +172,5 @@ class _TestBot extends SinkBot<ToClient, ToServer> {
         ToServer.newLetter(n: n2, content: 'Hello from debug bot'),
       );
     });
-  }
-}
-
-/// Extension to access private _rooms for debugging
-extension LettersBroadManagerDebug on LettersBroadManager {
-  LettersBroad? _getRoom(Role role) {
-    // Access via reflection-like approach - actually we need a different way
-    return null;
   }
 }

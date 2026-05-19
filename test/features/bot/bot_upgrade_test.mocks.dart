@@ -86,81 +86,75 @@ class _FakeDatabaseConnectionUser_8 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-class _Fake$UserTableTable_9 extends _i1.SmartFake
-    implements _i5.$UserTableTable {
-  _Fake$UserTableTable_9(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
-class _Fake$UnitTableTable_10 extends _i1.SmartFake
+class _Fake$UnitTableTable_9 extends _i1.SmartFake
     implements _i5.$UnitTableTable {
-  _Fake$UnitTableTable_10(Object parent, Invocation parentInvocation)
+  _Fake$UnitTableTable_9(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _Fake$SelectedUnitTableTable_11 extends _i1.SmartFake
+class _Fake$SelectedUnitTableTable_10 extends _i1.SmartFake
     implements _i5.$SelectedUnitTableTable {
-  _Fake$SelectedUnitTableTable_11(Object parent, Invocation parentInvocation)
+  _Fake$SelectedUnitTableTable_10(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeUnitDaoManager_12 extends _i1.SmartFake
+class _FakeUnitDaoManager_11 extends _i1.SmartFake
     implements _i8.UnitDaoManager {
-  _FakeUnitDaoManager_12(Object parent, Invocation parentInvocation)
+  _FakeUnitDaoManager_11(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeFuture_13<T1> extends _i1.SmartFake implements _i9.Future<T1> {
-  _FakeFuture_13(Object parent, Invocation parentInvocation)
+class _FakeFuture_12<T1> extends _i1.SmartFake implements _i9.Future<T1> {
+  _FakeFuture_12(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeInsertStatement_14<T1 extends _i6.Table, D1> extends _i1.SmartFake
+class _FakeInsertStatement_13<T1 extends _i6.Table, D1> extends _i1.SmartFake
     implements _i6.InsertStatement<T1, D1> {
-  _FakeInsertStatement_14(Object parent, Invocation parentInvocation)
+  _FakeInsertStatement_13(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeUpdateStatement_15<T extends _i6.Table, D> extends _i1.SmartFake
+class _FakeUpdateStatement_14<T extends _i6.Table, D> extends _i1.SmartFake
     implements _i6.UpdateStatement<T, D> {
-  _FakeUpdateStatement_15(Object parent, Invocation parentInvocation)
+  _FakeUpdateStatement_14(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeSimpleSelectStatement_16<T1 extends _i6.HasResultSet, D>
+class _FakeSimpleSelectStatement_15<T1 extends _i6.HasResultSet, D>
     extends _i1.SmartFake
     implements _i6.SimpleSelectStatement<T1, D> {
-  _FakeSimpleSelectStatement_16(Object parent, Invocation parentInvocation)
+  _FakeSimpleSelectStatement_15(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeJoinedSelectStatement_17<FirstT extends _i6.HasResultSet, FirstD>
+class _FakeJoinedSelectStatement_16<FirstT extends _i6.HasResultSet, FirstD>
     extends _i1.SmartFake
     implements _i6.JoinedSelectStatement<FirstT, FirstD> {
-  _FakeJoinedSelectStatement_17(Object parent, Invocation parentInvocation)
+  _FakeJoinedSelectStatement_16(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeBaseSelectStatement_18<Row> extends _i1.SmartFake
+class _FakeBaseSelectStatement_17<Row> extends _i1.SmartFake
     implements _i6.BaseSelectStatement<Row> {
-  _FakeBaseSelectStatement_18(Object parent, Invocation parentInvocation)
+  _FakeBaseSelectStatement_17(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeDeleteStatement_19<T1 extends _i6.Table, D1> extends _i1.SmartFake
+class _FakeDeleteStatement_18<T1 extends _i6.Table, D1> extends _i1.SmartFake
     implements _i6.DeleteStatement<T1, D1> {
-  _FakeDeleteStatement_19(Object parent, Invocation parentInvocation)
+  _FakeDeleteStatement_18(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeSelectable_20<T> extends _i1.SmartFake implements _i6.Selectable<T> {
-  _FakeSelectable_20(Object parent, Invocation parentInvocation)
+class _FakeSelectable_19<T> extends _i1.SmartFake implements _i6.Selectable<T> {
+  _FakeSelectable_19(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeGenerationContext_21 extends _i1.SmartFake
+class _FakeGenerationContext_20 extends _i1.SmartFake
     implements _i6.GenerationContext {
-  _FakeGenerationContext_21(Object parent, Invocation parentInvocation)
+  _FakeGenerationContext_20(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -611,29 +605,14 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
           as _i6.DatabaseConnectionUser);
 
   @override
-  _i5.$UserTableTable get userTable =>
-      (super.noSuchMethod(
-            Invocation.getter(#userTable),
-            returnValue: _Fake$UserTableTable_9(
-              this,
-              Invocation.getter(#userTable),
-            ),
-            returnValueForMissingStub: _Fake$UserTableTable_9(
-              this,
-              Invocation.getter(#userTable),
-            ),
-          )
-          as _i5.$UserTableTable);
-
-  @override
   _i5.$UnitTableTable get unitTable =>
       (super.noSuchMethod(
             Invocation.getter(#unitTable),
-            returnValue: _Fake$UnitTableTable_10(
+            returnValue: _Fake$UnitTableTable_9(
               this,
               Invocation.getter(#unitTable),
             ),
-            returnValueForMissingStub: _Fake$UnitTableTable_10(
+            returnValueForMissingStub: _Fake$UnitTableTable_9(
               this,
               Invocation.getter(#unitTable),
             ),
@@ -644,11 +623,11 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
   _i5.$SelectedUnitTableTable get selectedUnitTable =>
       (super.noSuchMethod(
             Invocation.getter(#selectedUnitTable),
-            returnValue: _Fake$SelectedUnitTableTable_11(
+            returnValue: _Fake$SelectedUnitTableTable_10(
               this,
               Invocation.getter(#selectedUnitTable),
             ),
-            returnValueForMissingStub: _Fake$SelectedUnitTableTable_11(
+            returnValueForMissingStub: _Fake$SelectedUnitTableTable_10(
               this,
               Invocation.getter(#selectedUnitTable),
             ),
@@ -659,11 +638,11 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
   _i8.UnitDaoManager get managers =>
       (super.noSuchMethod(
             Invocation.getter(#managers),
-            returnValue: _FakeUnitDaoManager_12(
+            returnValue: _FakeUnitDaoManager_11(
               this,
               Invocation.getter(#managers),
             ),
-            returnValueForMissingStub: _FakeUnitDaoManager_12(
+            returnValueForMissingStub: _FakeUnitDaoManager_11(
               this,
               Invocation.getter(#managers),
             ),
@@ -904,7 +883,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                   ),
                   (T v) => _i9.Future<T>.value(v),
                 ) ??
-                _FakeFuture_13<T>(this, Invocation.method(#doWhenOpened, [fn])),
+                _FakeFuture_12<T>(this, Invocation.method(#doWhenOpened, [fn])),
             returnValueForMissingStub:
                 _i14.ifNotNull(
                   _i14.dummyValueOrNull<T>(
@@ -913,7 +892,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                   ),
                   (T v) => _i9.Future<T>.value(v),
                 ) ??
-                _FakeFuture_13<T>(this, Invocation.method(#doWhenOpened, [fn])),
+                _FakeFuture_12<T>(this, Invocation.method(#doWhenOpened, [fn])),
           )
           as _i9.Future<T>);
 
@@ -923,11 +902,11 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
   ) =>
       (super.noSuchMethod(
             Invocation.method(#into, [table]),
-            returnValue: _FakeInsertStatement_14<T, D>(
+            returnValue: _FakeInsertStatement_13<T, D>(
               this,
               Invocation.method(#into, [table]),
             ),
-            returnValueForMissingStub: _FakeInsertStatement_14<T, D>(
+            returnValueForMissingStub: _FakeInsertStatement_13<T, D>(
               this,
               Invocation.method(#into, [table]),
             ),
@@ -940,11 +919,11 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
   ) =>
       (super.noSuchMethod(
             Invocation.method(#update, [table]),
-            returnValue: _FakeUpdateStatement_15<Tbl, R>(
+            returnValue: _FakeUpdateStatement_14<Tbl, R>(
               this,
               Invocation.method(#update, [table]),
             ),
-            returnValueForMissingStub: _FakeUpdateStatement_15<Tbl, R>(
+            returnValueForMissingStub: _FakeUpdateStatement_14<Tbl, R>(
               this,
               Invocation.method(#update, [table]),
             ),
@@ -958,11 +937,11 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
   }) =>
       (super.noSuchMethod(
             Invocation.method(#select, [table], {#distinct: distinct}),
-            returnValue: _FakeSimpleSelectStatement_16<T, R>(
+            returnValue: _FakeSimpleSelectStatement_15<T, R>(
               this,
               Invocation.method(#select, [table], {#distinct: distinct}),
             ),
-            returnValueForMissingStub: _FakeSimpleSelectStatement_16<T, R>(
+            returnValueForMissingStub: _FakeSimpleSelectStatement_15<T, R>(
               this,
               Invocation.method(#select, [table], {#distinct: distinct}),
             ),
@@ -976,11 +955,11 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
   }) =>
       (super.noSuchMethod(
             Invocation.method(#selectOnly, [table], {#distinct: distinct}),
-            returnValue: _FakeJoinedSelectStatement_17<T, R>(
+            returnValue: _FakeJoinedSelectStatement_16<T, R>(
               this,
               Invocation.method(#selectOnly, [table], {#distinct: distinct}),
             ),
-            returnValueForMissingStub: _FakeJoinedSelectStatement_17<T, R>(
+            returnValueForMissingStub: _FakeJoinedSelectStatement_16<T, R>(
               this,
               Invocation.method(#selectOnly, [table], {#distinct: distinct}),
             ),
@@ -993,12 +972,12 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
   ) =>
       (super.noSuchMethod(
             Invocation.method(#selectExpressions, [columns]),
-            returnValue: _FakeBaseSelectStatement_18<_i6.TypedResult>(
+            returnValue: _FakeBaseSelectStatement_17<_i6.TypedResult>(
               this,
               Invocation.method(#selectExpressions, [columns]),
             ),
             returnValueForMissingStub:
-                _FakeBaseSelectStatement_18<_i6.TypedResult>(
+                _FakeBaseSelectStatement_17<_i6.TypedResult>(
                   this,
                   Invocation.method(#selectExpressions, [columns]),
                 ),
@@ -1011,11 +990,11 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
   ) =>
       (super.noSuchMethod(
             Invocation.method(#delete, [table]),
-            returnValue: _FakeDeleteStatement_19<T, D>(
+            returnValue: _FakeDeleteStatement_18<T, D>(
               this,
               Invocation.method(#delete, [table]),
             ),
-            returnValueForMissingStub: _FakeDeleteStatement_19<T, D>(
+            returnValueForMissingStub: _FakeDeleteStatement_18<T, D>(
               this,
               Invocation.method(#delete, [table]),
             ),
@@ -1097,7 +1076,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
               [query],
               {#variables: variables, #readsFrom: readsFrom},
             ),
-            returnValue: _FakeSelectable_20<_i6.QueryRow>(
+            returnValue: _FakeSelectable_19<_i6.QueryRow>(
               this,
               Invocation.method(
                 #customSelect,
@@ -1105,7 +1084,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                 {#variables: variables, #readsFrom: readsFrom},
               ),
             ),
-            returnValueForMissingStub: _FakeSelectable_20<_i6.QueryRow>(
+            returnValueForMissingStub: _FakeSelectable_19<_i6.QueryRow>(
               this,
               Invocation.method(
                 #customSelect,
@@ -1128,7 +1107,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
               [query],
               {#variables: variables, #readsFrom: readsFrom},
             ),
-            returnValue: _FakeSelectable_20<_i6.QueryRow>(
+            returnValue: _FakeSelectable_19<_i6.QueryRow>(
               this,
               Invocation.method(
                 #customSelectQuery,
@@ -1136,7 +1115,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                 {#variables: variables, #readsFrom: readsFrom},
               ),
             ),
-            returnValueForMissingStub: _FakeSelectable_20<_i6.QueryRow>(
+            returnValueForMissingStub: _FakeSelectable_19<_i6.QueryRow>(
               this,
               Invocation.method(
                 #customSelectQuery,
@@ -1179,7 +1158,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                   ),
                   (T v) => _i9.Future<T>.value(v),
                 ) ??
-                _FakeFuture_13<T>(
+                _FakeFuture_12<T>(
                   this,
                   Invocation.method(
                     #transaction,
@@ -1199,7 +1178,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                   ),
                   (T v) => _i9.Future<T>.value(v),
                 ) ??
-                _FakeFuture_13<T>(
+                _FakeFuture_12<T>(
                   this,
                   Invocation.method(
                     #transaction,
@@ -1222,7 +1201,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                   ),
                   (T v) => _i9.Future<T>.value(v),
                 ) ??
-                _FakeFuture_13<T>(
+                _FakeFuture_12<T>(
                   this,
                   Invocation.method(#exclusively, [action]),
                 ),
@@ -1234,7 +1213,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                   ),
                   (T v) => _i9.Future<T>.value(v),
                 ) ??
-                _FakeFuture_13<T>(
+                _FakeFuture_12<T>(
                   this,
                   Invocation.method(#exclusively, [action]),
                 ),
@@ -1273,7 +1252,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                   ),
                   (T v) => _i9.Future<T>.value(v),
                 ) ??
-                _FakeFuture_13<T>(
+                _FakeFuture_12<T>(
                   this,
                   Invocation.method(
                     #runWithInterceptor,
@@ -1293,7 +1272,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                   ),
                   (T v) => _i9.Future<T>.value(v),
                 ) ??
-                _FakeFuture_13<T>(
+                _FakeFuture_12<T>(
                   this,
                   Invocation.method(
                     #runWithInterceptor,
@@ -1316,7 +1295,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
               [component],
               {#hasMultipleTables: hasMultipleTables, #startIndex: startIndex},
             ),
-            returnValue: _FakeGenerationContext_21(
+            returnValue: _FakeGenerationContext_20(
               this,
               Invocation.method(
                 #$write,
@@ -1327,7 +1306,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                 },
               ),
             ),
-            returnValueForMissingStub: _FakeGenerationContext_21(
+            returnValueForMissingStub: _FakeGenerationContext_20(
               this,
               Invocation.method(
                 #$write,
@@ -1353,7 +1332,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
               [table, insertable],
               {#startIndex: startIndex},
             ),
-            returnValue: _FakeGenerationContext_21(
+            returnValue: _FakeGenerationContext_20(
               this,
               Invocation.method(
                 #$writeInsertable,
@@ -1361,7 +1340,7 @@ class MockUnitDao extends _i1.Mock implements _i8.UnitDao {
                 {#startIndex: startIndex},
               ),
             ),
-            returnValueForMissingStub: _FakeGenerationContext_21(
+            returnValueForMissingStub: _FakeGenerationContext_20(
               this,
               Invocation.method(
                 #$writeInsertable,
