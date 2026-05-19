@@ -1,0 +1,27 @@
+import 'package:dart_frog/dart_frog.dart';
+import 'package:dto/dto.dart';
+
+import '../features/auth/application/session_socket.dart';
+import '../features/auth/application/system_orchestrator.dart';
+import 'ws_cmd.dart';
+
+class CreateBotsCmd extends DeveloperWsCmd<CreateBotsTs> {
+  const CreateBotsCmd();
+
+  @override
+  void executeDeveloper(
+    RequestContext context,
+    UserChannel channel,
+    GameSocket session,
+    CreateBotsTs message,
+  ) {
+    context.read<SystemOrchestrator>().createBots();
+    channel.sinkAdd(
+      WsResponse.ack(
+        n: message.n,
+        status: 200,
+        message: 'All ArenaBots created',
+      ).toPacket(),
+    );
+  }
+}

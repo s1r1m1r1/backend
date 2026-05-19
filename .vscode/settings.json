@@ -1,0 +1,35 @@
+{
+    "cSpell.language": "en,ru",
+    "explorer.fileNesting.enabled": true,
+    // "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "pubspec.yaml": ".gitignore,pubspec.lock,pubspec_overrides.yaml,.packages,.flutter-plugins,.flutter-plugins-dependencies,.metadata,devtools_options.yaml,analysis_options.yaml,.tool-versions,.json,flutter_launcher_i*.yaml,Dockerfile.*,*.md,build.yaml",
+        // Всё, что относится к командам, прячем в barrel-файл
+        "cmd.dart": "*.cmd.dart",
+    },
+    // не для workspace
+    "workbench.editor.labelFormat": "short",
+    // видимость файлов
+    "files.exclude": {
+        "**/.dart_tool": true,
+        "**/*.g.*": true,
+        "**/*.freezed.*": true,
+        // "**/test": false,
+        // "**/combined/*": true,
+    },
+    "cSpell.words": [
+        "ansicolor",
+        "checkpw",
+        "colorfy",
+        "daos",
+        "dotenv",
+        "gensalt",
+        "hashpw",
+        "rxdart",
+        "trase",
+        "бродкастов",
+        "взаимодейтсвия",
+        "зависоместей",
+        "комлексного"
+    ],
+}

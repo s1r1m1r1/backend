@@ -1,0 +1,40 @@
+import 'dart:async';
+import 'package:dart_frog/dart_frog.dart';
+import 'package:dto/dto.dart';
+import '../core/debug_log.dart';
+import '../features/auth/application/online_repository_impl.dart';
+import '../features/auth/application/session_socket.dart';
+import '../features/game/application/arena_broadcast.dart';
+import 'ws_cmd.dart';
+
+class JoinArenaCmd extends AuthenticatedWsCmd<JoinArenaTs> {
+  const JoinArenaCmd();
+
+  @override
+  FutureOr<void> execute(
+    RequestContext context,
+    UserChannel channel,
+    JoinArenaTs message,
+  ) async {
+    final session = context.read<OnlineRepository>().getSessionSINK(
+      channel.userId,
+    );
+    if (session == null) {
+      debugLog('session null');
+      await channel.close(
+        WebSocketCloseCode.forbidden.code,
+        WebSocketCloseCode.forbidden.message,
+      );
+      return;
+    }
+    context.read<ArenaBroadcast>().subscribeChannel(session, message.n);
+  }
+
+  @override
+  void executeAuthenticated(
+    RequestContext context,
+    UserChannel channel,
+    GameSocket session,
+    JoinArenaTs message,
+  ) {}
+}

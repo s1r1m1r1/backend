@@ -1,0 +1,37 @@
+import 'package:dto/dto.dart';
+import 'package:game_dto/game_dto.dart';
+
+import 'unit.dart';
+
+class Combatant {
+  final UnitId unitId;
+  int teamId;
+  final UserId userId;
+  bool isBot;
+  //------------------
+  final UnitDto baseUnit;
+  final UnitStatsDto stats;
+  Unit mutableUnit;
+
+  bool ready = false;
+
+  Combatant({
+    required this.unitId,
+    required this.teamId,
+    required this.userId,
+    required this.isBot,
+    required this.baseUnit,
+    required this.stats,
+  }) : mutableUnit = Unit.fromDto(baseUnit);
+
+  CombatantDto toDto({bool includeBase = true}) {
+    return CombatantDto(
+      unitId: unitId as int,
+      teamId: teamId,
+      userId: userId as String,
+      isBot: isBot,
+      baseUnit: includeBase ? baseUnit : null,
+      unit: mutableUnit.toDto(),
+    );
+  }
+}
