@@ -119,13 +119,13 @@ class _LettersBroad extends Broadcast<LetterTc> {
     _lock.synchronized(() async {
       try {
         final trimmed = content.trim();
-        if (trimmed.isEmpty || trimmed.length > 10000) {
+        if (trimmed.isEmpty || trimmed.length > 1000) {
           _sendLetterError(
             socket,
             n,
             WsLetterError.invalidContent,
             [letterId],
-            'Letter content must be between 1 and 10000 characters',
+            'Letter content must be between 1 and 1000 characters',
           );
           return;
         }
