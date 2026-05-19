@@ -45,7 +45,7 @@ class ArenaBotStrategy extends BotStrategy {
   @override
   void onInit(ScenarioBot bot) {
     if (!joinedArena) {
-      bot.send(WsRequest.joinArena(n: NouN.next().v));
+      bot.send(.joinArena(n: NouN.next().v));
       joinedArena = true;
     }
   }
@@ -53,9 +53,7 @@ class ArenaBotStrategy extends BotStrategy {
   @override
   void onMessage(ScenarioBot bot, WsResponse message) {
     if (message is RequiredAckResponse) {
-      bot.send(
-        WsRequest.ack(n: message.n, ts: DateTime.now().millisecondsSinceEpoch),
-      );
+      bot.send(.ack(n: message.n, ts: DateTime.now().millisecondsSinceEpoch));
     }
 
     if (message is! WsResponseBot) return;
@@ -67,7 +65,6 @@ class ArenaBotStrategy extends BotStrategy {
         setBroadcasts.addAll(broadcasts.map((i) => BroadcastId(i.id)));
 
       case TerminatedBroadcastResponse(:final broad):
-        // Broadcast завершён — сброс если была наша комната или эдикт
         setBroadcasts.remove(BroadcastId(broad));
         if (combatRoom?.id == broad || joinedEdict?.id == broad) {
           _reset(bot);
@@ -78,8 +75,7 @@ class ArenaBotStrategy extends BotStrategy {
         setBroadcasts.clear();
         joinedArena = false;
         _reset(bot);
-        // Переподключаемся к арене
-        bot.send(WsRequest.joinArena(n: NouN.next().v));
+        bot.send(.joinArena(n: NouN.next().v));
         joinedArena = true;
 
       case ArenaErrorResponse():
@@ -98,7 +94,7 @@ class ArenaBotStrategy extends BotStrategy {
           (i) => i.members.any((m) => m.userId == bot.userId.id),
         );
         if (joinedEdict != null) {
-          status = BotStatus.joined;
+          status = .joined;
           return;
         }
         // Ищем первый доступный эдикт и вступаем
@@ -107,23 +103,19 @@ class ArenaBotStrategy extends BotStrategy {
             (e) => e.maxMembers > e.members.length,
           );
           if (available != null) {
-            bot.send(
-              WsRequest.joinEdict(n: NouN.next().v, edictId: available.id),
-            );
+            bot.send(.joinEdict(n: NouN.next().v, edictId: available.id));
           }
         }
 
       case JoinedEdictResponse(:final edict):
         joinedEdict = edict;
-        status = BotStatus.joined;
+        status = .joined;
 
       // TransitionResponse: подтверждаем переход в Combat через joinBattleRoom
       case CombatStartedResponse(:final combatRoom):
         this.combatRoom = BroadcastId(combatRoom);
-        status = BotStatus.play;
-        bot.send(
-          WsRequest.joinBattleRoom(n: NouN.next().v, combatRoomId: combatRoom),
-        );
+        status = .play;
+        bot.send(.joinBattleRoom(n: NouN.next().v, combatRoomId: combatRoom));
 
       case StartBattleResponse(
         :final broadcastId,
@@ -152,7 +144,7 @@ class ArenaBotStrategy extends BotStrategy {
           (c) => c.unitId == (bot.unitId as int),
         );
         if (selfCombatant != null && selfCombatant.unit.hp <= 0) {
-          status = BotStatus.dead;
+          status = .dead;
           this.unitOrder.remove(bot.unitId as int);
           debugLog(
             '[ArenaBot ${bot.userId}] Bot is dead on start, skipping actions.',

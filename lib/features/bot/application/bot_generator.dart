@@ -79,10 +79,7 @@ class BotGenerator {
       'BotGenerator: Selecting unit: ${unit.id} for userId: ${user.userId.id}',
     );
     await unitDao.setSelectedUnit(
-      SelectedUnitTableCompanion.insert(
-        unitId: unit.id,
-        userId: user.userId.id,
-      ),
+      .insert(unitId: unit.id, userId: user.userId.id),
     );
   }
 }

@@ -39,7 +39,7 @@ class ArenaTestScenarioStrategy extends BotStrategy {
           );
           if (!alreadyMy) {
             debugLog('Creator bot ${bot.userId} creating new edict');
-            bot.send(const WsRequest.createNewEdict(n: 'test_create'));
+            bot.send(const .createNewEdict(n: 'test_create'));
           }
         } else {
           // Партнер ищет созданный эдикт
@@ -50,9 +50,7 @@ class ArenaTestScenarioStrategy extends BotStrategy {
             );
             if (isNotMember && target.members.length < target.maxMembers) {
               debugLog('Partner bot ${bot.userId} joining edict ${target.id}');
-              bot.send(
-                WsRequest.joinEdict(n: 'test_join_edict', edictId: target.id),
-              );
+              bot.send(.joinEdict(n: 'test_join_edict', edictId: target.id));
             }
           }
         }
@@ -64,10 +62,7 @@ class ArenaTestScenarioStrategy extends BotStrategy {
         if (!combatStarted.isCompleted) combatStarted.complete();
         // Подтверждаем готовность к бою
         bot.send(
-          WsRequest.joinBattleRoom(
-            n: 'test_ready',
-            combatRoomId: message.combatRoom,
-          ),
+          .joinBattleRoom(n: 'test_ready', combatRoomId: message.combatRoom),
         );
 
       case StartBattleResponse():

@@ -12,12 +12,14 @@ analyzer:
     - "**/*.freezed.dart"
   errors:
     todo: ignore
+ 
 
 linter:
   rules:
     # --- Project Specific preferences ---
     prefer_relative_imports: true
     directives_ordering: true
+ 
 
     # --- Best Practices ---
     always_declare_return_types: true

@@ -14,9 +14,9 @@ class ResetScenarioStrategy extends BotStrategy {
       'Bot ${bot.userId} starting ResetScenarioStrategy (isResetEdicts: $isResetEdicts)',
     );
     if (isResetEdicts) {
-      bot.send(const WsRequest.resetEdicts(n: 'test_reset_edicts'));
+      bot.send(const .resetEdicts(n: 'test_reset_edicts'));
     } else {
-      bot.send(const WsRequest.resetCombats(n: 'test_reset_combats'));
+      bot.send(const .resetCombats(n: 'test_reset_combats'));
     }
     Future.delayed(const Duration(milliseconds: 100), () => done.complete());
   }

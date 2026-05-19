@@ -23,17 +23,15 @@ class WinnerScenarioStrategy extends BotStrategy {
   @override
   FutureOr<void> onInit(ScenarioBot bot) {
     debugLog('[WinnerBot] Bot ${bot.userId} starting (creator: $isCreator)');
-    bot.send(const WsRequest.joinArena(n: 'winner_join_arena'));
-    bot.send(const WsRequest.syncOnlineUsers(n: 'winner_initial_stats'));
+    bot.send(const .joinArena(n: 'winner_join_arena'));
+    bot.send(const .syncOnlineUsers(n: 'winner_initial_stats'));
   }
 
   @override
   void onMessage(ScenarioBot bot, WsResponse message) {
     // Send ack for any RequiredAckResponse message first
     if (message is RequiredAckResponse) {
-      bot.send(
-        WsRequest.ack(n: message.n, ts: DateTime.now().millisecondsSinceEpoch),
-      );
+      bot.send(.ack(n: message.n, ts: DateTime.now().millisecondsSinceEpoch));
     }
 
     switch (message) {

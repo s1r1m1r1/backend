@@ -24,7 +24,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
   @override
   FutureOr<void> onInit(ScenarioBot bot) {
     debugLog('[Bot ${bot.userId}] onInit: joining arena');
-    bot.send(const WsRequest.joinArena(n: 'upgrade_join_arena'));
+    bot.send(const .joinArena(n: 'upgrade_join_arena'));
   }
 
   @override
@@ -42,7 +42,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
       if (!winnerTeamId.isCompleted)
         winnerTeamId.complete(message.winnerTeamId);
 
-      bot.send(const WsRequest.joinArena(n: 'upgrade_rejoin'));
+      bot.send(const .joinArena(n: 'upgrade_rejoin'));
       return;
     }
 
@@ -81,18 +81,13 @@ class UpgradeScenarioStrategy extends BotStrategy {
           if (!edicts.any(
             (e) => e.members.any((m) => m.userId == bot.userId.id),
           )) {
-            bot.send(const WsRequest.createNewEdict(n: 'upgrade_create'));
+            bot.send(const .createNewEdict(n: 'upgrade_create'));
           }
         } else {
           if (edicts.isNotEmpty) {
             final target = edicts.first;
             if (!target.members.any((m) => m.userId == bot.userId.id)) {
-              bot.send(
-                WsRequest.joinEdict(
-                  n: 'upgrade_join_edict',
-                  edictId: target.id,
-                ),
-              );
+              bot.send(.joinEdict(n: 'upgrade_join_edict', edictId: target.id));
             }
           }
         }
@@ -148,7 +143,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
   void _checkUpgrades(ScenarioBot bot, UnitDto unit) {
     final addAtk = unit.statPoints;
     bot.send(
-      WsRequest.allocateStats(
+      .allocateStats(
         n: 'upgrade_alloc',
         unitId: unit.id,
         addAtk: addAtk,
