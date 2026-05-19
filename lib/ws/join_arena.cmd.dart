@@ -7,14 +7,14 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/application/arena_broadcast.dart';
 import 'ws_cmd.dart';
 
-class JoinArenaCmd extends AuthenticatedWsCmd<JoinArenaTs> {
+class JoinArenaCmd extends AuthenticatedWsCmd<JoinArenaRequest> {
   const JoinArenaCmd();
 
   @override
   FutureOr<void> execute(
     RequestContext context,
     UserChannel channel,
-    JoinArenaTs message,
+    JoinArenaRequest message,
   ) async {
     final session = context.read<OnlineRepository>().getSessionSINK(
       channel.userId,
@@ -35,6 +35,6 @@ class JoinArenaCmd extends AuthenticatedWsCmd<JoinArenaTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    JoinArenaTs message,
+    JoinArenaRequest message,
   ) {}
 }

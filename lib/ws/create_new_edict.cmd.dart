@@ -4,7 +4,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/application/arena_broadcast.dart';
 import 'ws_cmd.dart';
 
-class CreateNewEdictCmd extends AuthenticatedWsCmd<CreateNewEdictTs> {
+class CreateNewEdictCmd extends AuthenticatedWsCmd<CreateNewEdictRequest> {
   const CreateNewEdictCmd();
 
   @override
@@ -12,7 +12,7 @@ class CreateNewEdictCmd extends AuthenticatedWsCmd<CreateNewEdictTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    CreateNewEdictTs message,
+    CreateNewEdictRequest message,
   ) {
     context.read<ArenaBroadcast>().createEdict(session, message.n);
   }

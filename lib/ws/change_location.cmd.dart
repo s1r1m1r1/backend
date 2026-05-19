@@ -6,14 +6,14 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/application/arena_broadcast.dart';
 import 'ws_cmd.dart';
 
-class ChangeLocationCmd extends AuthenticatedWsCmd<ChangeLocationTs> {
+class ChangeLocationCmd extends AuthenticatedWsCmd<ChangeLocationRequest> {
   const ChangeLocationCmd();
 
   @override
   FutureOr<void> execute(
     RequestContext context,
     UserChannel channel,
-    ChangeLocationTs message,
+    ChangeLocationRequest message,
   ) async {
     final session = context.read<OnlineRepository>().getSessionSINK(
       channel.userId,
@@ -43,6 +43,6 @@ class ChangeLocationCmd extends AuthenticatedWsCmd<ChangeLocationTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    ChangeLocationTs message,
+    ChangeLocationRequest message,
   ) {}
 }

@@ -6,14 +6,14 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/application/arena_broadcast.dart';
 import 'ws_cmd.dart';
 
-class LeaveArenaCmd extends AuthenticatedWsCmd<LeaveArenaTs> {
+class LeaveArenaCmd extends AuthenticatedWsCmd<LeaveArenaRequest> {
   const LeaveArenaCmd();
 
   @override
   FutureOr<void> execute(
     RequestContext context,
     UserChannel channel,
-    LeaveArenaTs message,
+    LeaveArenaRequest message,
   ) async {
     final session = context.read<OnlineRepository>().getSessionSINK(
       channel.userId,
@@ -33,6 +33,6 @@ class LeaveArenaCmd extends AuthenticatedWsCmd<LeaveArenaTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    LeaveArenaTs message,
+    LeaveArenaRequest message,
   ) {}
 }

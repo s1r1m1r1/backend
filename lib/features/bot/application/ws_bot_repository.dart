@@ -32,8 +32,8 @@ class BotRepository {
 
   /// ловим сообщения бота и отправляем в нужный broadcast
   Future<void> add(SinkBot botSink, WsRequest toServer) async {
-    // Filter: process only messages tagged with [BotTs]
-    if (toServer is! BotTs) return;
+    // Filter: process only messages tagged with [BotRequest]
+    if (toServer is! BotRequest) return;
 
     try {
       debugLog('[BotRepository] add: $toServer for userId=${botSink.userId}');
@@ -42,60 +42,60 @@ class BotRepository {
         '[BotRepository] gameSocket=${gameSocket != null ? "found" : "NULL"}',
       );
       switch (toServer) {
-        case JoinArenaTs():
+        case JoinArenaRequest():
           if (gameSocket == null) break;
           _arenaBroadcast.subscribeChannel(gameSocket, NouN.next().v);
-        case JoinEdictTs():
+        case JoinEdictRequest():
           if (gameSocket == null) break;
           await _arenaBroadcast.joinEdict(
             gameSocket,
             toServer.edictId,
             NouN.next().v,
           );
-        case CreateNewEdictTs():
+        case CreateNewEdictRequest():
           if (gameSocket != null) {
             _arenaBroadcast.createEdict(gameSocket, toServer.n);
           }
-        case LeaveEdictTs():
+        case LeaveEdictRequest():
           if (gameSocket != null) {
             _arenaBroadcast.leaveEdict(gameSocket, toServer.n);
           }
-        case LeaveArenaTs():
+        case LeaveArenaRequest():
           if (gameSocket != null) {
             _arenaBroadcast.leaveArena(gameSocket, toServer.n);
           }
-        case WithTokenTs():
-        case SyncJoinedBroadsTs():
+        case WithTokenRequest():
+        case SyncJoinedBroadsRequest():
         case SyncOnlineUsers():
           _onlineBroadcast.syncOnlineUsers(botSink, toServer.n);
-        case JoinLettersTs():
+        case JoinLettersRequest():
           if (gameSocket != null) {
             _lettersBroadManager.subscribe(gameSocket, toServer.n);
           }
-        case NewLetterTs():
+        case NewLetterRequest():
           if (gameSocket != null) {
             _lettersBroadManager.newLetter(gameSocket, toServer);
           }
-        case EditLetterTs():
+        case EditLetterRequest():
           if (gameSocket != null) {
             _lettersBroadManager.editLetter(gameSocket, toServer);
           }
-        case DeleteLetterTs():
+        case DeleteLetterRequest():
           if (gameSocket != null) {
             _lettersBroadManager.removeLetter(gameSocket, toServer);
           }
-        case ResetEdictsTs():
+        case ResetEdictsRequest():
           // Global arena reset — not tied to a specific bot user
           _arenaBroadcast.reset();
-        case ResetCombatsTs():
+        case ResetCombatsRequest():
           // Global combat supervisor teardown — not tied to a specific bot user
           await _combatSupervisor.dispose();
-        case DisconnectTs(:final n):
-          debugLog('[BotRepository] BOT DisconnectTs $n');
+        case DisconnectRequest(:final n):
+          debugLog('[BotRepository] BOT DisconnectRequest $n');
           _onlineBroadcast.removeUser(botSink, n);
-        case GameActionTs():
+        case GameActionRequest():
           debugLog(
-            '[BotRepository] GameActionTs: combatRoomId=${toServer.combatRoomId}, action=${toServer.action}',
+            '[BotRepository] GameActionRequest: combatRoomId=${toServer.combatRoomId}, action=${toServer.action}',
           );
           if (gameSocket != null) {
             debugLog(
@@ -105,10 +105,10 @@ class BotRepository {
             debugLog('[BotRepository] combatSupervisor.gameAction completed');
           } else {
             debugLog(
-              '[BotRepository] ERROR: gameSocket is null for GameActionTs',
+              '[BotRepository] ERROR: gameSocket is null for GameActionRequest',
             );
           }
-        case JoinBattleRoomTs():
+        case JoinBattleRoomRequest():
           if (gameSocket != null) {
             await _combatSupervisor.combatReady(
               gameSocket,
@@ -116,33 +116,33 @@ class BotRepository {
               toServer.n,
             );
           }
-        case JoinAsCombatObserverTs():
+        case JoinAsCombatObserverRequest():
         case LeaveBattleRoom():
-        case FocusCombatObserverTs():
-        case CreateBotsTs():
-        case RemoveBotsTs():
-        case AckTs():
+        case FocusCombatObserverRequest():
+        case CreateBotsRequest():
+        case RemoveBotsRequest():
+        case AckRequest():
           if (gameSocket != null) {
-            gameSocket.handleAck(toServer as AckTs);
+            gameSocket.handleAck(toServer as AckRequest);
             if (gameSocket.pendingTransitionRoom != null) {
               gameSocket.commitPendingTransition();
             }
           }
           break;
-        case SyncMenuTs():
+        case SyncMenuRequest():
           break;
-        case ChangeLocationTs():
+        case ChangeLocationRequest():
           break;
-        case PingTs():
+        case PingRequest():
           break;
-        case AllocateStatsTs():
+        case AllocateStatsRequest():
           await _unitRepository.allocateStats(
             toServer.unitId,
             toServer.addAtk,
             toServer.addDef,
             toServer.addVitality,
           );
-        case ChangeUnitStatsTs():
+        case ChangeUnitStatsRequest():
           await _unitDao.setStats(
             unitId: toServer.unitId ?? botSink.unitId as int,
             wins: toServer.wins,
@@ -150,9 +150,9 @@ class BotRepository {
             coins: toServer.coins,
             exp: toServer.exp,
           );
-        case SyncCombatStateTs():
+        case SyncCombatStateRequest():
           break;
-        case GetUnitStatsTs():
+        case GetUnitStatsRequest():
           break;
       }
     } catch (e, s) {

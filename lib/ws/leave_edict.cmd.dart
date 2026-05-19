@@ -4,7 +4,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/application/arena_broadcast.dart';
 import 'ws_cmd.dart';
 
-class LeaveEdictCmd extends AuthenticatedWsCmd<LeaveEdictTs> {
+class LeaveEdictCmd extends AuthenticatedWsCmd<LeaveEdictRequest> {
   const LeaveEdictCmd();
 
   @override
@@ -12,7 +12,7 @@ class LeaveEdictCmd extends AuthenticatedWsCmd<LeaveEdictTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    LeaveEdictTs message,
+    LeaveEdictRequest message,
   ) {
     context.read<ArenaBroadcast>().leaveEdict(session, message.n);
   }

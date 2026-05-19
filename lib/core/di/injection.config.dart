@@ -73,6 +73,12 @@ extension GetItInjectableX on _i174.GetIt {
       () => dbClientModule.file(),
       registerFor: {_prod, _dev},
     );
+    gh.lazySingleton<_i789.UserRepository>(
+      () => _i894.UserRepositoryImpl(
+        gh<_i946.DbClient>(),
+        gh<_i834.MailingService>(),
+      ),
+    );
     gh.lazySingleton<_i958.UserDao>(
       () => dbClientModule.userDao(gh<_i946.DbClient>()),
     );
@@ -99,12 +105,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i319.UnitRepository>(
       () => _i814.UnitRepositoryImpl(gh<_i946.DbClient>()),
-    );
-    gh.lazySingleton<_i789.UserRepository>(
-      () => _i894.UserRepositoryImpl(
-        gh<_i946.DbClient>(),
-        gh<_i834.MailingService>(),
-      ),
     );
     gh.lazySingleton<_i454.SessionRepository>(
       () => _i224.SessionRepositoryImpl(gh<_i946.DbClient>()),

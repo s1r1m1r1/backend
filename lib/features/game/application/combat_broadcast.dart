@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -20,7 +22,7 @@ import '../domain/level_system.dart';
 import '../domain/unit.dart';
 import '../domain/unit_repository.dart';
 
-class CombatBroadcast extends Broadcast<CombatTc> {
+class CombatBroadcast extends Broadcast<CombatResponse> {
   CombatBroadcast(
     this._onlineRep,
     this._sessionRep,
@@ -36,7 +38,7 @@ class CombatBroadcast extends Broadcast<CombatTc> {
   int _nonceCount = 0;
   String get _nextN => 'combat_${_nonceCount++}';
 
-  final _eventHistory = <CombatEventTc>[];
+  final _eventHistory = <CombatEventResponse>[];
 
   @override
   late BroadcastId broadcastId;
@@ -60,9 +62,9 @@ class CombatBroadcast extends Broadcast<CombatTc> {
               turnEndAt: _currentTurnEndAt,
               id: eventId,
             )
-            as CombatEventTc;
+            as CombatEventResponse;
     _eventHistory.add(tc);
-    broadcast(tc as CombatTc);
+    broadcast(tc as CombatResponse);
   }
 
   void _startTurnTimer() {
@@ -128,7 +130,7 @@ class CombatBroadcast extends Broadcast<CombatTc> {
         }
 
         if (allReady) {
-          // Все подключились — отправляем StartBattleTc всем
+          // Все подключились — отправляем StartBattleResponse всем
           _startTurnTimer();
           broadcast(
             WsResponse.startBattle(
@@ -141,7 +143,7 @@ class CombatBroadcast extends Broadcast<CombatTc> {
                   turnEndAt: _currentTurnEndAt,
                   id: -1, // Initial state before any events
                 )
-                as CombatTc,
+                as CombatResponse,
           );
         } else {
           // Ещё не все — отправляем только подключившемуся (lobby-state)
@@ -192,7 +194,7 @@ class CombatBroadcast extends Broadcast<CombatTc> {
     });
   }
 
-  Future<void> gameAction(GameSocket socket, GameActionTs ts) async {
+  Future<void> gameAction(GameSocket socket, GameActionRequest ts) async {
     await _lock.synchronized(() async {
       // 1/ проверить может ли пользователь делать действие или нет
       final unitId = socket.session.unit.unitId;
@@ -376,7 +378,7 @@ class CombatBroadcast extends Broadcast<CombatTc> {
                 );
               } else {
                 // Provide 10% of base reward for losing, but do not process level ups for simplicity right now
-                final loserExp = 10;
+                const loserExp = 10;
                 combatant.mutableUnit.losses += 1;
                 combatant.mutableUnit.exp += loserExp;
 
@@ -400,7 +402,7 @@ class CombatBroadcast extends Broadcast<CombatTc> {
 
             broadcast(
               WsResponse.location(n: _nextN, location: GameLocation.arena)
-                  as CombatTc,
+                  as CombatResponse,
             );
             broadcast(
               WsResponse.combatWin(
@@ -408,7 +410,7 @@ class CombatBroadcast extends Broadcast<CombatTc> {
                     broadcastId: broadcastId as String,
                     winnerTeamId: winnerTeamId,
                   )
-                  as CombatTc,
+                  as CombatResponse,
             );
 
             for (final combatant in combatants) {
@@ -536,7 +538,7 @@ class CombatBroadcast extends Broadcast<CombatTc> {
         ).toPacket(),
       );
 
-      // Регистрируем pending-переход: подписка произойдёт атомарно по AckTs
+      // Регистрируем pending-переход: подписка произойдёт атомарно по AckRequest
       socket.setPendingTransition(broadcastId, (s) {
         if (!channels.containsKey(s.userId)) {
           subscribe(s);
@@ -568,9 +570,9 @@ class CombatBroadcast extends Broadcast<CombatTc> {
         n: _nextN,
         combatRoom: broadcastId,
       );
-      // sendWithAck регистрирует ожидание AckTs по nonce
+      // sendWithAck регистрирует ожидание AckRequest по nonce
       socket
-          .sendWithAck(combatStarted as RequiredAckTc)
+          .sendWithAck(combatStarted as RequiredAckResponse)
           .then((_) {
             debugLog(
               '[CombatBroadcast] ACK received for combatStarted → ${socket.userId}',

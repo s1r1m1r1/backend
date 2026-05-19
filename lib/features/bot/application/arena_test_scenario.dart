@@ -23,8 +23,8 @@ class ArenaTestScenarioStrategy extends BotStrategy {
 
   @override
   void onMessage(ScenarioBot bot, WsResponse message) {
-    // Send ack for any RequiredAckTc message first
-    if (message is RequiredAckTc) {
+    // Send ack for any RequiredAckResponse message first
+    if (message is RequiredAckResponse) {
       bot.send(
         WsRequest.ack(n: message.n, ts: DateTime.now().millisecondsSinceEpoch),
       );
@@ -32,14 +32,14 @@ class ArenaTestScenarioStrategy extends BotStrategy {
 
     // debugLog('Bot ${bot.userId} received message: ${message.runtimeType}'.dye(.cyan));
     switch (message) {
-      case ActiveEdictsTc(:final edicts):
+      case ActiveEdictsResponse(:final edicts):
         if (isCreator) {
           final alreadyMy = edicts.any(
             (e) => e.members.any((m) => m.userId == bot.userId.id),
           );
           if (!alreadyMy) {
             debugLog('Creator bot ${bot.userId} creating new edict');
-            bot.send(WsRequest.createNewEdict(n: 'test_create'));
+            bot.send(const WsRequest.createNewEdict(n: 'test_create'));
           }
         } else {
           // Партнер ищет созданный эдикт
@@ -57,9 +57,9 @@ class ArenaTestScenarioStrategy extends BotStrategy {
           }
         }
 
-      case CombatStartedTc():
+      case CombatStartedResponse():
         debugLog(
-          'Bot ${bot.userId} received CombatStartedTc: ${message.combatRoom}',
+          'Bot ${bot.userId} received CombatStartedResponse: ${message.combatRoom}',
         );
         if (!combatStarted.isCompleted) combatStarted.complete();
         // Подтверждаем готовность к бою
@@ -70,13 +70,13 @@ class ArenaTestScenarioStrategy extends BotStrategy {
           ),
         );
 
-      case StartBattleTc():
+      case StartBattleResponse():
         debugLog(
-          'Bot ${bot.userId} received StartBattleTc. Ready: ${message.ready}',
+          'Bot ${bot.userId} received StartBattleResponse. Ready: ${message.ready}',
         );
         if (!battleLoaded.isCompleted) battleLoaded.complete();
 
-      case ArenaErrorTc(:final error):
+      case ArenaErrorResponse(:final error):
         debugLog('Bot ${bot.userId} ArenaError: $error');
 
       default:

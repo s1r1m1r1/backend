@@ -6,19 +6,18 @@ enum CombatStatus { initial, ready, started, stopped, failure }
 enum TurnStatus { none, available, completed }
 
 class Combat {
-  factory Combat.initial() => Combat(
-    round: 0,
-    currentCombatant: UnitId.none,
-    unitOrder: [],
-    combatants: [],
-  );
-
   Combat({
     required this.round,
     required this.currentCombatant,
     required this.unitOrder,
     required this.combatants,
   });
+  factory Combat.initial() => Combat(
+    round: 0,
+    currentCombatant: UnitId.none,
+    unitOrder: [],
+    combatants: [],
+  );
   CombatStatus status = CombatStatus.initial;
   int round;
   UnitId currentCombatant;

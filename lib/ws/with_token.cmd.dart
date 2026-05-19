@@ -4,13 +4,13 @@ import '../features/auth/application/presence_manager.dart';
 import '../features/auth/application/session_socket.dart';
 import 'ws_cmd.dart';
 
-class WithTokenCmd extends WsCmd<WithTokenTs> {
+class WithTokenCmd extends WsCmd<WithTokenRequest> {
   const WithTokenCmd();
   @override
   Future<void> execute(
     RequestContext context,
     UserChannel channel,
-    WithTokenTs message,
+    WithTokenRequest message,
   ) async {
     await context.read<PresenceManager>().join(
       channel,

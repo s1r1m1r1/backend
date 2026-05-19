@@ -5,14 +5,14 @@ import '../features/auth/application/online_repository_impl.dart';
 import '../features/auth/application/session_socket.dart';
 import 'ws_cmd.dart';
 
-class PingCmd extends WsCmd<PingTs> {
+class PingCmd extends WsCmd<PingRequest> {
   const PingCmd();
 
   @override
   FutureOr<void> execute(
     RequestContext context,
     UserChannel channel,
-    PingTs message,
+    PingRequest message,
   ) {
     // Optionally update lastActiveTime if session exists
     final session = context.read<OnlineRepository>().getSessionSINK(

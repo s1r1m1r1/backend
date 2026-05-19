@@ -82,13 +82,13 @@ class GameSocket extends IGameSocket {
   DateTime? lastActiveTime;
 
   /// Комната, в которую пользователь переходит.
-  /// Заполняется при отправке [TransitionTc], очищается после получения ACK.
+  /// Заполняется при отправке [TransitionResponse], очищается после получения ACK.
   /// Подписка выполняется атомарно в [commitPendingTransition].
   BroadcastId? pendingTransitionRoom;
   void Function(GameSocket)? _pendingTransitionSubscriber;
 
   /// Атомарно подписывает сокет к [pendingTransitionRoom].
-  /// Вызывается из AckCMD при получении AckTs от клиента.
+  /// Вызывается из AckCMD при получении AckRequest от клиента.
   void commitPendingTransition() {
     final room = pendingTransitionRoom;
     final subscriber = _pendingTransitionSubscriber;
@@ -107,14 +107,14 @@ class GameSocket extends IGameSocket {
     _pendingTransitionSubscriber = subscribe;
   }
 
-  final Map<String, Completer<AckTs>> _pendingAcks = {};
+  final Map<String, Completer<AckRequest>> _pendingAcks = {};
 
   /// Sends a message and waits for an acknowledgment.
   ///
   /// Multiple concurrent acks are supported as long as they have different nonces.
   /// If a nonce is reused while the previous ack is still pending, the old ack
   /// will be completed with an error and replaced with the new one.
-  Future<AckTs> sendWithAck<T extends RequiredAckTc>(
+  Future<AckRequest> sendWithAck<T extends RequiredAckResponse>(
     T message, {
     Duration timeout = const Duration(seconds: 10),
   }) {
@@ -130,7 +130,7 @@ class GameSocket extends IGameSocket {
       );
     }
 
-    final completer = Completer<AckTs>();
+    final completer = Completer<AckRequest>();
     _pendingAcks[n] = completer;
 
     sinkAdd(message.toPacket());
@@ -144,7 +144,7 @@ class GameSocket extends IGameSocket {
     );
   }
 
-  void handleAck(AckTs ack) {
+  void handleAck(AckRequest ack) {
     final completer = _pendingAcks.remove(ack.n);
     if (completer != null && !completer.isCompleted) {
       completer.complete(ack);

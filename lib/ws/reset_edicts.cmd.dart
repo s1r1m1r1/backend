@@ -4,7 +4,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/application/arena_broadcast.dart';
 import 'ws_cmd.dart';
 
-class ResetEdictsCmd extends DeveloperWsCmd<ResetEdictsTs> {
+class ResetEdictsCmd extends DeveloperWsCmd<ResetEdictsRequest> {
   const ResetEdictsCmd();
 
   @override
@@ -12,7 +12,7 @@ class ResetEdictsCmd extends DeveloperWsCmd<ResetEdictsTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    ResetEdictsTs message,
+    ResetEdictsRequest message,
   ) {
     context.read<ArenaBroadcast>().reset();
     channel.sinkAdd(

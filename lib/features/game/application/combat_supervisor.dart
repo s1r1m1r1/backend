@@ -13,7 +13,12 @@ import 'combat_broadcast.dart';
 
 @lazySingleton
 final class CombatSupervisor
-    extends BroadcastSupervisor<CombatRoomsTc, CombatTc, CombatBroadcast> {
+    extends
+        BroadcastSupervisor<
+          CombatRoomsResponse,
+          CombatResponse,
+          CombatBroadcast
+        > {
   CombatSupervisor(
     this.onlineRepository,
     this.sessionRepository,
@@ -62,7 +67,7 @@ final class CombatSupervisor
             broadcastId: broadcastId,
             rooms: listDto.values.toList(),
           )
-          as CombatRoomsTc,
+          as CombatRoomsResponse,
     );
 
     for (final sub in _obsListCombat) {
@@ -117,7 +122,7 @@ final class CombatSupervisor
     await room.combatReady(socket, n);
   }
 
-  Future<void> gameAction(GameSocket socket, GameActionTs action) async {
+  Future<void> gameAction(GameSocket socket, GameActionRequest action) async {
     final room = getRoom(BroadcastId(action.combatRoomId));
     if (room == null) {
       socket.sinkAdd(
@@ -134,7 +139,7 @@ final class CombatSupervisor
 
   Future<void> syncCombatState(
     GameSocket socket,
-    SyncCombatStateTs message,
+    SyncCombatStateRequest message,
   ) async {
     final room = getRoom(BroadcastId(message.combatRoomId));
     if (room == null) {
@@ -156,13 +161,13 @@ final class CombatSupervisor
   final Map<BroadcastId, CombatRoomDto> listDto = {};
 
   @override
-  void onRoomBroadcast(EncodedPacket<CombatTc> toClient) {
+  void onRoomBroadcast(EncodedPacket<CombatResponse> toClient) {
     final data = toClient.data;
     switch (data) {
-      case LocationTc():
-      case CombatStartedTc():
+      case LocationResponse():
+      case CombatStartedResponse():
         break;
-      case StartBattleTc(:final membs, :final broadcastId):
+      case StartBattleResponse(:final membs, :final broadcastId):
         final dto = CombatRoomDto(
           id: broadcastId,
           members: membs
@@ -175,18 +180,18 @@ final class CombatSupervisor
         listDto[BroadcastId(broadcastId)] = dto;
         _broadcastRooms();
         break;
-      case CombatEventTc():
-      case CombatStateTc():
+      case CombatEventResponse():
+      case CombatStateResponse():
         break;
-      case CombatErrorTc(:final isFatal, :final broadcastId):
+      case CombatErrorResponse(:final isFatal, :final broadcastId):
         if (isFatal) {
           deleteRoom(broadcastId);
           listDto.remove(BroadcastId(broadcastId));
           _broadcastRooms();
         }
         break;
-      case CombatClosedTc(:final broadcastId):
-      case CombatWinTc(:final broadcastId):
+      case CombatClosedResponse(:final broadcastId):
+      case CombatWinResponse(:final broadcastId):
         deleteRoom(broadcastId);
         listDto.remove(BroadcastId(broadcastId));
         _broadcastRooms();
@@ -199,10 +204,10 @@ final class CombatSupervisor
     broadcast(
       WsResponse.combatRooms(
             n: NouN.next().v,
-            broadcastId: this.broadcastId,
+            broadcastId: broadcastId,
             rooms: listDto.values.toList(),
           )
-          as CombatRoomsTc,
+          as CombatRoomsResponse,
     );
   }
 
@@ -211,11 +216,11 @@ final class CombatSupervisor
     for (final room in roomsToDispose) {
       room.broadcast(
         WsResponse.location(n: NouN.next().v, location: GameLocation.arena)
-            as CombatTc,
+            as CombatResponse,
       );
       room.broadcast(
         WsResponse.combatClosed(n: NouN.next().v, broadcastId: room.broadcastId)
-            as CombatTc,
+            as CombatResponse,
       );
       deleteRoom(room.broadcastId);
     }

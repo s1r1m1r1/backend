@@ -1415,21 +1415,23 @@ class MockLettersBroadManager extends _i1.Mock
   );
 
   @override
-  void newLetter(_i16.GameSocket? socket, _i11.NewLetterTs? message) =>
+  void newLetter(_i16.GameSocket? socket, _i11.NewLetterRequest? message) =>
       super.noSuchMethod(
         Invocation.method(#newLetter, [socket, message]),
         returnValueForMissingStub: null,
       );
 
   @override
-  void removeLetter(_i16.GameSocket? socket, _i11.DeleteLetterTs? message) =>
-      super.noSuchMethod(
-        Invocation.method(#removeLetter, [socket, message]),
-        returnValueForMissingStub: null,
-      );
+  void removeLetter(
+    _i16.GameSocket? socket,
+    _i11.DeleteLetterRequest? message,
+  ) => super.noSuchMethod(
+    Invocation.method(#removeLetter, [socket, message]),
+    returnValueForMissingStub: null,
+  );
 
   @override
-  void editLetter(_i16.GameSocket? socket, _i11.EditLetterTs? message) =>
+  void editLetter(_i16.GameSocket? socket, _i11.EditLetterRequest? message) =>
       super.noSuchMethod(
         Invocation.method(#editLetter, [socket, message]),
         returnValueForMissingStub: null,

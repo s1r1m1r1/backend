@@ -4,7 +4,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/chat/application/letters_broad_manager.dart';
 import 'ws_cmd.dart';
 
-class NewLetterCmd extends AuthenticatedWsCmd<NewLetterTs> {
+class NewLetterCmd extends AuthenticatedWsCmd<NewLetterRequest> {
   const NewLetterCmd();
 
   @override
@@ -12,7 +12,7 @@ class NewLetterCmd extends AuthenticatedWsCmd<NewLetterTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    NewLetterTs message,
+    NewLetterRequest message,
   ) {
     context.read<LettersBroadManager>().newLetter(session, message);
   }

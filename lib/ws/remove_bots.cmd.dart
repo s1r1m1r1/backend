@@ -6,7 +6,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/auth/application/system_orchestrator.dart';
 import 'ws_cmd.dart';
 
-class RemoveBotsCmd extends DeveloperWsCmd<RemoveBotsTs> {
+class RemoveBotsCmd extends DeveloperWsCmd<RemoveBotsRequest> {
   const RemoveBotsCmd();
 
   @override
@@ -14,7 +14,7 @@ class RemoveBotsCmd extends DeveloperWsCmd<RemoveBotsTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    RemoveBotsTs message,
+    RemoveBotsRequest message,
   ) async {
     final orchestrator = context.read<SystemOrchestrator>();
     final presenceManager = context.read<PresenceManager>();

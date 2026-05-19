@@ -5,13 +5,13 @@ import '../features/auth/application/presence_manager.dart';
 import '../features/auth/application/session_socket.dart';
 import 'ws_cmd.dart';
 
-class DisconnectCmd extends WsCmd<DisconnectTs> {
+class DisconnectCmd extends WsCmd<DisconnectRequest> {
   const DisconnectCmd();
   @override
   void execute(
     RequestContext context,
     UserChannel channel,
-    DisconnectTs message,
+    DisconnectRequest message,
   ) {
     debugLog('[WebSocket] Disconnect: replace by BOT');
     context.read<PresenceManager>().removeUser(channel, message.n);

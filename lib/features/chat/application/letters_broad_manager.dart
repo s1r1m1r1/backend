@@ -35,7 +35,7 @@ class LettersBroadManager {
     bloc.subscribeChannel(socket, n);
   }
 
-  void newLetter(GameSocket socket, NewLetterTs message) {
+  void newLetter(GameSocket socket, NewLetterRequest message) {
     final role = socket.session.user.role;
     final bloc = _rooms[role];
     if (bloc == null) {
@@ -45,7 +45,7 @@ class LettersBroadManager {
     bloc.newLetter(socket, message.content, message.n);
   }
 
-  void removeLetter(GameSocket socket, DeleteLetterTs message) {
+  void removeLetter(GameSocket socket, DeleteLetterRequest message) {
     final role = socket.session.user.role;
     final broadcast = _rooms[role];
     if (broadcast == null) return;
@@ -54,7 +54,7 @@ class LettersBroadManager {
     broadcast.removeLetters(socket, message.letterId, message.n);
   }
 
-  void editLetter(GameSocket socket, EditLetterTs message) {
+  void editLetter(GameSocket socket, EditLetterRequest message) {
     final role = socket.session.user.role;
     final bloc = _rooms[role];
     if (bloc == null) return;

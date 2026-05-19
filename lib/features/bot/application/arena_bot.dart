@@ -52,7 +52,7 @@ class ArenaBotStrategy extends BotStrategy {
 
   @override
   void onMessage(ScenarioBot bot, WsResponse message) {
-    if (message is RequiredAckTc) {
+    if (message is RequiredAckResponse) {
       bot.send(
         WsRequest.ack(n: message.n, ts: DateTime.now().millisecondsSinceEpoch),
       );
@@ -63,17 +63,17 @@ class ArenaBotStrategy extends BotStrategy {
     final toClient = message;
 
     switch (toClient) {
-      case BroadcastInfoTc(:final broadcasts):
+      case BroadcastInfoResponse(:final broadcasts):
         setBroadcasts.addAll(broadcasts.map((i) => BroadcastId(i.id)));
 
-      case TerminatedBroadcastTc(:final broad):
+      case TerminatedBroadcastResponse(:final broad):
         // Broadcast завершён — сброс если была наша комната или эдикт
         setBroadcasts.remove(BroadcastId(broad));
         if (combatRoom?.id == broad || joinedEdict?.id == broad) {
           _reset(bot);
         }
 
-      case TerminatedAllBroadcastTc():
+      case TerminatedAllBroadcastResponse():
         // Полный сброс (ResetEdictsCMD или ResetCombatsCMD)
         setBroadcasts.clear();
         joinedArena = false;
@@ -82,10 +82,10 @@ class ArenaBotStrategy extends BotStrategy {
         bot.send(WsRequest.joinArena(n: NouN.next().v));
         joinedArena = true;
 
-      case ArenaErrorTc():
+      case ArenaErrorResponse():
         break;
 
-      case ActiveEdictsTc(:final edicts):
+      case ActiveEdictsResponse(:final edicts):
         this.edicts = edicts;
         // Если уже в бою или уже присоединились — не трогаем эдикты
         if (status == BotStatus.play || status == BotStatus.joined) {
@@ -113,19 +113,19 @@ class ArenaBotStrategy extends BotStrategy {
           }
         }
 
-      case JoinedEdictTc(:final edict):
+      case JoinedEdictResponse(:final edict):
         joinedEdict = edict;
         status = BotStatus.joined;
 
-      // TransitionTc: подтверждаем переход в Combat через joinBattleRoom
-      case CombatStartedTc(:final combatRoom):
+      // TransitionResponse: подтверждаем переход в Combat через joinBattleRoom
+      case CombatStartedResponse(:final combatRoom):
         this.combatRoom = BroadcastId(combatRoom);
         status = BotStatus.play;
         bot.send(
           WsRequest.joinBattleRoom(n: NouN.next().v, combatRoomId: combatRoom),
         );
 
-      case StartBattleTc(
+      case StartBattleResponse(
         :final broadcastId,
         :final membs,
         :final unitOrder,
@@ -133,7 +133,7 @@ class ArenaBotStrategy extends BotStrategy {
         :final ready,
       ):
         if (broadcastId != combatRoom) {
-          debugLog('[ArenaBot ${bot.userId}] StartBattleTc WRONG ROOM');
+          debugLog('[ArenaBot ${bot.userId}] StartBattleResponse WRONG ROOM');
           return;
         }
         combatants = List<CombatantDto>.from(membs);
@@ -164,15 +164,19 @@ class ArenaBotStrategy extends BotStrategy {
           _performAttack(bot, broadcastId);
         }
 
-      case CombatStateTc(:final broadcastId, :final currentTurn, :final membs):
+      case CombatStateResponse(
+        :final broadcastId,
+        :final currentTurn,
+        :final membs,
+      ):
         if (broadcastId != combatRoom?.id) {
-          debugLog('[ArenaBot ${bot.userId}] CombatStateTc WRONG ROOM');
+          debugLog('[ArenaBot ${bot.userId}] CombatStateResponse WRONG ROOM');
           return;
         }
         this.currentTurn = currentTurn;
         combatants = List<CombatantDto>.from(membs);
         // Refresh unitOrder based on alive combatants
-        this.unitOrder = combatants
+        unitOrder = combatants
             .where((c) => c.unit.hp > 0)
             .map((c) => c.unitId)
             .toList();
@@ -183,7 +187,7 @@ class ArenaBotStrategy extends BotStrategy {
         );
         if (selfCombatant != null && selfCombatant.unit.hp <= 0) {
           status = BotStatus.dead;
-          this.unitOrder.remove(bot.unitId as int);
+          unitOrder.remove(bot.unitId as int);
           debugLog('[ArenaBot ${bot.userId}] Bot is dead, skipping turn.');
           return;
         }
@@ -191,7 +195,7 @@ class ArenaBotStrategy extends BotStrategy {
           _performAttack(bot, broadcastId);
         }
 
-      case CombatEventTc(:final broadcastId, :final events):
+      case CombatEventResponse(:final broadcastId, :final events):
         if (broadcastId != combatRoom?.id) return;
         for (final event in events) {
           switch (event) {
@@ -230,7 +234,7 @@ class ArenaBotStrategy extends BotStrategy {
           _performAttack(bot, broadcastId);
         }
 
-      case CombatErrorTc(:final broadcastId):
+      case CombatErrorResponse(:final broadcastId):
         if (broadcastId == combatRoom?.id) {
           debugLog(
             '[ArenaBot ${bot.userId}] CombatError — resetting & rejoining Arena',
@@ -239,29 +243,26 @@ class ArenaBotStrategy extends BotStrategy {
           bot.send(WsRequest.joinArena(n: NouN.next().v));
         }
 
-      case CombatWinTc(:final broadcastId):
+      case CombatWinResponse(:final broadcastId):
         if (broadcastId == combatRoom?.id) {
           debugLog(
             '[ArenaBot ${bot.userId}] CombatWin — resetting & rejoining Arena',
           );
           _reset(bot);
-          // После победы могут появиться очки навыков
-          // Мы не знаем текущие статы, поэтому полагаемся на MenuTc
-          // который обычно приходит после обновления статов в OnlineRepository
           bot.send(WsRequest.joinArena(n: NouN.next().v));
         }
 
-      case CombatRoomsTc():
+      case CombatRoomsResponse():
         break;
 
-      case MenuTc(:final units):
+      case MenuResponse(:final units):
         _onUnitsUpdate(bot, units);
         break;
 
-      case UnitsUpdateTc(:final dto):
+      case UnitsUpdateResponse(:final dto):
         _onUnitsUpdate(bot, dto);
         break;
-      case CombatClosedTc(:final broadcastId):
+      case CombatClosedResponse(:final broadcastId):
         if (broadcastId == combatRoom?.id) {
           debugLog(
             '[ArenaBot ${bot.userId}] CombatClosed — resetting & rejoining Arena',

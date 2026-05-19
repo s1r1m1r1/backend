@@ -23,7 +23,7 @@ class ResetScenarioStrategy extends BotStrategy {
 
   @override
   void onMessage(ScenarioBot bot, WsResponse message) {
-    if (isResetEdicts && message is ActiveEdictsTc) {
+    if (isResetEdicts && message is ActiveEdictsResponse) {
       if (message.edicts.isEmpty) {
         debugLog('Edicts reset verified!');
       }

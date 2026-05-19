@@ -69,7 +69,7 @@ class UserRepositoryImpl extends UserRepository with LifecycleLogging {
       );
 
       if (user.confirmationToken != null) {
-        mailingService.sendConfirmationEmail(
+        await mailingService.sendConfirmationEmail(
           user.email,
           user.confirmationToken!,
         );

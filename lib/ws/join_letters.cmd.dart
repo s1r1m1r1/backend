@@ -4,7 +4,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/chat/application/letters_broad_manager.dart';
 import 'ws_cmd.dart';
 
-class JoinLettersCmd extends AuthenticatedWsCmd<JoinLettersTs> {
+class JoinLettersCmd extends AuthenticatedWsCmd<JoinLettersRequest> {
   const JoinLettersCmd();
 
   @override
@@ -12,7 +12,7 @@ class JoinLettersCmd extends AuthenticatedWsCmd<JoinLettersTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    JoinLettersTs message,
+    JoinLettersRequest message,
   ) {
     context.read<LettersBroadManager>().subscribe(session, message.n);
   }

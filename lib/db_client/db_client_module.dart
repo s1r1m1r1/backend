@@ -22,7 +22,6 @@ abstract class DbClientModule {
   @lazySingleton
   DbClient file() => DbClient(DbClient.openConnection());
 
-  /// вторичные lazySingleton
   @lazySingleton
   UserDao userDao(DbClient db) => db.userDao;
 

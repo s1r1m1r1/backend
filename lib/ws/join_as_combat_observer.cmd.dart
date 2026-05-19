@@ -5,7 +5,7 @@ import '../features/game/application/combat_supervisor.dart';
 import 'ws_cmd.dart';
 
 class JoinAsCombatObserverCmd
-    extends AuthenticatedWsCmd<JoinAsCombatObserverTs> {
+    extends AuthenticatedWsCmd<JoinAsCombatObserverRequest> {
   const JoinAsCombatObserverCmd();
 
   @override
@@ -13,7 +13,7 @@ class JoinAsCombatObserverCmd
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    JoinAsCombatObserverTs message,
+    JoinAsCombatObserverRequest message,
   ) {
     context.read<CombatSupervisor>().subscribeObserver(session);
   }

@@ -7,7 +7,7 @@ import '../db_client/dao/unit_dao.dart';
 import '../features/auth/application/session_socket.dart';
 import 'ws_cmd.dart';
 
-class ChangeUnitStatsCmd extends DeveloperWsCmd<ChangeUnitStatsTs> {
+class ChangeUnitStatsCmd extends DeveloperWsCmd<ChangeUnitStatsRequest> {
   const ChangeUnitStatsCmd();
 
   @override
@@ -15,7 +15,7 @@ class ChangeUnitStatsCmd extends DeveloperWsCmd<ChangeUnitStatsTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    ChangeUnitStatsTs message,
+    ChangeUnitStatsRequest message,
   ) async {
     final unitDao = context.read<UnitDao>();
 

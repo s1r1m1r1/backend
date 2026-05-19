@@ -4,7 +4,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/application/arena_broadcast.dart';
 import 'ws_cmd.dart';
 
-class JoinEdictCmd extends AuthenticatedWsCmd<JoinEdictTs> {
+class JoinEdictCmd extends AuthenticatedWsCmd<JoinEdictRequest> {
   const JoinEdictCmd();
 
   @override
@@ -12,7 +12,7 @@ class JoinEdictCmd extends AuthenticatedWsCmd<JoinEdictTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    JoinEdictTs message,
+    JoinEdictRequest message,
   ) {
     context.read<ArenaBroadcast>().joinEdict(
       session,

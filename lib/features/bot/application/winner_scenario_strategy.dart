@@ -17,7 +17,7 @@ class WinnerScenarioStrategy extends BotStrategy {
   String? _combatRoomId;
   OnlineMemberDto? initialStats;
 
-  /// Last known member list from StartBattleTc / CombatStateTc.
+  /// Last known member list from StartBattleResponse / CombatStateResponse.
   List<CombatantDto> _lastMembs = [];
 
   @override
@@ -29,15 +29,15 @@ class WinnerScenarioStrategy extends BotStrategy {
 
   @override
   void onMessage(ScenarioBot bot, WsResponse message) {
-    // Send ack for any RequiredAckTc message first
-    if (message is RequiredAckTc) {
+    // Send ack for any RequiredAckResponse message first
+    if (message is RequiredAckResponse) {
       bot.send(
         WsRequest.ack(n: message.n, ts: DateTime.now().millisecondsSinceEpoch),
       );
     }
 
     switch (message) {
-      case OnlineUsersTc(:final members):
+      case OnlineUsersResponse(:final members):
         final myUnitIdInt = bot.unitId.s;
         final me = members.cast<OnlineMemberDto?>().firstWhere(
           (m) => m?.unitId == myUnitIdInt,
@@ -66,7 +66,7 @@ class WinnerScenarioStrategy extends BotStrategy {
           }
         }
 
-      case ActiveEdictsTc(:final edicts):
+      case ActiveEdictsResponse(:final edicts):
         if (isCreator) {
           if (!edicts.any(
             (e) => e.members.any((m) => m.userId == (bot.userId as String)),
@@ -86,10 +86,10 @@ class WinnerScenarioStrategy extends BotStrategy {
           }
         }
 
-      case CombatStartedTc():
+      case CombatStartedResponse():
         _combatRoomId = message.combatRoom;
         debugLog(
-          '[WinnerBot] Bot ${bot.userId} CombatStartedTc room=$_combatRoomId',
+          '[WinnerBot] Bot ${bot.userId} CombatStartedResponse room=$_combatRoomId',
         );
         if (!combatStarted.isCompleted) combatStarted.complete();
         bot.send(
@@ -99,41 +99,41 @@ class WinnerScenarioStrategy extends BotStrategy {
           ),
         );
 
-      case StartBattleTc(:final currentTurn, :final membs):
+      case StartBattleResponse(:final currentTurn, :final membs):
         debugLog(
-          '[WinnerBot] Bot ${bot.userId} StartBattleTc turn=$currentTurn myId=${bot.unitId.s}',
+          '[WinnerBot] Bot ${bot.userId} StartBattleResponse turn=$currentTurn myId=${bot.unitId.s}',
         );
         _lastMembs = membs.toList();
         _handleTurn(bot, currentTurn, membs);
 
-      case CombatEventTc(:final events):
+      case CombatEventResponse(:final events):
         // Update last known state from events, then check for our turn
         _updateStateFromEvents(events);
         final turnEvent = events.whereType<TurnEventDto>().firstOrNull;
         if (turnEvent != null) {
           debugLog(
-            '[WinnerBot] Bot ${bot.userId} CombatEventTc turn=${turnEvent.currentTurn} myId=${bot.unitId.s}',
+            '[WinnerBot] Bot ${bot.userId} CombatEventResponse turn=${turnEvent.currentTurn} myId=${bot.unitId.s}',
           );
           _handleTurn(bot, turnEvent.currentTurn, _lastMembs);
         }
 
-      case CombatStateTc(:final currentTurn, :final membs):
+      case CombatStateResponse(:final currentTurn, :final membs):
         debugLog(
-          '[WinnerBot] Bot ${bot.userId} CombatStateTc turn=$currentTurn myId=${bot.unitId.s}',
+          '[WinnerBot] Bot ${bot.userId} CombatStateResponse turn=$currentTurn myId=${bot.unitId.s}',
         );
         _lastMembs = membs.toList();
         _handleTurn(bot, currentTurn, membs);
 
-      case CombatWinTc(:final winnerTeamId):
+      case CombatWinResponse(:final winnerTeamId):
         debugLog(
-          '[WinnerBot] Bot ${bot.userId} CombatWinTc winner=$winnerTeamId',
+          '[WinnerBot] Bot ${bot.userId} CombatWinResponse winner=$winnerTeamId',
         );
         if (!this.winnerTeamId.isCompleted) {
           this.winnerTeamId.complete(winnerTeamId);
         }
         bot.send(const WsRequest.syncOnlineUsers(n: 'winner_final_sync'));
 
-      case CombatErrorTc(:final error):
+      case CombatErrorResponse(:final error):
         debugLog('[WinnerBot] Bot ${bot.userId} CombatError: $error');
 
       default:

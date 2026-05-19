@@ -542,14 +542,14 @@ class MockPresenceManager extends _i1.Mock implements _i14.PresenceManager {
       );
 
   @override
-  void removeUser(_i16.Sink<_i11.ToClient>? channel, String? n) =>
+  void removeUser(_i16.Sink<_i11.WsResponse>? channel, String? n) =>
       super.noSuchMethod(
         Invocation.method(#removeUser, [channel, n]),
         returnValueForMissingStub: null,
       );
 
   @override
-  void syncOnlineUsers(_i16.Sink<_i11.ToClient>? channel, String? n) =>
+  void syncOnlineUsers(_i16.Sink<_i11.WsResponse>? channel, String? n) =>
       super.noSuchMethod(
         Invocation.method(#syncOnlineUsers, [channel, n]),
         returnValueForMissingStub: null,
@@ -557,7 +557,7 @@ class MockPresenceManager extends _i1.Mock implements _i14.PresenceManager {
 
   @override
   _i9.Future<void> joinBot(
-    _i16.SinkBot<_i11.ToClient, _i11.ToServer>? bot,
+    _i16.SinkBot<_i11.WsResponse, _i11.WsRequest>? bot,
     _i3.GameSession? session,
   ) =>
       (super.noSuchMethod(
@@ -1514,21 +1514,23 @@ class MockLettersBroadManager extends _i1.Mock
   );
 
   @override
-  void newLetter(_i16.GameSocket? socket, _i11.NewLetterTs? message) =>
+  void newLetter(_i16.GameSocket? socket, _i11.NewLetterRequest? message) =>
       super.noSuchMethod(
         Invocation.method(#newLetter, [socket, message]),
         returnValueForMissingStub: null,
       );
 
   @override
-  void removeLetter(_i16.GameSocket? socket, _i11.DeleteLetterTs? message) =>
-      super.noSuchMethod(
-        Invocation.method(#removeLetter, [socket, message]),
-        returnValueForMissingStub: null,
-      );
+  void removeLetter(
+    _i16.GameSocket? socket,
+    _i11.DeleteLetterRequest? message,
+  ) => super.noSuchMethod(
+    Invocation.method(#removeLetter, [socket, message]),
+    returnValueForMissingStub: null,
+  );
 
   @override
-  void editLetter(_i16.GameSocket? socket, _i11.EditLetterTs? message) =>
+  void editLetter(_i16.GameSocket? socket, _i11.EditLetterRequest? message) =>
       super.noSuchMethod(
         Invocation.method(#editLetter, [socket, message]),
         returnValueForMissingStub: null,

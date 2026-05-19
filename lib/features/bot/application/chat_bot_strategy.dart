@@ -30,14 +30,14 @@ abstract class ChatBotStrategy extends BotStrategy {
 
   @override
   void onMessage(ScenarioBot bot, WsResponse message) {
-    if (message is RequiredAckTc) {
+    if (message is RequiredAckResponse) {
       bot.send(
         WsRequest.ack(n: message.n, ts: DateTime.now().millisecondsSinceEpoch),
       );
     }
 
     switch (message) {
-      case LetterHistoryTc(:final letters):
+      case LetterHistoryResponse(:final letters):
         _receivedLetters.clear();
         _receivedLetters.addAll(letters);
         debugLog(
@@ -45,12 +45,12 @@ abstract class ChatBotStrategy extends BotStrategy {
         );
         onHistoryLoaded(bot, letters);
 
-      case OnLetterTc(:final dto):
+      case OnLetterResponse(:final dto):
         _receivedLetters.add(dto);
         debugLog('[ChatBot ${bot.userId}] New letter received: ${dto.id}');
         onNewLetter(bot, dto);
 
-      case EditedLetterTc(:final dto):
+      case EditedLetterResponse(:final dto):
         final index = _receivedLetters.indexWhere((l) => l.id == dto.id);
         if (index != -1) {
           _receivedLetters[index] = dto;
@@ -58,12 +58,12 @@ abstract class ChatBotStrategy extends BotStrategy {
         debugLog('[ChatBot ${bot.userId}] Letter edited: ${dto.id}');
         onLetterEdited(bot, dto);
 
-      case DeletedLetterTc(:final letterId):
+      case DeletedLetterResponse(:final letterId):
         _receivedLetters.removeWhere((l) => letterId.contains(l.id));
         debugLog('[ChatBot ${bot.userId}] Letters deleted: $letterId');
         onLettersDeleted(bot, letterId);
 
-      case LetterErrorTc(:final error, :final letterIds, :final reason):
+      case LetterErrorResponse(:final error, :final letterIds, :final reason):
         debugLog(
           '[ChatBot ${bot.userId}] Letter error: $error, '
           'letterIds: $letterIds, reason: $reason',
@@ -74,7 +74,7 @@ abstract class ChatBotStrategy extends BotStrategy {
         }
         onDeleteFailed(bot, letterIds, reason ?? error.name);
 
-      case AckTc(:final status, :final message, :final payload):
+      case AckResponse(:final status, :final message, :final payload):
         // Handle error responses (e.g., editLetterFail sent as ack with status >= 400)
         if (status >= 400 && message == 'editLetterFail') {
           final letterId = payload?['letterId'] as int?;
@@ -87,7 +87,7 @@ abstract class ChatBotStrategy extends BotStrategy {
           }
         }
 
-      case BroadcastInfoTc(:final broadcasts):
+      case BroadcastInfoResponse(:final broadcasts):
         debugLog(
           '[ChatBot ${bot.userId}] Broadcast info: ${broadcasts.length} broadcasts',
         );

@@ -7,11 +7,11 @@ part 'login_user_dto.g.dart';
 
 @freezed
 abstract class LoginUserDto with _$LoginUserDto {
-  const LoginUserDto._();
   const factory LoginUserDto({
     required String email,
     required String password,
   }) = _LoginUserDto;
+  const LoginUserDto._();
 
   factory LoginUserDto.fromJson(Map<String, dynamic> json) =>
       _$LoginUserDtoFromJson(json);

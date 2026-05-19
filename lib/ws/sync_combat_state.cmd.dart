@@ -5,7 +5,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/application/combat_supervisor.dart';
 import 'ws_cmd.dart';
 
-class SyncCombatStateCmd extends AuthenticatedWsCmd<SyncCombatStateTs> {
+class SyncCombatStateCmd extends AuthenticatedWsCmd<SyncCombatStateRequest> {
   const SyncCombatStateCmd();
 
   @override
@@ -13,7 +13,7 @@ class SyncCombatStateCmd extends AuthenticatedWsCmd<SyncCombatStateTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    SyncCombatStateTs message,
+    SyncCombatStateRequest message,
   ) async {
     await context.read<CombatSupervisor>().syncCombatState(session, message);
   }

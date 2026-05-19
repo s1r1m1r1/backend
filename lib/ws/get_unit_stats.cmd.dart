@@ -6,7 +6,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/domain/unit_repository.dart';
 import 'ws_cmd.dart';
 
-class GetUnitStatsCmd extends AuthenticatedWsCmd<GetUnitStatsTs> {
+class GetUnitStatsCmd extends AuthenticatedWsCmd<GetUnitStatsRequest> {
   const GetUnitStatsCmd();
 
   @override
@@ -14,7 +14,7 @@ class GetUnitStatsCmd extends AuthenticatedWsCmd<GetUnitStatsTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    GetUnitStatsTs message,
+    GetUnitStatsRequest message,
   ) async {
     final unitRepository = context.read<UnitRepository>();
 

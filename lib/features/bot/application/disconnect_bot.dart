@@ -18,7 +18,7 @@ class DisconnectBot extends SinkBot<WsResponse, WsRequest> {
   @override
   void init() {
     _timer = Timer(const Duration(seconds: 10), () async {
-      botCallback?.call(const DisconnectTs(n: 'bot'));
+      botCallback?.call(const DisconnectRequest(n: 'bot'));
     });
   }
 

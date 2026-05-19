@@ -10,14 +10,14 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/domain/unit_repository.dart';
 import 'ws_cmd.dart';
 
-class AllocateStatsCmd implements WsCmd<AllocateStatsTs> {
+class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
   const AllocateStatsCmd();
 
   @override
   FutureOr<void> execute(
     RequestContext context,
     UserChannel channel,
-    AllocateStatsTs message,
+    AllocateStatsRequest message,
   ) async {
     final unitRep = context.read<UnitRepository>();
 

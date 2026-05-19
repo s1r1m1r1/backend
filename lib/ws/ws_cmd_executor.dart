@@ -43,67 +43,67 @@ class WsCmdExecutor {
   ) {
     final WsCmd command = switch (message) {
       // Auth commands
-      AuthTs() => switch (message) {
-        AckTs() => const AckCmd(),
-        PingTs() => const PingCmd(),
-        WithTokenTs() => const WithTokenCmd(),
-        DisconnectTs() => const DisconnectCmd(),
+      AuthRequest() => switch (message) {
+        AckRequest() => const AckCmd(),
+        PingRequest() => const PingCmd(),
+        WithTokenRequest() => const WithTokenCmd(),
+        DisconnectRequest() => const DisconnectCmd(),
       },
 
       // Menu commands
-      MenuTs() => switch (message) {
-        SyncMenuTs() => const SyncMenuCmd(),
+      MenuRequest() => switch (message) {
+        SyncMenuRequest() => const SyncMenuCmd(),
         SyncOnlineUsers() => const SyncOnlineUsersCmd(),
-        ChangeLocationTs() => const ChangeLocationCmd(),
+        ChangeLocationRequest() => const ChangeLocationCmd(),
       },
 
       // Unit commands
-      UnitTs() => switch (message) {
-        AllocateStatsTs() => const AllocateStatsCmd(),
-        GetUnitStatsTs() => const GetUnitStatsCmd(),
+      UnitRequest() => switch (message) {
+        AllocateStatsRequest() => const AllocateStatsCmd(),
+        GetUnitStatsRequest() => const GetUnitStatsCmd(),
       },
 
       // Letter commands
-      LetterTs() => switch (message) {
-        JoinLettersTs() => const JoinLettersCmd(),
-        NewLetterTs() => const NewLetterCmd(),
-        EditLetterTs() => const EditLetterCmd(),
-        DeleteLetterTs() => const DeleteLetterCmd(),
+      LetterRequest() => switch (message) {
+        JoinLettersRequest() => const JoinLettersCmd(),
+        NewLetterRequest() => const NewLetterCmd(),
+        EditLetterRequest() => const EditLetterCmd(),
+        DeleteLetterRequest() => const DeleteLetterCmd(),
       },
 
       // Arena commands
-      ArenaTs() => switch (message) {
-        JoinArenaTs() => const JoinArenaCmd(),
-        LeaveArenaTs() => const LeaveArenaCmd(),
-        CreateNewEdictTs() => const CreateNewEdictCmd(),
-        JoinEdictTs() => const JoinEdictCmd(),
-        LeaveEdictTs() => const LeaveEdictCmd(),
+      ArenaRequest() => switch (message) {
+        JoinArenaRequest() => const JoinArenaCmd(),
+        LeaveArenaRequest() => const LeaveArenaCmd(),
+        CreateNewEdictRequest() => const CreateNewEdictCmd(),
+        JoinEdictRequest() => const JoinEdictCmd(),
+        LeaveEdictRequest() => const LeaveEdictCmd(),
       },
 
       // Combat commands
-      CombatTs() => switch (message) {
-        JoinBattleRoomTs() => const JoinBattleRoomCmd(),
+      CombatRequest() => switch (message) {
+        JoinBattleRoomRequest() => const JoinBattleRoomCmd(),
         LeaveBattleRoom() => throw UnimplementedError(
           'LeaveBattleRoom not implemented',
         ),
-        JoinAsCombatObserverTs() => const JoinAsCombatObserverCmd(),
-        FocusCombatObserverTs() => const FocusCombatObserverCmd(),
-        GameActionTs() => const GameActionCmd(),
-        SyncCombatStateTs() => const SyncCombatStateCmd(),
+        JoinAsCombatObserverRequest() => const JoinAsCombatObserverCmd(),
+        FocusCombatObserverRequest() => const FocusCombatObserverCmd(),
+        GameActionRequest() => const GameActionCmd(),
+        SyncCombatStateRequest() => const SyncCombatStateCmd(),
       },
 
       // Broadcast commands
-      BroadcastTs() => switch (message) {
-        SyncJoinedBroadsTs() => const SyncJoinedBroadsCmd(),
+      BroadcastRequest() => switch (message) {
+        SyncJoinedBroadsRequest() => const SyncJoinedBroadsCmd(),
       },
 
       // Developer commands
-      DeveloperTs() => switch (message) {
-        ResetEdictsTs() => const ResetEdictsCmd(),
-        ResetCombatsTs() => const ResetCombatsCmd(),
-        CreateBotsTs() => const CreateBotsCmd(),
-        RemoveBotsTs() => const RemoveBotsCmd(),
-        ChangeUnitStatsTs() => const ChangeUnitStatsCmd(),
+      DeveloperRequest() => switch (message) {
+        ResetEdictsRequest() => const ResetEdictsCmd(),
+        ResetCombatsRequest() => const ResetCombatsCmd(),
+        CreateBotsRequest() => const CreateBotsCmd(),
+        RemoveBotsRequest() => const RemoveBotsCmd(),
+        ChangeUnitStatsRequest() => const ChangeUnitStatsCmd(),
       },
     };
 

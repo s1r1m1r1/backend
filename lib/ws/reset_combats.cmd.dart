@@ -4,7 +4,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/game/application/combat_supervisor.dart';
 import 'ws_cmd.dart';
 
-class ResetCombatsCmd extends DeveloperWsCmd<ResetCombatsTs> {
+class ResetCombatsCmd extends DeveloperWsCmd<ResetCombatsRequest> {
   const ResetCombatsCmd();
 
   @override
@@ -12,7 +12,7 @@ class ResetCombatsCmd extends DeveloperWsCmd<ResetCombatsTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    ResetCombatsTs message,
+    ResetCombatsRequest message,
   ) {
     context.read<CombatSupervisor>().reset();
     channel.sinkAdd(

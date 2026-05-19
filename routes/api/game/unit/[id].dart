@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'dart:io';
 import 'package:backend/features/auth/application/check_session.dart';
 import 'package:backend/features/game/domain/unit_repository.dart';

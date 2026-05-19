@@ -15,9 +15,9 @@ Future<UserRecord> checkSession(RequestContext context) async {
   final request = context.request;
   final authHeader = request.headers[HttpHeaders.authorizationHeader] ?? '';
   final token = authHeader.replaceFirst('Bearer ', '');
-  debugLog("token: $token");
+  debugLog('token: $token');
   if (token.isEmpty) {
-    debugLog("token is null");
+    debugLog('token is null');
     throw const ApiException.unauthorized(
       message: 'Session token must not be empty',
     );

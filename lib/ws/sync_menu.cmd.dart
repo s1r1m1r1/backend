@@ -5,7 +5,7 @@ import '../features/auth/application/presence_manager.dart';
 import '../features/auth/application/session_socket.dart';
 import 'ws_cmd.dart';
 
-class SyncMenuCmd extends AuthenticatedWsCmd<SyncMenuTs> {
+class SyncMenuCmd extends AuthenticatedWsCmd<SyncMenuRequest> {
   const SyncMenuCmd();
 
   @override
@@ -13,7 +13,7 @@ class SyncMenuCmd extends AuthenticatedWsCmd<SyncMenuTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    SyncMenuTs message,
+    SyncMenuRequest message,
   ) async {
     final userId = session.session.user.userId;
 

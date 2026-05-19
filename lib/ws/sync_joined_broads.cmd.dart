@@ -4,13 +4,13 @@ import '../features/auth/application/presence_manager.dart';
 import '../features/auth/application/session_socket.dart';
 import 'ws_cmd.dart';
 
-class SyncJoinedBroadsCmd extends WsCmd<SyncJoinedBroadsTs> {
+class SyncJoinedBroadsCmd extends WsCmd<SyncJoinedBroadsRequest> {
   const SyncJoinedBroadsCmd();
   @override
   void execute(
     RequestContext context,
     UserChannel channel,
-    SyncJoinedBroadsTs message,
+    SyncJoinedBroadsRequest message,
   ) {
     context.read<PresenceManager>().infoJoinedBroads(channel, message.n);
   }

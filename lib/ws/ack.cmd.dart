@@ -5,11 +5,15 @@ import '../features/auth/application/online_repository_impl.dart';
 import '../features/auth/application/session_socket.dart';
 import 'ws_cmd.dart';
 
-class AckCmd extends WsCmd<AckTs> {
+class AckCmd extends WsCmd<AckRequest> {
   const AckCmd();
 
   @override
-  void execute(RequestContext context, UserChannel channel, AckTs message) {
+  void execute(
+    RequestContext context,
+    UserChannel channel,
+    AckRequest message,
+  ) {
     final userId = channel.userId;
     final socketId = userId; // UserId реализует SocketId
 
@@ -27,12 +31,12 @@ class AckCmd extends WsCmd<AckTs> {
       }
     }
 
-    final ackTs = message.ts ?? DateTime.now().millisecondsSinceEpoch;
+    final ackRequest = message.ts ?? DateTime.now().millisecondsSinceEpoch;
 
     debugLog(
       '[AckCmd] ack from $socketId '
       'n=${message.n} status=${message.status} '
-      'ts=$ackTs message=${message.message ?? ''}',
+      'ts=$ackRequest message=${message.message ?? ''}',
     );
   }
 }

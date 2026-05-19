@@ -21,7 +21,7 @@ class LettersBroad extends _LettersBroad with LettersBroadGuard {
 }
 
 // letter_bloc.dart
-class _LettersBroad extends Broadcast<LetterTc> {
+class _LettersBroad extends Broadcast<LetterResponse> {
   _LettersBroad(LettersRepository lettersRepository, BroadcastId roomId)
     : _lettersRepository = lettersRepository {
     broadcastId = roomId;
@@ -89,10 +89,10 @@ class _LettersBroad extends Broadcast<LetterTc> {
         }
         debugLog('new letter: for ');
         _letterCache.add(newLetter);
-        final OnLetterTc letter =
+        final OnLetterResponse letter =
             WsResponse.onLetter(n: n, roomId: broadcastId, dto: newLetter)
-                as OnLetterTc;
-        broadcast(letter as LetterTc);
+                as OnLetterResponse;
+        broadcast(letter as LetterResponse);
       } on ApiException catch (e, s) {
         addError(e, s);
         _sendLetterError(
@@ -162,7 +162,7 @@ class _LettersBroad extends Broadcast<LetterTc> {
         _letterCache[indexLetter] = updatedLetter;
         broadcast(
           WsResponse.editedLetter(n: n, roomId: broadcastId, dto: updatedLetter)
-              as LetterTc,
+              as LetterResponse,
         );
       } catch (e, s) {
         debugLog('$e $s');
@@ -213,7 +213,11 @@ class _LettersBroad extends Broadcast<LetterTc> {
         debugLog('remove letter 4');
         _letterCache.removeAt(index);
         broadcast(
-          DeletedLetterTc(n: n, roomId: broadcastId, letterId: [deletedId]),
+          DeletedLetterResponse(
+            n: n,
+            roomId: broadcastId,
+            letterId: [deletedId],
+          ),
         );
       } catch (e, s) {
         debugLog('$e $s');
@@ -302,7 +306,11 @@ class _LettersBroad extends Broadcast<LetterTc> {
 
         debugLog('remove letters - success, deleted: ${deletedIds.length}');
         broadcast(
-          DeletedLetterTc(n: n, roomId: broadcastId, letterId: deletedIds),
+          DeletedLetterResponse(
+            n: n,
+            roomId: broadcastId,
+            letterId: deletedIds,
+          ),
         );
       } catch (e, s) {
         debugLog('remove letters error: $e $s');

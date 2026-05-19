@@ -1,10 +1,11 @@
 import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:dto/dto.dart';
-import 'package:backend/features/bot/application/bot_strategy.dart';
 import 'package:game_dto/game_dto.dart';
 
 import '../../../core/debug_log.dart';
+import 'bot_strategy.dart';
 
 class UpgradeScenarioStrategy extends BotStrategy {
   UpgradeScenarioStrategy({required this.isCreator});
@@ -28,39 +29,40 @@ class UpgradeScenarioStrategy extends BotStrategy {
 
   @override
   void onMessage(ScenarioBot bot, WsResponse message) {
-    if (message is RequiredAckTc) {
+    if (message is RequiredAckResponse) {
       bot.send(
         WsRequest.ack(n: message.n, ts: DateTime.now().millisecondsSinceEpoch),
       );
     }
 
-    if (message is CombatWinTc) {
+    if (message is CombatWinResponse) {
       debugLog(
-        '[Bot ${bot.userId}] CombatWinTc MATCHED! team=${message.winnerTeamId}',
+        '[Bot ${bot.userId}] CombatWinResponse MATCHED! team=${message.winnerTeamId}',
       );
       if (!winnerTeamId.isCompleted)
         winnerTeamId.complete(message.winnerTeamId);
+
       bot.send(const WsRequest.joinArena(n: 'upgrade_rejoin'));
       return;
     }
 
-    if (message is UnitsUpdateTc) {
+    if (message is UnitsUpdateResponse) {
       _onUnitsUpdate(bot, message.dto);
       return;
     }
 
-    if (message is MenuTc) {
+    if (message is MenuResponse) {
       _onUnitsUpdate(bot, message.units);
       return;
     }
 
-    if (message is CombatEventTc) {
+    if (message is CombatEventResponse) {
       for (final event in message.events) {
         switch (event) {
           case TurnEventDto(:final currentTurn):
             debugLog('[Bot ${bot.userId}] Turn event: $currentTurn');
             _handleTurn(bot, currentTurn, lastMembs);
-          case AttackEventDto(:final targetId, :final targetHp):
+          case AttackEventDto(:final targetId):
             final target = lastMembs.firstWhereOrNull(
               (m) => m.unitId == targetId,
             );
@@ -74,7 +76,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
     }
 
     switch (message) {
-      case ActiveEdictsTc(:final edicts):
+      case ActiveEdictsResponse(:final edicts):
         if (isCreator) {
           if (!edicts.any(
             (e) => e.members.any((m) => m.userId == bot.userId.id),
@@ -95,7 +97,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
           }
         }
 
-      case CombatStartedTc():
+      case CombatStartedResponse():
         _combatRoomId = message.combatRoom;
         bot.send(
           WsRequest.joinBattleRoom(
@@ -104,11 +106,11 @@ class UpgradeScenarioStrategy extends BotStrategy {
           ),
         );
 
-      case StartBattleTc(:final currentTurn, :final membs):
+      case StartBattleResponse(:final currentTurn, :final membs):
         lastMembs = membs;
         _handleTurn(bot, currentTurn, membs);
 
-      case CombatStateTc(:final currentTurn, :final membs):
+      case CombatStateResponse(:final currentTurn, :final membs):
         lastMembs = membs;
         _handleTurn(bot, currentTurn, membs);
 
@@ -144,7 +146,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
   }
 
   void _checkUpgrades(ScenarioBot bot, UnitDto unit) {
-    int addAtk = unit.statPoints;
+    final addAtk = unit.statPoints;
     bot.send(
       WsRequest.allocateStats(
         n: 'upgrade_alloc',

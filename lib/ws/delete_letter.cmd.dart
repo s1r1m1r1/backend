@@ -4,7 +4,7 @@ import '../features/auth/application/session_socket.dart';
 import '../features/chat/application/letters_broad_manager.dart';
 import 'ws_cmd.dart';
 
-class DeleteLetterCmd extends AuthenticatedWsCmd<DeleteLetterTs> {
+class DeleteLetterCmd extends AuthenticatedWsCmd<DeleteLetterRequest> {
   const DeleteLetterCmd();
 
   @override
@@ -12,7 +12,7 @@ class DeleteLetterCmd extends AuthenticatedWsCmd<DeleteLetterTs> {
     RequestContext context,
     UserChannel channel,
     GameSocket session,
-    DeleteLetterTs message,
+    DeleteLetterRequest message,
   ) {
     context.read<LettersBroadManager>().removeLetter(session, message);
   }
