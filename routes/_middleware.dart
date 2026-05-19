@@ -44,8 +44,6 @@ Handler middleware(Handler handler) {
       .use(exceptionHandler());
 }
 
-// -- logging---
-
 Middleware exceptionHandler() {
   return (handler) {
     return (context) async {
