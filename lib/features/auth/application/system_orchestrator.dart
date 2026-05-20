@@ -156,7 +156,7 @@ class SystemOrchestrator {
         session.setBot(bot);
         bot.init();
         // _broadcastOnlineUsers();
-      } catch (e, s) {
+      } catch (e) {
         debugLog(e.toString());
         // addError(e, s);
       }

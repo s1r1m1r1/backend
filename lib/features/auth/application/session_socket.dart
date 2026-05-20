@@ -275,19 +275,61 @@ class UserChannel extends Sink<WsResponse> {
   @override
   set userId(UserId id) => _userId = id;
 
-  final List<DateTime> _messageTimestamps = [];
+  /// Short-window timestamps (1 second) — burst protection.
+  @Deprecated('Use centralized RateLimiter service instead')
+  final List<DateTime> _burstTimestamps = [];
 
+  /// Long-window timestamps (10 seconds) — sustained flood protection.
+  @Deprecated('Use centralized RateLimiter service instead')
+  final List<DateTime> _sustainedTimestamps = [];
+
+  /// Maximum messages per 1-second window (burst limit).
+  @Deprecated('Use centralized RateLimiter service instead')
+  static const _burstLimit = 5;
+
+  /// Burst window duration.
+  @Deprecated('Use centralized RateLimiter service instead')
+  static const _burstWindow = Duration(seconds: 1);
+
+  /// Maximum messages per 10-second window (sustained limit).
+  @Deprecated('Use centralized RateLimiter service instead')
+  static const _sustainedLimit = 30;
+
+  /// Sustained window duration.
+  @Deprecated('Use centralized RateLimiter service instead')
+  static const _sustainedWindow = Duration(seconds: 10);
+
+  /// Returns `true` if the user has exceeded either the burst or sustained rate limit.
+  ///
+  /// Two sliding windows are checked:
+  /// - **Burst**: max [_burstLimit] messages per [_burstWindow] — prevents sudden spikes.
+  /// - **Sustained**: max [_sustainedLimit] messages per [_sustainedWindow] — prevents continuous flood.
+  ///
+  /// Timestamps outside each window are purged before checking.
+  @Deprecated('Use centralized RateLimiter service instead')
   bool isRateLimited() {
     final now = DateTime.now();
-    _messageTimestamps.removeWhere(
-      (t) => now.difference(t) > const Duration(seconds: 1),
-    );
 
-    if (_messageTimestamps.length >= 20) {
+    // Purge old timestamps outside the sustained window (covers both windows).
+    final cutoffSustained = now.subtract(_sustainedWindow);
+    _sustainedTimestamps.removeWhere((t) => t.isBefore(cutoffSustained));
+
+    final cutoffBurst = now.subtract(_burstWindow);
+    _burstTimestamps.removeWhere((t) => t.isBefore(cutoffBurst));
+
+    // Check burst limit (short window).
+    if (_burstTimestamps.length >= _burstLimit) {
       return true;
     }
 
-    _messageTimestamps.add(now);
+    // Check sustained limit (long window).
+    if (_sustainedTimestamps.length >= _sustainedLimit) {
+      return true;
+    }
+
+    // Record the message in both windows.
+    _burstTimestamps.add(now);
+    _sustainedTimestamps.add(now);
     return false;
   }
 }

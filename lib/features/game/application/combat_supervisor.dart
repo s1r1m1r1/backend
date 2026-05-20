@@ -32,7 +32,7 @@ final class CombatSupervisor
   final UserRepository userRepository;
   // main rooms
   final _obsListCombat = <GameSocket>{};
-  final _focusObservers = <UserId, BroadcastId>{};
+  // final _focusObservers = <UserId, BroadcastId>{};
 
   Future<void> createRoom(Edict edict) async {
     final combat = CombatBroadcast(

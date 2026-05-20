@@ -13,7 +13,7 @@ abstract class ChatBotStrategy extends BotStrategy {
 
   bool _joined = false;
   final List<LetterDto> _receivedLetters = [];
-  final Random _random = Random();
+  // final Random _random = Random();
 
   @override
   FutureOr<void> onInit(ScenarioBot bot) {

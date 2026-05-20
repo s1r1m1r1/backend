@@ -21,15 +21,6 @@ Future<Response> onRequest(RequestContext context) async {
 
         final freezed = WsRequest.decoded(message);
         try {
-          if (channel.isRateLimited()) {
-            debugLog('[WebSocket] Rate limit exceeded for ${channel.userId}');
-            await channel.close(
-              WebSocketCloseCode.rateLimitExceeded.code,
-              WebSocketCloseCode.rateLimitExceeded.message,
-            );
-            return;
-          }
-
           debugLog('ON MESSAGE: ${freezed.runtimeType} ${freezed.n}');
           await WsCmdExecutor.execute(context, channel, freezed);
         } on TimeoutException catch (e) {

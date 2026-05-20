@@ -9,14 +9,7 @@ import '../../../core/debug_log.dart';
 import '../../auth/application/session_socket.dart';
 import '../domain/letters_repository.dart';
 
-mixin LettersBroadGuard on _LettersBroad {
-  bool hasAccess(Role role) {
-    // return Role.user == role || Role.admin == role;
-    return true;
-  }
-}
-
-class LettersBroad extends _LettersBroad with LettersBroadGuard {
+class LettersBroad extends _LettersBroad {
   LettersBroad(super.lettersRepository, super.roomId);
 }
 
@@ -30,13 +23,48 @@ class _LettersBroad extends Broadcast<LetterResponse> {
   // Вынесено в единую константу класса
   static const _defaultTimeout = Duration(seconds: 5);
 
+  // --- Spam protection ---
+  /// Maximum number of letters kept in the per-room cache.
+  static const _maxCacheSize = 500;
+
+  /// Maximum messages a single user can send within the rate-limit window.
+  static const _rateLimitMaxMessages = 10;
+
+  /// Rate-limit window duration.
+  static const _rateLimitWindow = Duration(seconds: 30);
+
   final LettersRepository _lettersRepository;
   final _lock = Lock();
   final _letterCache = <LetterDto>[];
   int _nonceCount = 0;
-  String get _nextN => "letter_${_nonceCount++}";
+  String get _nextN => 'letter_${_nonceCount++}';
+
+  /// Per-user rate limiter: userId → list of timestamps (ms since epoch).
+  final _rateLimiter = <String, List<int>>{};
   @override
   late BroadcastId broadcastId;
+
+  /// Trim the cache to [_maxCacheSize] by removing the oldest entries.
+  void _trimCache() {
+    if (_letterCache.length > _maxCacheSize) {
+      _letterCache.removeRange(0, _letterCache.length - _maxCacheSize);
+    }
+  }
+
+  /// Check whether [userId] has exceeded the rate limit.
+  /// Returns `true` if the user is allowed to send, `false` if rate-limited.
+  bool _checkRateLimit(String userId) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final windowStart = now - _rateLimitWindow.inMilliseconds;
+    final timestamps = _rateLimiter.putIfAbsent(userId, () => <int>[]);
+    // Remove timestamps outside the current window
+    timestamps.removeWhere((ts) => ts < windowStart);
+    if (timestamps.length >= _rateLimitMaxMessages) {
+      return false;
+    }
+    timestamps.add(now);
+    return true;
+  }
 
   /// Load existing letters from the database into the cache.
   /// This ensures that when a bot (or user) joins, they receive
@@ -58,14 +86,25 @@ class _LettersBroad extends Broadcast<LetterResponse> {
   void newLetter(GameSocket socket, String content, String n) {
     _lock.synchronized(() async {
       try {
+        // Rate limit check
+        if (!_checkRateLimit(socket.userId)) {
+          _sendLetterError(
+            socket,
+            n,
+            .rateLimited,
+            [],
+            'Rate limit exceeded: max $_rateLimitMaxMessages messages per ${_rateLimitWindow.inSeconds}s',
+          );
+          return;
+        }
         final trimmed = content.trim();
-        if (trimmed.isEmpty || trimmed.length > 10000) {
+        if (trimmed.isEmpty || trimmed.length > 1000) {
           _sendLetterError(
             socket,
             n,
             .invalidContent,
             [],
-            'Letter content must be between 1 and 10000 characters',
+            'Letter content must be between 1 and 1000 characters',
           );
           return;
         }
@@ -77,6 +116,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
 
         debugLog('new letter: for ');
         _letterCache.add(newLetter);
+        _trimCache();
         final OnLetterResponse letter =
             WsResponse.onLetter(n: n, roomId: broadcastId, dto: newLetter)
                 as OnLetterResponse;
@@ -106,6 +146,17 @@ class _LettersBroad extends Broadcast<LetterResponse> {
   void editLetter(GameSocket socket, int letterId, String content, String n) {
     _lock.synchronized(() async {
       try {
+        // Rate limit check
+        if (!_checkRateLimit(socket.userId)) {
+          _sendLetterError(
+            socket,
+            n,
+            .rateLimited,
+            [letterId],
+            'Rate limit exceeded: max $_rateLimitMaxMessages messages per ${_rateLimitWindow.inSeconds}s',
+          );
+          return;
+        }
         final trimmed = content.trim();
         if (trimmed.isEmpty || trimmed.length > 1000) {
           _sendLetterError(
@@ -164,6 +215,17 @@ class _LettersBroad extends Broadcast<LetterResponse> {
   void removeLetter(GameSocket socket, int letterId, String n) {
     _lock.synchronized(() async {
       try {
+        // Rate limit check
+        if (!_checkRateLimit(socket.userId)) {
+          _sendLetterError(
+            socket,
+            n,
+            .rateLimited,
+            [letterId],
+            'Rate limit exceeded: max $_rateLimitMaxMessages messages per ${_rateLimitWindow.inSeconds}s',
+          );
+          return;
+        }
         debugLog('remove letter -start');
         final indexLetter = _letterCache.indexWhere(
           (LetterDto i) => i.id == letterId,
@@ -219,6 +281,17 @@ class _LettersBroad extends Broadcast<LetterResponse> {
   void removeLetters(GameSocket socket, List<int> letterIds, String n) {
     _lock.synchronized(() async {
       try {
+        // Rate limit check
+        if (!_checkRateLimit(socket.userId)) {
+          _sendLetterError(
+            socket,
+            n,
+            .rateLimited,
+            letterIds,
+            'Rate limit exceeded: max $_rateLimitMaxMessages messages per ${_rateLimitWindow.inSeconds}s',
+          );
+          return;
+        }
         debugLog('remove letters - start, count: ${letterIds.length}');
 
         // Validate all letters exist and belong to user

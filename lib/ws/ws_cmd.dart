@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:dart_frog/dart_frog.dart' hide Request;
 import 'package:dto/dto.dart';
 
+import '../core/rate_limit_tier_mapping.dart';
+import '../core/rate_limiter.dart';
 import '../features/auth/application/online_repository_impl.dart';
 import '../features/auth/application/session_socket.dart';
 
@@ -35,6 +37,28 @@ abstract class AuthenticatedWsCmd<T extends WsRequest> extends WsCmd<T> {
       return;
     }
     session.lastActiveTime = DateTime.now();
+
+    // Per-tier rate limiting via centralized RateLimiter.
+    final rateLimiter = context.read<RateLimiter>();
+    final tier = message.rateLimitTier;
+    if (rateLimiter.isRateLimitedByTier(channel.userId, tier)) {
+      final penalty = rateLimiter.recordViolation(channel.userId);
+      final errorResponse = WsResponse.rateLimitError(
+        n: 'rate_limit_${penalty.name}',
+        error: RateLimitErrorResponse(
+          type: 'rate_limit_exceeded',
+          message: 'Превышен лимит запросов. Пожалуйста, подождите.',
+          retryAfterMs: 1000,
+          penaltyLevel: penalty.value,
+          currentViolationCount: rateLimiter.getViolationCount(channel.userId),
+          commandType: message.runtimeType.toString(),
+          muteRemainingMs: rateLimiter.getMuteRemainingMs(channel.userId),
+        ),
+      );
+      channel.sinkAdd(EncodedPacket(errorResponse, errorResponse.n));
+      return;
+    }
+
     return executeAuthenticated(context, channel, session, message);
   }
 

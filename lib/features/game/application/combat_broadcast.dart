@@ -552,8 +552,6 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
       return;
     }
 
-    // Отправляем location и combatStarted через sendWithAck —
-    // каждый сокет ACKнет и commitPendingTransition выполнится атомарно
     for (final combatant in combatants) {
       final socket = await _socketOrBot(UserId(combatant.userId.id));
       if (socket == null) continue;

@@ -10,6 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:backend/core/app_observer.dart' as _i604;
+import 'package:backend/core/rate_limiter.dart' as _i1042;
 import 'package:backend/core/server_app_observer.dart' as _i835;
 import 'package:backend/core/system_health_service.dart' as _i809;
 import 'package:backend/db_client/dao/game_dao.dart' as _i401;
@@ -154,6 +155,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i35.OnlineRepository>(),
         gh<_i212.CombatSupervisor>(),
       ),
+    );
+    gh.lazySingleton<_i1042.RateLimiter>(
+      () => _i1042.RateLimiter()..startCleanupTimer(),
     );
     gh.singletonAsync<_i227.SystemOrchestrator>(() {
       final i = _i227.SystemOrchestrator(

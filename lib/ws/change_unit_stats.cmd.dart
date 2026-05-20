@@ -22,16 +22,16 @@ class ChangeUnitStatsCmd extends DeveloperWsCmd<ChangeUnitStatsRequest> {
     // Если unitId не передан, используем текущий из канала/сессии
     final targetUnitId = message.unitId ?? channel.unitId;
 
-    if (targetUnitId == null) {
-      channel.sinkAdd(
-        WsResponse.ack(
-          n: message.n,
-          status: 400,
-          message: 'No unitId specified and no active unit in session',
-        ).toPacket(),
-      );
-      return;
-    }
+    // if (targetUnitId == null) {
+    //   channel.sinkAdd(
+    //     WsResponse.ack(
+    //       n: message.n,
+    //       status: 400,
+    //       message: 'No unitId specified and no active unit in session',
+    //     ).toPacket(),
+    //   );
+    //   return;
+    // }
 
     await unitDao.setStats(
       unitId: targetUnitId,
