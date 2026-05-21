@@ -33,7 +33,7 @@ Future<Response> getUnit(RequestContext context, String id) async {
 
   final dto = await characterRepo.getUnit(
     userId: user.userId,
-    characterId: characterId,
+    characterId: UnitId(characterId.toString()),
   );
 
   if (dto == null) {
@@ -49,7 +49,7 @@ Future<Response> updateUnit(RequestContext context, String id) async {
   final characterRepo = context.read<UnitRepository>();
 
   final parsedBody = await parseJson(context.request);
-  final characterId = mapToInt(id);
+  final characterId = UnitId(id);
   final dto = UpdateUnitDto.fromJson(parsedBody);
 
   if (characterId != dto.id) {
@@ -72,7 +72,7 @@ Future<Response> deleteUnit(RequestContext context, String id) async {
 
   final res = await uRepo.deleteUnit(
     userId: user.userId,
-    characterId: characterId,
+    characterId: UnitId(characterId.toString()),
   );
 
   if (!res) {

@@ -44,59 +44,62 @@ class SystemOrchestrator {
   // добавить ботов для тестирования
   @postConstruct
   Future<void> createBots() async {
-    debugLog('SystemOrchestrator: createBots START');
+    debugLog('[BotCreate] START');
     try {
       final existingBots = await userRepository.getBots();
-      debugLog('Existing bots in DB: ${existingBots.length}');
+      debugLog('[BotCreate] Existing bots in DB: ${existingBots.length}');
 
-      // If we don't have enough bots, generate more up to MAX_BOTS
       if (existingBots.length < targetBots) {
         final toGenerate = targetBots - existingBots.length;
-        debugLog('Generating $toGenerate new bots');
+        debugLog('[BotCreate] Generating $toGenerate new bots');
         for (var i = 0; i < toGenerate; i++) {
-          await botGenerator.generateBot();
+          try {
+            await botGenerator.generateBot();
+            debugLog('[BotCreate] Generated bot ${i + 1}/$toGenerate');
+          } catch (e) {
+            debugLog('[BotCreate] ERROR generating bot $i: $e');
+          }
         }
       }
 
-      // Refresh list after generation
       final allBots = await userRepository.getBots();
+      debugLog('[BotCreate] Total bots in DB: ${allBots.length}');
 
-      // Ensure bots are online (up to targetBots)
       var onlineCount = 0;
+      var errorCount = 0;
       for (var b in allBots) {
         if (onlineCount >= targetBots) break;
-        // Check if bot is already online
         if (onlineBroadcast.getGameSocket(b.userId) != null) {
+          debugLog('[BotCreate] Bot already online: ${b.email} (${b.userId})');
           onlineCount++;
           continue;
         }
 
         try {
-          debugLog('SystemOrchestrator: Joining bot ${b.email} to online');
+          debugLog('[BotCreate] Connecting bot: ${b.email} (${b.userId})');
           final session = await sessionRepository.createSession(b);
           final unit = await unitRepository.getSelectedUnit(b.userId);
           if (unit == null) {
-            debugLog('Bot ${b.email} has no unit selected');
+            debugLog('[BotCreate] SKIP bot ${b.email} — no unit selected');
             continue;
           }
-          final gameSession = GameSession.fromSession(
-            session,
-            Unit.fromDto(unit),
-          );
+          final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
           final sinkBot = ArenaBot(
             botRepository: botRepository,
             userId: gameSession.user.userId,
             unitId: gameSession.unit.unitId,
           );
           await onlineBroadcast.joinBot(sinkBot, gameSession);
+          debugLog('[BotCreate] Bot connected: ${b.email} (${b.userId})');
           onlineCount++;
-        } catch (e, _) {
-          debugLog('Error joining bot ${b.email}: $e');
+        } catch (e, st) {
+          errorCount++;
+          debugLog('[BotCreate] ERROR connecting bot ${b.email}: $e\n$st');
         }
       }
-      debugLog('SystemOrchestrator: Active bots online: $onlineCount');
-    } catch (e, _) {
-      debugLog('SystemOrchestrator: createBots Error: $e');
+      debugLog('[BotCreate] DONE — online: $onlineCount, errors: $errorCount');
+    } catch (e, st) {
+      debugLog('[BotCreate] FATAL ERROR: $e\n$st');
     }
   }
 
@@ -105,7 +108,7 @@ class SystemOrchestrator {
     debugLog('SystemOrchestrator: removeAllBotsFromDb START');
     try {
       final bots = await userRepository.getBots();
-      final botIds = bots.map((e) => e.userId.id).toList();
+      final botIds = bots.map((e) => e.userId).toList();
 
       // 1. Remove from units
       final unitDao = botGenerator.unitDao;

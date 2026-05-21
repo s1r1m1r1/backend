@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dto/dto.dart';
-import 'package:game_dto/game_dto.dart';
 import '../features/auth/application/session_socket.dart';
 import '../features/game/domain/unit_repository.dart';
 import 'ws_cmd.dart';

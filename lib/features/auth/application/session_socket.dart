@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:dto/dto.dart';
-import 'package:game_dto/game_dto.dart';
 
 import '../../bot/application/ws_bot_repository.dart';
 import '../domain/session.dart';
@@ -43,7 +42,7 @@ class GameSocket extends IGameSocket {
   final GameSession session;
 
   @override
-  SocketId get socketId => userId;
+  SocketId get socketId => SocketId(userId);
   @override
   UserId get userId => session.user.userId;
 

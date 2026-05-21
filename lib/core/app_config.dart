@@ -41,6 +41,15 @@ abstract class AppConfig {
     );
     return seconds != null
         ? Duration(seconds: seconds)
-        : const Duration(seconds: 5);
+        : const Duration(seconds: 1);
+  }
+
+  /// Задержка принятия действий ботами (в секундах).
+  /// По умолчанию 2 секунды — реалистичное время реакции.
+  static int get botActionDelaySec {
+    final seconds = int.tryParse(
+      Platform.environment['BOT_ACTION_DELAY_SEC'] ?? '',
+    );
+    return seconds ?? 2;
   }
 }

@@ -7,7 +7,7 @@ part 'user.freezed.dart';
 abstract class User with _$User {
   const factory User({
     required UserId userId,
-    required String email,
+    required Email email,
     required Role role,
     required DateTime createdAt,
     @Default(false) bool emailVerified,
@@ -17,6 +17,6 @@ abstract class User with _$User {
   const User._();
 
   UserDto toDto() {
-    return UserDto(email: email, role: role, userId: userId.id);
+    return UserDto(email: email, role: role, userId: userId);
   }
 }

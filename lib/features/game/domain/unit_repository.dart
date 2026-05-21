@@ -8,19 +8,22 @@ abstract class UnitRepository {
   Future<UnitDto?> updateUnit(UserId userId, UpdateUnitDto dto);
   FutureOr<UnitDto?> getUnit({
     required UserId userId,
-    required int characterId,
+    required UnitId characterId,
   });
   FutureOr<List<UnitDto>> getListUnit({required UserId userId});
   Future<UnitDto> setSelectedUnit({
     required UserId userid,
-    required int unitId,
+    required UnitId unitId,
   });
   Future<UnitDto?> getSelectedUnit(UserId userid);
 
-  Future<bool> deleteUnit({required UserId userId, required int characterId});
+  Future<bool> deleteUnit({
+    required UserId userId,
+    required UnitId characterId,
+  });
 
   Future<void> updateStats({
-    required int unitId,
+    required UnitId unitId,
     int winDelta = 0,
     int lossDelta = 0,
     int coinDelta = 0,
@@ -30,7 +33,7 @@ abstract class UnitRepository {
   });
 
   Future<void> allocateStats(
-    int unitId,
+    UnitId unitId,
     int addAtk,
     int addDef,
     int addVitality,

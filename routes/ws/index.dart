@@ -7,7 +7,6 @@ import 'package:backend/ws/ws_cmd_executor.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:dto/dto.dart';
-import 'package:game_dto/game_dto.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((webSocketChannel, protocol) {
@@ -21,7 +20,9 @@ Future<Response> onRequest(RequestContext context) async {
 
         final freezed = WsRequest.decoded(message);
         try {
-          debugLog('ON MESSAGE: ${freezed.runtimeType} ${freezed.n}');
+          if (freezed is! AckRequest) {
+            debugLog('ON MESSAGE: ${freezed.runtimeType} ${freezed.n}');
+          }
           await WsCmdExecutor.execute(context, channel, freezed);
         } on TimeoutException catch (e) {
           debugLog(

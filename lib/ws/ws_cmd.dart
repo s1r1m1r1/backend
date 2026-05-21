@@ -44,7 +44,7 @@ abstract class AuthenticatedWsCmd<T extends WsRequest> extends WsCmd<T> {
     if (rateLimiter.isRateLimitedByTier(channel.userId, tier)) {
       final penalty = rateLimiter.recordViolation(channel.userId);
       final errorResponse = WsResponse.rateLimitError(
-        n: 'rate_limit_${penalty.name}',
+        n: Noun('rate_limit_${penalty.name}'),
         error: RateLimitErrorResponse(
           type: 'rate_limit_exceeded',
           message: 'Превышен лимит запросов. Пожалуйста, подождите.',
@@ -55,7 +55,7 @@ abstract class AuthenticatedWsCmd<T extends WsRequest> extends WsCmd<T> {
           muteRemainingMs: rateLimiter.getMuteRemainingMs(channel.userId),
         ),
       );
-      channel.sinkAdd(EncodedPacket(errorResponse, errorResponse.n));
+      channel.sinkAdd(errorResponse.toPacket());
       return;
     }
 

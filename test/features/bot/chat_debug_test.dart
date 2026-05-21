@@ -115,7 +115,7 @@ void main() {
         createdAt: DateTime.now(),
       ),
       unit: Unit(
-        unitId: UnitId(999),
+        unitId: UnitId('999'),
         name: 'DebugUnit',
         hp: 100,
         atk: 10,
@@ -131,7 +131,7 @@ void main() {
       strategy: _DebugChatStrategy(receivedMessages, completer),
       botRepository: repo,
       userId: UserId(testUserId),
-      unitId: UnitId(999),
+      unitId: UnitId('999'),
     );
 
     stdout.writeln('Calling joinBot...');

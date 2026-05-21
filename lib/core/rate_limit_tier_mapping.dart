@@ -9,6 +9,11 @@ import 'rate_limiter.dart';
 extension RateLimitTierMapping on WsRequest {
   /// Returns the [RateLimitTier] for this request type.
   RateLimitTier get rateLimitTier {
+    // Light messages (marked with LightRequest) - no rate limiting
+    if (this is LightRequest) {
+      return RateLimitTier.none;
+    }
+
     return switch (this) {
       // --- No limit (keep-alive) ---
       PingRequest() => RateLimitTier.none,

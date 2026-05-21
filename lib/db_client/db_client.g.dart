@@ -3148,16 +3148,13 @@ class $UnitTableTable extends UnitTable
   $UnitTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    clientDefault: () => const Uuid().v7(),
   );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
@@ -3444,7 +3441,7 @@ class $UnitTableTable extends UnitTable
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return UnitEntry(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       name: attachedDatabase.typeMapping.read(
@@ -3513,7 +3510,7 @@ class $UnitTableTable extends UnitTable
 }
 
 class UnitEntry extends DataClass implements Insertable<UnitEntry> {
-  final int id;
+  final String id;
   final String name;
   final int atk;
   final int def;
@@ -3548,7 +3545,7 @@ class UnitEntry extends DataClass implements Insertable<UnitEntry> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['atk'] = Variable<int>(atk);
     map['def'] = Variable<int>(def);
@@ -3596,7 +3593,7 @@ class UnitEntry extends DataClass implements Insertable<UnitEntry> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return UnitEntry(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       atk: serializer.fromJson<int>(json['atk']),
       def: serializer.fromJson<int>(json['def']),
@@ -3617,7 +3614,7 @@ class UnitEntry extends DataClass implements Insertable<UnitEntry> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'atk': serializer.toJson<int>(atk),
       'def': serializer.toJson<int>(def),
@@ -3636,7 +3633,7 @@ class UnitEntry extends DataClass implements Insertable<UnitEntry> {
   }
 
   UnitEntry copyWith({
-    int? id,
+    String? id,
     String? name,
     int? atk,
     int? def,
@@ -3752,7 +3749,7 @@ class UnitEntry extends DataClass implements Insertable<UnitEntry> {
 }
 
 class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> name;
   final Value<int> atk;
   final Value<int> def;
@@ -3767,6 +3764,7 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
   const UnitTableCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -3783,6 +3781,7 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   UnitTableCompanion.insert({
     this.id = const Value.absent(),
@@ -3800,13 +3799,14 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   }) : name = Value(name),
        atk = Value(atk),
        def = Value(def),
        vitality = Value(vitality),
        userId = Value(userId);
   static Insertable<UnitEntry> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? name,
     Expression<int>? atk,
     Expression<int>? def,
@@ -3821,6 +3821,7 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3838,11 +3839,12 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   UnitTableCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String>? name,
     Value<int>? atk,
     Value<int>? def,
@@ -3857,6 +3859,7 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
   }) {
     return UnitTableCompanion(
       id: id ?? this.id,
@@ -3874,6 +3877,7 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -3881,7 +3885,7 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -3925,6 +3929,9 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
     if (deletedAt.present) {
       map['deleted_at'] = Variable<DateTime>(deletedAt.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -3945,7 +3952,8 @@ class UnitTableCompanion extends UpdateCompanion<UnitEntry> {
           ..write('userId: $userId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -3959,11 +3967,11 @@ class $SelectedUnitTableTable extends SelectedUnitTable
   $SelectedUnitTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _unitIdMeta = const VerificationMeta('unitId');
   @override
-  late final GeneratedColumn<int> unitId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> unitId = GeneratedColumn<String>(
     'unit_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
@@ -4015,7 +4023,7 @@ class $SelectedUnitTableTable extends SelectedUnitTable
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return SelectedUnitEntry(
       unitId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}unit_id'],
       )!,
       userId: attachedDatabase.typeMapping.read(
@@ -4033,13 +4041,13 @@ class $SelectedUnitTableTable extends SelectedUnitTable
 
 class SelectedUnitEntry extends DataClass
     implements Insertable<SelectedUnitEntry> {
-  final int unitId;
+  final String unitId;
   final String userId;
   const SelectedUnitEntry({required this.unitId, required this.userId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['unit_id'] = Variable<int>(unitId);
+    map['unit_id'] = Variable<String>(unitId);
     map['user_id'] = Variable<String>(userId);
     return map;
   }
@@ -4057,7 +4065,7 @@ class SelectedUnitEntry extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SelectedUnitEntry(
-      unitId: serializer.fromJson<int>(json['unitId']),
+      unitId: serializer.fromJson<String>(json['unitId']),
       userId: serializer.fromJson<String>(json['userId']),
     );
   }
@@ -4065,12 +4073,12 @@ class SelectedUnitEntry extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'unitId': serializer.toJson<int>(unitId),
+      'unitId': serializer.toJson<String>(unitId),
       'userId': serializer.toJson<String>(userId),
     };
   }
 
-  SelectedUnitEntry copyWith({int? unitId, String? userId}) =>
+  SelectedUnitEntry copyWith({String? unitId, String? userId}) =>
       SelectedUnitEntry(
         unitId: unitId ?? this.unitId,
         userId: userId ?? this.userId,
@@ -4102,7 +4110,7 @@ class SelectedUnitEntry extends DataClass
 }
 
 class SelectedUnitTableCompanion extends UpdateCompanion<SelectedUnitEntry> {
-  final Value<int> unitId;
+  final Value<String> unitId;
   final Value<String> userId;
   final Value<int> rowid;
   const SelectedUnitTableCompanion({
@@ -4111,13 +4119,13 @@ class SelectedUnitTableCompanion extends UpdateCompanion<SelectedUnitEntry> {
     this.rowid = const Value.absent(),
   });
   SelectedUnitTableCompanion.insert({
-    required int unitId,
+    required String unitId,
     required String userId,
     this.rowid = const Value.absent(),
   }) : unitId = Value(unitId),
        userId = Value(userId);
   static Insertable<SelectedUnitEntry> custom({
-    Expression<int>? unitId,
+    Expression<String>? unitId,
     Expression<String>? userId,
     Expression<int>? rowid,
   }) {
@@ -4129,7 +4137,7 @@ class SelectedUnitTableCompanion extends UpdateCompanion<SelectedUnitEntry> {
   }
 
   SelectedUnitTableCompanion copyWith({
-    Value<int>? unitId,
+    Value<String>? unitId,
     Value<String>? userId,
     Value<int>? rowid,
   }) {
@@ -4144,7 +4152,7 @@ class SelectedUnitTableCompanion extends UpdateCompanion<SelectedUnitEntry> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (unitId.present) {
-      map['unit_id'] = Variable<int>(unitId.value);
+      map['unit_id'] = Variable<String>(unitId.value);
     }
     if (userId.present) {
       map['user_id'] = Variable<String>(userId.value);
@@ -6263,7 +6271,7 @@ typedef $$CharacterTableTableProcessedTableManager =
     >;
 typedef $$UnitTableTableCreateCompanionBuilder =
     UnitTableCompanion Function({
-      Value<int> id,
+      Value<String> id,
       required String name,
       required int atk,
       required int def,
@@ -6278,10 +6286,11 @@ typedef $$UnitTableTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
+      Value<int> rowid,
     });
 typedef $$UnitTableTableUpdateCompanionBuilder =
     UnitTableCompanion Function({
-      Value<int> id,
+      Value<String> id,
       Value<String> name,
       Value<int> atk,
       Value<int> def,
@@ -6296,6 +6305,7 @@ typedef $$UnitTableTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
+      Value<int> rowid,
     });
 
 class $$UnitTableTableFilterComposer
@@ -6307,7 +6317,7 @@ class $$UnitTableTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -6392,7 +6402,7 @@ class $$UnitTableTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -6477,7 +6487,7 @@ class $$UnitTableTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get name =>
@@ -6553,7 +6563,7 @@ class $$UnitTableTableTableManager
               $$UnitTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                Value<String> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<int> atk = const Value.absent(),
                 Value<int> def = const Value.absent(),
@@ -6568,6 +6578,7 @@ class $$UnitTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => UnitTableCompanion(
                 id: id,
                 name: name,
@@ -6584,10 +6595,11 @@ class $$UnitTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                Value<String> id = const Value.absent(),
                 required String name,
                 required int atk,
                 required int def,
@@ -6602,6 +6614,7 @@ class $$UnitTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => UnitTableCompanion.insert(
                 id: id,
                 name: name,
@@ -6618,6 +6631,7 @@ class $$UnitTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -6643,13 +6657,13 @@ typedef $$UnitTableTableProcessedTableManager =
     >;
 typedef $$SelectedUnitTableTableCreateCompanionBuilder =
     SelectedUnitTableCompanion Function({
-      required int unitId,
+      required String unitId,
       required String userId,
       Value<int> rowid,
     });
 typedef $$SelectedUnitTableTableUpdateCompanionBuilder =
     SelectedUnitTableCompanion Function({
-      Value<int> unitId,
+      Value<String> unitId,
       Value<String> userId,
       Value<int> rowid,
     });
@@ -6663,7 +6677,7 @@ class $$SelectedUnitTableTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get unitId => $composableBuilder(
+  ColumnFilters<String> get unitId => $composableBuilder(
     column: $table.unitId,
     builder: (column) => ColumnFilters(column),
   );
@@ -6683,7 +6697,7 @@ class $$SelectedUnitTableTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get unitId => $composableBuilder(
+  ColumnOrderings<String> get unitId => $composableBuilder(
     column: $table.unitId,
     builder: (column) => ColumnOrderings(column),
   );
@@ -6703,7 +6717,7 @@ class $$SelectedUnitTableTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get unitId =>
+  GeneratedColumn<String> get unitId =>
       $composableBuilder(column: $table.unitId, builder: (column) => column);
 
   GeneratedColumn<String> get userId =>
@@ -6750,7 +6764,7 @@ class $$SelectedUnitTableTableTableManager
               ),
           updateCompanionCallback:
               ({
-                Value<int> unitId = const Value.absent(),
+                Value<String> unitId = const Value.absent(),
                 Value<String> userId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SelectedUnitTableCompanion(
@@ -6760,7 +6774,7 @@ class $$SelectedUnitTableTableTableManager
               ),
           createCompanionCallback:
               ({
-                required int unitId,
+                required String unitId,
                 required String userId,
                 Value<int> rowid = const Value.absent(),
               }) => SelectedUnitTableCompanion.insert(

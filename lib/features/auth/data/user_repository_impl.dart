@@ -30,7 +30,7 @@ class UserRepositoryImpl extends UserRepository with LifecycleLogging {
     String? confirmationToken,
   }) async {
     final result = await _db.userDao.getUser(
-      userId: userId?.id,
+      userId: userId,
       email: email,
       confirmationToken: confirmationToken,
     );
@@ -132,7 +132,7 @@ class UserRepositoryImpl extends UserRepository with LifecycleLogging {
     }
 
     final updatedUser = await _db.userDao.updateUser(
-      user.userId.id,
+      user.userId,
       const UserTableCompanion(
         emailVerified: Value(true),
         confirmationToken: Value(null),

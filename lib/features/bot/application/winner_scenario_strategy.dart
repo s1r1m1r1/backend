@@ -11,7 +11,7 @@ class WinnerScenarioStrategy extends BotStrategy {
 
   final bool isCreator;
   final Completer<void> combatStarted = Completer<void>();
-  final Completer<int> winnerTeamId = Completer<int>();
+  final Completer<TeamId> winnerTeamId = Completer<TeamId>();
   final Completer<OnlineMemberDto> statsUpdated = Completer<OnlineMemberDto>();
 
   String? _combatRoomId;
@@ -23,8 +23,8 @@ class WinnerScenarioStrategy extends BotStrategy {
   @override
   FutureOr<void> onInit(ScenarioBot bot) {
     debugLog('[WinnerBot] Bot ${bot.userId} starting (creator: $isCreator)');
-    bot.send(const .joinArena(n: 'winner_join_arena'));
-    bot.send(const .syncOnlineUsers(n: 'winner_initial_stats'));
+    bot.sendDelayed(const .joinArena(n: Noun('winner_join_arena')));
+    bot.sendDelayed(const .syncOnlineUsers(n: Noun('winner_initial_stats')));
   }
 
   @override
@@ -36,7 +36,7 @@ class WinnerScenarioStrategy extends BotStrategy {
 
     switch (message) {
       case OnlineUsersResponse(:final members):
-        final myUnitIdInt = bot.unitId.s;
+        final myUnitIdInt = bot.unitId;
         final me = members.cast<OnlineMemberDto?>().firstWhere(
           (m) => m?.unitId == myUnitIdInt,
           orElse: () => null,
@@ -69,7 +69,9 @@ class WinnerScenarioStrategy extends BotStrategy {
           if (!edicts.any(
             (e) => e.members.any((m) => m.userId == (bot.userId as String)),
           )) {
-            bot.send(const WsRequest.createNewEdict(n: 'winner_create'));
+            bot.sendDelayed(
+              const WsRequest.createNewEdict(n: Noun('winner_create')),
+            );
           }
         } else {
           if (edicts.isNotEmpty) {
@@ -77,8 +79,11 @@ class WinnerScenarioStrategy extends BotStrategy {
             if (!target.members.any(
               (m) => m.userId == (bot.userId as String),
             )) {
-              bot.send(
-                WsRequest.joinEdict(n: 'winner_join_edict', edictId: target.id),
+              bot.sendDelayed(
+                WsRequest.joinEdict(
+                  n: const Noun('winner_join_edict'),
+                  edictId: target.id,
+                ),
               );
             }
           }
@@ -90,16 +95,16 @@ class WinnerScenarioStrategy extends BotStrategy {
           '[WinnerBot] Bot ${bot.userId} CombatStartedResponse room=$_combatRoomId',
         );
         if (!combatStarted.isCompleted) combatStarted.complete();
-        bot.send(
+        bot.sendDelayed(
           WsRequest.joinBattleRoom(
-            n: 'winner_ready',
+            n: const Noun('winner_ready'),
             combatRoomId: _combatRoomId!,
           ),
         );
 
       case StartBattleResponse(:final currentTurn, :final membs):
         debugLog(
-          '[WinnerBot] Bot ${bot.userId} StartBattleResponse turn=$currentTurn myId=${bot.unitId.s}',
+          '[WinnerBot] Bot ${bot.userId} StartBattleResponse turn=$currentTurn myId=${bot.unitId}',
         );
         _lastMembs = membs.toList();
         _handleTurn(bot, currentTurn, membs);
@@ -110,14 +115,14 @@ class WinnerScenarioStrategy extends BotStrategy {
         final turnEvent = events.whereType<TurnEventDto>().firstOrNull;
         if (turnEvent != null) {
           debugLog(
-            '[WinnerBot] Bot ${bot.userId} CombatEventResponse turn=${turnEvent.currentTurn} myId=${bot.unitId.s}',
+            '[WinnerBot] Bot ${bot.userId} CombatEventResponse turn=${turnEvent.currentTurn} myId=${bot.unitId}',
           );
           _handleTurn(bot, turnEvent.currentTurn, _lastMembs);
         }
 
       case CombatStateResponse(:final currentTurn, :final membs):
         debugLog(
-          '[WinnerBot] Bot ${bot.userId} CombatStateResponse turn=$currentTurn myId=${bot.unitId.s}',
+          '[WinnerBot] Bot ${bot.userId} CombatStateResponse turn=$currentTurn myId=${bot.unitId}',
         );
         _lastMembs = membs.toList();
         _handleTurn(bot, currentTurn, membs);
@@ -129,7 +134,9 @@ class WinnerScenarioStrategy extends BotStrategy {
         if (!this.winnerTeamId.isCompleted) {
           this.winnerTeamId.complete(winnerTeamId);
         }
-        bot.send(const WsRequest.syncOnlineUsers(n: 'winner_final_sync'));
+        bot.sendDelayed(
+          const WsRequest.syncOnlineUsers(n: Noun('winner_final_sync')),
+        );
 
       case CombatErrorResponse(:final error):
         debugLog('[WinnerBot] Bot ${bot.userId} CombatError: $error');
@@ -163,8 +170,12 @@ class WinnerScenarioStrategy extends BotStrategy {
     }
   }
 
-  void _handleTurn(ScenarioBot bot, int currentTurn, List<CombatantDto> membs) {
-    final myUnitId = bot.unitId.s;
+  void _handleTurn(
+    ScenarioBot bot,
+    UnitId currentTurn,
+    List<CombatantDto> membs,
+  ) {
+    final myUnitId = bot.unitId;
     debugLog(
       '[WinnerBot] Bot ${bot.userId} _handleTurn: turn=$currentTurn myId=$myUnitId',
     );
@@ -182,9 +193,9 @@ class WinnerScenarioStrategy extends BotStrategy {
         '[WinnerBot] Bot ${bot.userId} attacking enemy ${enemy.unitId} (HP: ${enemy.unit.hp})',
       );
 
-      bot.send(
+      bot.sendDelayed(
         WsRequest.gameAction(
-          n: 'winner_attack',
+          n: const Noun('winner_attack'),
           combatRoomId: _combatRoomId!,
           action: GameActionDto.attack(
             combatantId: myUnitId,

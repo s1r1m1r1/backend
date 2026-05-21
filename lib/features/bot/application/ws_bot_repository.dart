@@ -4,8 +4,9 @@ import 'package:dto/dto.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../core/debug_log.dart';
-import '../../../core/utils/noun_gen.dart';
+import '../../../core/utils/next_noun.dart';
 import '../../../db_client/dao/unit_dao.dart';
+import '../../../ws/bot_cmd_executor.dart';
 import '../../auth/application/presence_manager.dart';
 import '../../auth/application/session_socket.dart';
 import '../../chat/application/letters_broad_manager.dart';
@@ -22,6 +23,7 @@ class BotRepository {
     this._unitRepository,
     this._unitDao,
     this._lettersBroadManager,
+    this._botCmdExecutor,
   );
   final PresenceManager _onlineBroadcast;
   final ArenaBroadcast _arenaBroadcast;
@@ -29,11 +31,20 @@ class BotRepository {
   final UnitRepository _unitRepository;
   final UnitDao _unitDao;
   final LettersBroadManager _lettersBroadManager;
+  final BotCmdExecutor _botCmdExecutor;
 
   /// ловим сообщения бота и отправляем в нужный broadcast
   Future<void> add(SinkBot botSink, WsRequest toServer) async {
     // Filter: process only messages tagged with [BotRequest]
     if (toServer is! BotRequest) return;
+
+    // Check rate limiting via BotCmdExecutor
+    if (_botCmdExecutor.isCommandBlocked(botSink.userId, toServer)) {
+      debugLog(
+        '[BotRepository] Command blocked by rate limiter: $toServer for userId=${botSink.userId}',
+      );
+      return;
+    }
 
     try {
       debugLog('[BotRepository] add: $toServer for userId=${botSink.userId}');
@@ -44,13 +55,13 @@ class BotRepository {
       switch (toServer) {
         case JoinArenaRequest():
           if (gameSocket == null) break;
-          _arenaBroadcast.subscribeChannel(gameSocket, NouN.next().v);
+          _arenaBroadcast.subscribeChannel(gameSocket, nextNoun());
         case JoinEdictRequest():
           if (gameSocket == null) break;
           await _arenaBroadcast.joinEdict(
             gameSocket,
             toServer.edictId,
-            NouN.next().v,
+            nextNoun(),
           );
         case CreateNewEdictRequest():
           if (gameSocket != null) {
@@ -64,10 +75,10 @@ class BotRepository {
           if (gameSocket != null) {
             _arenaBroadcast.leaveArena(gameSocket, toServer.n);
           }
-        case WithTokenRequest():
-        case SyncJoinedBroadsRequest():
-        case SyncOnlineUsers():
-          _onlineBroadcast.syncOnlineUsers(botSink, toServer.n);
+        case WithTokenRequest(:final n):
+        case SyncJoinedBroadsRequest(:final n):
+        case SyncOnlineUsers(:final n):
+          _onlineBroadcast.syncOnlineUsers(botSink, n);
         case JoinLettersRequest():
           if (gameSocket != null) {
             _lettersBroadManager.subscribe(gameSocket, toServer.n);
@@ -144,7 +155,7 @@ class BotRepository {
           );
         case ChangeUnitStatsRequest():
           await _unitDao.setStats(
-            unitId: toServer.unitId ?? botSink.unitId as int,
+            unitId: toServer.unitId ?? botSink.unitId,
             wins: toServer.wins,
             losses: toServer.losses,
             coins: toServer.coins,
@@ -159,4 +170,18 @@ class BotRepository {
       debugLog('[BotRepository] ERROR: $e$s');
     }
   }
+
+  /// Check if a bot is disabled due to rate limit violations.
+  bool isBotDisabled(UserId userId) => _botCmdExecutor.isBotDisabled(userId);
+
+  /// Re-enable a disabled bot (for testing or manual recovery).
+  void enableBot(UserId userId) => _botCmdExecutor.enableBot(userId);
+
+  /// Get penalty level for a bot.
+  PenaltyLevel getBotPenaltyLevel(UserId userId) =>
+      _botCmdExecutor.getPenaltyLevel(userId);
+
+  /// Get remaining mute time for a bot in milliseconds.
+  int? getBotMuteRemainingMs(UserId userId) =>
+      _botCmdExecutor.getMuteRemainingMs(userId);
 }

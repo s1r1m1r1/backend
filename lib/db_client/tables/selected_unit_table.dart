@@ -5,8 +5,8 @@ import 'user_table.dart';
 
 @DataClassName('SelectedUnitEntry')
 class SelectedUnitTable extends Table {
-  IntColumn get unitId =>
-      integer().references(UnitTable, #id, onDelete: KeyAction.cascade)();
+  TextColumn get unitId =>
+      text().references(UnitTable, #id, onDelete: KeyAction.cascade)();
   TextColumn get userId =>
       text().references(UserTable, #id, onDelete: KeyAction.cascade)();
 

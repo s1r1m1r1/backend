@@ -25,9 +25,7 @@ class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
 
     // Validate request
     if (message.addAtk < 0 || message.addDef < 0 || message.addVitality < 0) {
-      debugLog(
-        '$logPrefix Invalid allocation amounts from ${channel.userId.id}',
-      );
+      debugLog('$logPrefix Invalid allocation amounts from ${channel.userId}');
       return;
     }
 
@@ -42,7 +40,7 @@ class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
 
     if (unit == null) {
       debugLog(
-        '$logPrefix Unit ${message.unitId} not found or not owned by ${channel.userId.id}',
+        '$logPrefix Unit ${message.unitId} not found or not owned by ${channel.userId}',
       );
       return;
     }
@@ -73,7 +71,7 @@ class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
     final sessionChannel = onlineRep.getSessionUSERID(channel.userId);
 
     if (sessionChannel != null &&
-        sessionChannel.session.unit.unitId.s == message.unitId) {
+        sessionChannel.session.unit.unitId == message.unitId) {
       sessionChannel.session.unit.atk = updatedUnit.atk;
       sessionChannel.session.unit.def = updatedUnit.def;
       sessionChannel.session.unit.hp = updatedUnit.hp;
@@ -88,7 +86,7 @@ class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
         n: message.n,
         dto: ListUnitDto(
           list: allUnits,
-          selectedId: sessionChannel?.session.unit.unitId.s ?? message.unitId,
+          selectedId: sessionChannel?.session.unit.unitId ?? message.unitId,
         ),
       ).toPacket(),
     );

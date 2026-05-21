@@ -36,7 +36,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
   final UserRepository _userRep;
   final UnitRepository _unitRep;
   int _nonceCount = 0;
-  String get _nextN => 'combat_${_nonceCount++}';
+  Noun _nextNoun() => Noun('combat_${_nonceCount++}');
 
   final _eventHistory = <CombatEventResponse>[];
 
@@ -52,11 +52,11 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
   Timer? _timer;
   int? _currentTurnEndAt;
 
-  void _broadcastEvent(List<CombatEventDto> events, {String? n}) {
+  void _broadcastEvent(List<CombatEventDto> events, {Noun? n}) {
     final eventId = _eventHistory.length;
     final tc =
         WsResponse.combatEvent(
-              n: n ?? _nextN,
+              n: n ?? _nextNoun(),
               broadcastId: broadcastId as String,
               events: events,
               turnEndAt: _currentTurnEndAt,
@@ -71,9 +71,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
     _timer?.cancel();
     _currentTurnEndAt = DateTime.now().millisecondsSinceEpoch + 20000;
     _timer = Timer(const Duration(seconds: 20), () {
-      debugLog(
-        '[CombatBroadcast] Turn timeout for ${combat.currentCombatant.s}',
-      );
+      debugLog('[CombatBroadcast] Turn timeout for ${combat.currentCombatant}');
       _onTurnTimeout();
     });
   }
@@ -84,8 +82,8 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
       _startTurnTimer();
       _broadcastEvent([
         CombatEventDto.turn(
-          currentTurn: combat.currentCombatant as int,
-          unitOrder: combat.unitOrder.cast<int>(),
+          currentTurn: combat.currentCombatant,
+          unitOrder: combat.unitOrder,
           turnEndAt: _currentTurnEndAt,
         ),
       ]);
@@ -98,7 +96,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
     super.dispose();
   }
 
-  Future<void> combatReady(GameSocket socket, String n) async {
+  Future<void> combatReady(GameSocket socket, Noun n) async {
     await _lock.synchronized(() async {
       final index = combatants.indexWhere((i) => i.userId == socket.userId);
       if (index == -1) {
@@ -106,7 +104,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
         socket.sinkAdd(
           WsResponse.combatError(
             n: n,
-            broadcastId: broadcastId as String,
+            broadcastId: broadcastId,
             error: WsCombatError.missedSocket,
           ).toPacket(),
         );
@@ -137,9 +135,9 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
                   n: n,
                   broadcastId: broadcastId,
                   membs: combatants.map((i) => i.toDto()).toList(),
-                  unitOrder: combat.unitOrder.cast<int>(),
+                  unitOrder: combat.unitOrder,
                   ready: readyCount,
-                  currentTurn: combat.currentCombatant as int,
+                  currentTurn: combat.currentCombatant,
                   turnEndAt: _currentTurnEndAt,
                   id: -1, // Initial state before any events
                 )
@@ -152,9 +150,9 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
               n: n,
               broadcastId: broadcastId,
               membs: combatants.map((i) => i.toDto()).toList(),
-              unitOrder: combat.unitOrder.cast<int>(),
+              unitOrder: combat.unitOrder,
               ready: readyCount,
-              currentTurn: combat.currentCombatant as int,
+              currentTurn: combat.currentCombatant,
               id: -1,
             ).toPacket(),
           );
@@ -166,9 +164,9 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
             n: n,
             broadcastId: broadcastId as String,
             round: combat.round,
-            currentTurn: combat.currentCombatant as int,
+            currentTurn: combat.currentCombatant,
             membs: combatants.map((i) => i.toDto(includeBase: true)).toList(),
-            unitOrder: combat.unitOrder.cast<int>(),
+            unitOrder: combat.unitOrder,
             turnEndAt: _currentTurnEndAt,
             id: _eventHistory.length - 1,
           ).toPacket(),
@@ -177,16 +175,16 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
     });
   }
 
-  Future<void> syncCombatState(GameSocket socket, String n) async {
+  Future<void> syncCombatState(GameSocket socket, Noun n) async {
     await _lock.synchronized(() async {
       socket.sinkAdd(
         WsResponse.combatState(
           n: n,
           broadcastId: broadcastId as String,
           round: combat.round,
-          currentTurn: combat.currentCombatant as int,
+          currentTurn: combat.currentCombatant,
           membs: combatants.map((i) => i.toDto(includeBase: true)).toList(),
-          unitOrder: combat.unitOrder.cast<int>(),
+          unitOrder: combat.unitOrder,
           turnEndAt: _currentTurnEndAt,
           id: _eventHistory.length - 1,
         ).toPacket(),
@@ -211,7 +209,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
         );
         socket.sinkAdd(
           WsResponse.combatError(
-            broadcastId: broadcastId as String,
+            broadcastId: broadcastId,
             n: ts.n,
             error: .actionNoPermitted,
           ).toPacket(),
@@ -229,7 +227,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
         socket.sinkAdd(
           WsResponse.combatError(
             n: ts.n,
-            broadcastId: broadcastId as String,
+            broadcastId: broadcastId,
             error: .notYourTurn,
           ).toPacket(),
         );
@@ -242,10 +240,10 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
       switch (action) {
         case AttackGA(:final combatantId, :final enemyCombatantId):
           final enemyCombatant = combatants.firstWhereOrNull(
-            (i) => i.unitId.s == enemyCombatantId,
+            (i) => i.unitId == enemyCombatantId,
           );
           final attackerCombatant = combatants.firstWhereOrNull(
-            (i) => i.unitId.s == combatantId,
+            (i) => i.unitId == combatantId,
           );
           // 3a/ проверка существования бойцов и принадлежности атакующего бойца текущему игроку
           if (enemyCombatant == null ||
@@ -254,7 +252,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
             socket.sinkAdd(
               WsResponse.combatError(
                 n: ts.n,
-                broadcastId: broadcastId as String,
+                broadcastId: broadcastId,
                 error: WsCombatError.wrongAction,
               ).toPacket(),
             );
@@ -264,7 +262,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
             socket.sinkAdd(
               WsResponse.combatError(
                 n: ts.n,
-                broadcastId: broadcastId as String,
+                broadcastId: broadcastId,
                 error: .wrongAction,
               ).toPacket(),
             );
@@ -276,8 +274,8 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
 
           events.add(
             CombatEventDto.attack(
-              attackerId: combatant.unitId as int,
-              targetId: enemyCombatant.unitId as int,
+              attackerId: combatant.unitId,
+              targetId: enemyCombatant.unitId,
               damage: damage,
               targetHp: enemyCombatant.mutableUnit.hp,
             ),
@@ -286,13 +284,11 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
           if (enemyCombatant.mutableUnit.hp <= 0) {
             enemyCombatant.mutableUnit.hp = 0;
             combat.unitOrder.remove(enemyCombatant.unitId);
-            events.add(
-              CombatEventDto.death(unitId: enemyCombatant.unitId as int),
-            );
+            events.add(CombatEventDto.death(unitId: enemyCombatant.unitId));
           }
 
           log(
-            '[COMBAT][${broadcastId}] Round ${combat.round} | Turn ${combatant.unitId.s}\n'
+            '[COMBAT][${broadcastId}] Round ${combat.round} | Turn ${combatant.unitId}\n'
             '  - ${combatant.mutableUnit.name} attacks ${enemyCombatant.mutableUnit.name}\n'
             '  - Damage: $damage | Enemy HP: ${enemyCombatant.mutableUnit.hp}',
           );
@@ -307,7 +303,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
             );
             if (nextCombatant == null || nextCombatant.mutableUnit.hp <= 0) {
               combat.unitOrder.removeAt(0);
-              events.add(.death(unitId: nextId as int));
+              events.add(.death(unitId: nextId));
               continue;
             }
             break;
@@ -365,7 +361,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
                 }
 
                 await _unitRep.updateStats(
-                  unitId: combatant.unitId.s,
+                  unitId: combatant.unitId,
                   winDelta: 1,
                   coinDelta: 10,
                   expDelta: levelSystemResult.addedExp,
@@ -389,7 +385,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
                 }
 
                 await _unitRep.updateStats(
-                  unitId: combatant.unitId.s,
+                  unitId: combatant.unitId,
                   lossDelta: 1,
                   expDelta: loserExp,
                 );
@@ -401,13 +397,13 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
             }
 
             broadcast(
-              WsResponse.location(n: _nextN, location: GameLocation.arena)
+              WsResponse.location(n: _nextNoun(), location: GameLocation.arena)
                   as CombatResponse,
             );
             broadcast(
               WsResponse.combatWin(
                     n: ts.n,
-                    broadcastId: broadcastId as String,
+                    broadcastId: broadcastId,
                     winnerTeamId: winnerTeamId,
                   )
                   as CombatResponse,
@@ -418,14 +414,14 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
               if (socket != null && socket.isBot) {
                 socket.sinkAdd(
                   WsResponse.location(
-                    n: _nextN,
+                    n: _nextNoun(),
                     location: GameLocation.arena,
                   ).toPacket(),
                 );
                 socket.sinkAdd(
                   WsResponse.combatWin(
                     n: ts.n,
-                    broadcastId: broadcastId as String,
+                    broadcastId: broadcastId,
                     winnerTeamId: winnerTeamId,
                   ).toPacket(),
                 );
@@ -441,8 +437,8 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
 
           events.add(
             CombatEventDto.turn(
-              currentTurn: combat.currentCombatant as int,
-              unitOrder: combat.unitOrder.cast<int>(),
+              currentTurn: combat.currentCombatant,
+              unitOrder: combat.unitOrder,
               turnEndAt: _currentTurnEndAt,
             ),
           );
@@ -480,9 +476,9 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
       );
 
       final uCombatant = Combatant(
-        unitId: UnitId(socket.session.unit.unitId as int),
+        unitId: socket.session.unit.unitId,
         userId: socket.userId,
-        teamId: socket.session.unit.unitId as int,
+        teamId: TeamId(socket.session.unit.unitId),
         isBot: socket.isBot,
         baseUnit: socket.session.unit.toDto(),
         stats:
@@ -496,8 +492,8 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
       // сообщить игроку что в комнате недостаточно игроков
       socket?.sinkAdd(
         WsResponse.combatError(
-          n: _nextN,
-          broadcastId: broadcastId as String,
+          n: _nextNoun(),
+          broadcastId: broadcastId,
           error: .notEnoughPlayers,
         ).toPacket(),
       );
@@ -519,8 +515,8 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
     WsCombatError? error;
     for (var i = 0; i < combatants.length; i++) {
       final combatant = combatants[i];
-      combatant.teamId = combatant.unitId.s;
-      final socket = await _socketOrBot(UserId(combatant.userId.id));
+      combatant.teamId = TeamId(combatant.unitId.value);
+      final socket = await _socketOrBot(UserId(combatant.userId));
 
       if (socket == null) {
         error = WsCombatError.missedSocket;
@@ -528,8 +524,8 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
       }
 
       final units = await _unitRep.getListUnit(userId: socket.userId);
-      final selectedId = socket.session.unit.unitId.s;
-      final menuN = 'combat_menu_${_nonceCount++}';
+      final selectedId = socket.session.unit.unitId;
+      final menuN = Noun('combat_menu_${_nonceCount++}');
       socket.sinkAdd(
         WsResponse.menu(
           n: menuN,
@@ -553,19 +549,19 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
     }
 
     for (final combatant in combatants) {
-      final socket = await _socketOrBot(UserId(combatant.userId.id));
+      final socket = await _socketOrBot(UserId(combatant.userId));
       if (socket == null) continue;
 
       socket.sinkAdd(
         WsResponse.location(
-          n: _nextN,
+          n: _nextNoun(),
           location: .game,
           roomId: broadcastId,
         ).toPacket(),
       );
 
       final combatStarted = WsResponse.combatStarted(
-        n: _nextN,
+        n: _nextNoun(),
         combatRoom: broadcastId,
       );
       // sendWithAck регистрирует ожидание AckRequest по nonce
@@ -587,12 +583,12 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
       final userId = combatants[i].userId;
       final socket = _onlineRep.getSessionUSERID(userId);
       socket?.sinkAdd(
-        WsResponse.location(n: _nextN, location: .arena).toPacket(),
+        WsResponse.location(n: _nextNoun(), location: .arena).toPacket(),
       );
       socket?.sinkAdd(
         WsResponse.combatError(
-          n: _nextN,
-          broadcastId: broadcastId as String,
+          n: _nextNoun(),
+          broadcastId: broadcastId,
           error: error,
         ).toPacket(),
       );
@@ -635,8 +631,8 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
     final selected = await _unitRep.getSelectedUnit(userId);
     socket.sinkAdd(
       WsResponse.unitsUpdate(
-        n: _nextN,
-        dto: ListUnitDto(selectedId: selected?.id ?? 0, list: units),
+        n: _nextNoun(),
+        dto: ListUnitDto(selectedId: selected?.id ?? UnitId.none, list: units),
       ).toPacket(),
     );
   }

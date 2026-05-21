@@ -2,7 +2,7 @@ import 'package:dto/dto.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../core/broadcast.dart';
-import '../../../core/utils/noun_gen.dart';
+import '../../../core/utils/next_noun.dart';
 import '../../auth/application/online_repository_impl.dart';
 import '../../auth/application/session_socket.dart';
 import '../../auth/domain/session_repository.dart';
@@ -11,7 +11,7 @@ import '../domain/edict.dart';
 import '../domain/unit_repository.dart';
 import 'combat_broadcast.dart';
 
-@lazySingleton
+@singleton
 final class CombatSupervisor
     extends
         BroadcastSupervisor<
@@ -32,7 +32,7 @@ final class CombatSupervisor
   final UserRepository userRepository;
   // main rooms
   final _obsListCombat = <GameSocket>{};
-  // final _focusObservers = <UserId, BroadcastId>{};
+  final _focusObservers = <UserId, BroadcastId>{};
 
   Future<void> createRoom(Edict edict) async {
     final combat = CombatBroadcast(
@@ -53,7 +53,7 @@ final class CombatSupervisor
     listDto[combat.broadcastId] = CombatRoomDto(
       id: edict.id,
       members: edict.members
-          .map((m) => UserMemberDto(m.userId.id, m.unitName))
+          .map((m) => UserMemberDto(m.userId, m.unitName))
           .toList(),
       maxMembers: edict.maxMembers,
       startedAt: DateTime.now(),
@@ -63,7 +63,7 @@ final class CombatSupervisor
     // Broadcast update to existing observers
     broadcast(
       WsResponse.combatRooms(
-            n: NouN.next().v,
+            n: nextNoun(),
             broadcastId: broadcastId,
             rooms: listDto.values.toList(),
           )
@@ -82,10 +82,16 @@ final class CombatSupervisor
     }
     _obsListCombat.add(socket);
     subscribe(socket);
+    // Register cleanup callback so observer is removed from tracking maps on disconnect
+    socket.shouldUnsubscribe[broadcastId] = () {
+      _obsListCombat.remove(socket);
+      _focusObservers.remove(socket.session.user.userId);
+      unsubscribe(socket);
+    };
     // send initial list
     socket.sinkAdd(
       WsResponse.combatRooms(
-        n: NouN.next().v,
+        n: nextNoun(),
         broadcastId: broadcastId,
         rooms: listDto.values.toList(),
       ).toPacket(),
@@ -93,27 +99,47 @@ final class CombatSupervisor
   }
 
   Future<void> focusObserver(GameSocket socket, String roomId) async {
-    // final room = rooms[BroadcastId(roomId)];
-    // if (room == null) {
-    //   socket.sinkAdd(ToClient.combatError(n: roomId, error: WsCombatError.missedRoom).jsonBarrel());
-    //   return;
-    // }
-    // _focusObservers[socket.session.user.userId] = room.broadcastId;
-    // room.subscribe(socket);
+    if (socket.session.user.role != Role.develop) {
+      return;
+    }
+    final room = getRoom(BroadcastId(roomId));
+    if (room == null) {
+      socket.sinkAdd(
+        WsResponse.combatError(
+          n: nextNoun(),
+          broadcastId: broadcastId,
+          error: WsCombatError.missedRoom,
+        ).toPacket(),
+      );
+      return;
+    }
+    _focusObservers[socket.session.user.userId] = room.broadcastId;
+    room.subscribe(socket);
+    socket.shouldUnsubscribe[room.broadcastId] = () => room.unsubscribe(socket);
   }
 
-  void deleteRoom(String edictId) {
-    final broadcast = removeRoom(BroadcastId(edictId));
+  void unsubscribeObserver(GameSocket socket) {
+    _obsListCombat.remove(socket);
+    final focusedRoomId = _focusObservers.remove(socket.session.user.userId);
+    if (focusedRoomId != null) {
+      final room = getRoom(focusedRoomId);
+      room?.unsubscribe(socket);
+    }
+    unsubscribe(socket);
+  }
+
+  void deleteRoom(BroadcastId edictId) {
+    final broadcast = removeRoom(edictId);
     broadcast?.dispose();
   }
 
-  Future<void> combatReady(GameSocket socket, String roomId, String n) async {
+  Future<void> combatReady(GameSocket socket, String roomId, Noun n) async {
     final room = getRoom(BroadcastId(roomId));
     if (room == null) {
       socket.sinkAdd(
         WsResponse.combatError(
           n: n,
-          broadcastId: broadcastId as String,
+          broadcastId: broadcastId,
           error: WsCombatError.missedSocket,
         ).toPacket(),
       );
@@ -147,7 +173,7 @@ final class CombatSupervisor
         WsResponse.combatError(
           n: message.n,
           error: WsCombatError.missedRoom,
-          broadcastId: broadcastId as String,
+          broadcastId: broadcastId,
         ).toPacket(),
       );
       return;
@@ -193,7 +219,7 @@ final class CombatSupervisor
       case CombatClosedResponse(:final broadcastId):
       case CombatWinResponse(:final broadcastId):
         deleteRoom(broadcastId);
-        listDto.remove(BroadcastId(broadcastId));
+        listDto.remove(broadcastId);
         _broadcastRooms();
 
         break;
@@ -203,7 +229,7 @@ final class CombatSupervisor
   void _broadcastRooms() {
     broadcast(
       WsResponse.combatRooms(
-            n: NouN.next().v,
+            n: nextNoun(),
             broadcastId: broadcastId,
             rooms: listDto.values.toList(),
           )
@@ -215,11 +241,11 @@ final class CombatSupervisor
     final roomsToDispose = rooms.toList();
     for (final room in roomsToDispose) {
       room.broadcast(
-        WsResponse.location(n: NouN.next().v, location: GameLocation.arena)
+        WsResponse.location(n: nextNoun(), location: GameLocation.arena)
             as CombatResponse,
       );
       room.broadcast(
-        WsResponse.combatClosed(n: NouN.next().v, broadcastId: room.broadcastId)
+        WsResponse.combatClosed(n: nextNoun(), broadcastId: room.broadcastId)
             as CombatResponse,
       );
       deleteRoom(room.broadcastId);

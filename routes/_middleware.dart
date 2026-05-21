@@ -2,6 +2,7 @@ import 'package:backend/core/api_exceptions.dart';
 import 'package:backend/core/debug_log.dart';
 import 'package:backend/core/di/injection.dart';
 import 'package:backend/core/on_records.dart';
+import 'package:backend/core/rate_limiter.dart';
 import 'package:backend/db_client/db_client.dart';
 import 'package:backend/features/auth/application/online_repository_impl.dart';
 import 'package:backend/features/auth/application/presence_manager.dart';
@@ -24,6 +25,7 @@ import 'package:stack_trace/stack_trace.dart';
 
 Handler middleware(Handler handler) {
   return handler
+      .use(provider<RateLimiter>((_) => getIt<RateLimiter>()))
       .use(provider<SystemOrchestrator>((_) => getIt<SystemOrchestrator>()))
       .use(provider<BotRepository>((_) => getIt<BotRepository>()))
       .use(provider<ArenaBroadcast>((_) => getIt<ArenaBroadcast>()))

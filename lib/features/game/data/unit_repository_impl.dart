@@ -5,7 +5,9 @@ import 'package:dto/dto.dart';
 import 'package:game_dto/game_dto.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../core/api_exceptions.dart';
 import '../../../db_client/db_client.dart';
+import '../../../db_client/extensions/entry_to_dto.dart';
 import '../domain/unit_repository.dart';
 
 @LazySingleton(as: UnitRepository)
@@ -15,86 +17,90 @@ class UnitRepositoryImpl implements UnitRepository {
 
   @override
   Future<UnitDto> createUnit(UserId userId, CreateUnitDto dto) async {
-    return _db.unitDao.insertUnit(
+    final entry = await _db.unitDao.insertUnit(
       UnitTableCompanion.insert(
         name: dto.name,
         atk: dto.atk,
         def: dto.def,
         vitality: dto.vitality,
-        userId: userId.id,
+        userId: userId.value,
       ),
     );
+    return entry.toDto();
   }
 
   @override
   FutureOr<UnitDto?> getUnit({
     required UserId userId,
-    required int characterId,
+    required UnitId characterId,
   }) async {
-    return _db.unitDao.getUnitDto(userId: userId.id, unitId: characterId);
+    final entry = await _db.unitDao.getUnitEntry(characterId.value);
+    if (entry == null || entry.userId != userId.value) return null;
+    return entry.toDto();
   }
 
   @override
-  FutureOr<List<UnitDto>> getListUnit({required UserId userId}) {
-    return _db.unitDao.getListUnitDto(userId: userId.id);
+  FutureOr<List<UnitDto>> getListUnit({required UserId userId}) async {
+    final entries = await _db.unitDao.getListUnitEntries(userId: userId.value);
+    return entries.map((e) => e.toDto()).toList();
   }
 
   @override
-  Future<UnitDto?> updateUnit(UserId userId, UpdateUnitDto dto) {
-    return _db.unitDao.updateUnit(
+  Future<UnitDto?> updateUnit(UserId userId, UpdateUnitDto dto) async {
+    final result = await _db.unitDao.updateUnit(
       UnitTableCompanion(
-        id: Value(dto.id),
+        id: Value(dto.id.value),
         name: Value.absentIfNull(dto.name),
         vitality: Value.absentIfNull(dto.vitality),
         atk: Value.absentIfNull(dto.atk),
         def: Value.absentIfNull(dto.def),
       ),
     );
+    if (result == null) return null;
+    return result.toDto();
   }
 
   @override
   Future<bool> deleteUnit({
     required UserId userId,
-    required int characterId,
+    required UnitId characterId,
   }) async {
-    // Verify ownership before deleting
-    final entry = await _db.unitDao.getUnitDto(
-      userId: userId.id,
-      unitId: characterId,
-    );
-    if (entry != null) {
-      final result = await _db.unitDao.deleteUnit(characterId);
-      return result == 1;
-    }
-    return false;
+    final entry = await _db.unitDao.getUnitEntry(characterId.value);
+    if (entry == null || entry.userId != userId.value) return false;
+    final result = await _db.unitDao.deleteUnit(characterId.value);
+    return result == 1;
   }
 
   @override
   Future<UnitDto> setSelectedUnit({
     required UserId userid,
-    required int unitId,
-  }) {
-    return _db.unitDao.setSelectedUnit(
+    required UnitId unitId,
+  }) async {
+    final entry = await _db.unitDao.setSelectedUnit(
       SelectedUnitTableCompanion(
-        userId: Value(userid.id),
-        unitId: Value(unitId),
+        userId: Value(userid.value),
+        unitId: Value(unitId.value),
       ),
     );
+    if (entry == null) throw const ApiException.notFound();
+    return entry.toDto();
   }
 
   @override
-  Future<UnitDto?> getSelectedUnit(UserId userid) {
-    return _db.unitDao.getSelectedUnitDto(userid.id);
+  Future<UnitDto?> getSelectedUnit(UserId userid) async {
+    final entry = await _db.unitDao.getSelectedUnitEntry(userid.value);
+    if (entry == null) return null;
+    return entry.toDto();
   }
 
   @override
-  Future<UnitStatsDto?> getUnitPublicInfo(unitId) {
-    return _db.unitDao.getUnitPublicInfo(unitId as int);
+  Future<UnitStatsDto?> getUnitPublicInfo(UnitId unitId) {
+    return _db.unitDao.getUnitPublicInfo(unitId.value);
   }
 
   @override
   Future<void> updateStats({
-    required int unitId,
+    required UnitId unitId,
     int winDelta = 0,
     int lossDelta = 0,
     int coinDelta = 0,
@@ -115,11 +121,11 @@ class UnitRepositoryImpl implements UnitRepository {
 
   @override
   Future<void> allocateStats(
-    int unitId,
+    UnitId unitId,
     int addAtk,
     int addDef,
     int addVitality,
   ) {
-    return _db.unitDao.allocateStats(unitId, addAtk, addDef, addVitality);
+    return _db.unitDao.allocateStats(unitId.value, addAtk, addDef, addVitality);
   }
 }

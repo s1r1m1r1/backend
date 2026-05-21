@@ -39,7 +39,7 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
     return into(sessionTable).insert(
       SessionTableCompanion(
         token: Value(session.token),
-        userId: Value(session.user.userId.id),
+        userId: Value(session.user.userId),
         expiryDate: Value(session.tokenExpiryDate),
         createdAt: Value(session.createdAt),
         refreshToken: Value(session.refreshToken),
@@ -56,7 +56,7 @@ class SessionDao extends DatabaseAccessor<DbClient> with _$SessionDaoMixin {
       SessionTableCompanion(
         id: Value(session.id!),
         token: Value(session.token),
-        userId: Value(session.user.userId.id),
+        userId: Value(session.user.userId),
         expiryDate: Value(session.tokenExpiryDate),
         createdAt: Value(session.createdAt),
         refreshToken: Value(session.refreshToken),

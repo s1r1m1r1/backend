@@ -1,4 +1,5 @@
-import 'package:game_dto/game_dto.dart';
+import 'package:types/types.dart';
+
 import 'combatant.dart';
 
 enum CombatStatus { initial, ready, started, stopped, failure }
@@ -13,13 +14,13 @@ class Combat {
     required this.combatants,
   });
   factory Combat.initial() => Combat(
-    round: 0,
+    round: const Round(0),
     currentCombatant: UnitId.none,
     unitOrder: [],
     combatants: [],
   );
   CombatStatus status = CombatStatus.initial;
-  int round;
+  Round round;
   UnitId currentCombatant;
   List<UnitId> unitOrder;
   List<Combatant> combatants;
@@ -45,7 +46,7 @@ class Combat {
   }
 
   void nextRound() {
-    round++;
+    round = Round(round.value + 1);
     unitOrder = combatants
         .where((e) => e.mutableUnit.hp > 0)
         .map((e) => e.unitId)

@@ -17,7 +17,7 @@ class Unit {
 
   factory Unit.fromDto(UnitDto dto) {
     return Unit(
-      unitId: UnitId(dto.id),
+      unitId: dto.id,
       name: dto.name,
       hp: dto.hp,
       atk: dto.atk,
@@ -34,7 +34,7 @@ class Unit {
 
   UnitDto toDto() {
     return UnitDto(
-      id: unitId.s,
+      id: unitId,
       name: name,
       hp: hp,
       atk: atk,

@@ -28,7 +28,7 @@ class LettersBroadManager {
     );
   }
 
-  void subscribe(GameSocket socket, String n) {
+  void subscribe(GameSocket socket, Noun n) {
     final role = socket.session.user.role;
     final bloc = _rooms[role];
     if (bloc == null) return;
@@ -56,8 +56,8 @@ class LettersBroadManager {
 
   void editLetter(GameSocket socket, EditLetterRequest message) {
     final role = socket.session.user.role;
-    final bloc = _rooms[role];
-    if (bloc == null) return;
-    bloc.editLetter(socket, message.letterId, message.content, message.n);
+    final room = _rooms[role];
+    if (room == null) return;
+    room.editLetter(socket, message.letterId, message.content, message.n);
   }
 }

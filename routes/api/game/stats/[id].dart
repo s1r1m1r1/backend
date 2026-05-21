@@ -17,7 +17,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
 
   final unitId = mapToInt(id);
   final uRepo = context.read<UnitRepository>();
-  final stats = await uRepo.getUnitPublicInfo(UnitId(unitId));
+  final stats = await uRepo.getUnitPublicInfo(UnitId(unitId.toString()));
 
   if (stats == null) {
     return Response(statusCode: HttpStatus.notFound);

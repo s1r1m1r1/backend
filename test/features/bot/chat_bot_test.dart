@@ -99,7 +99,7 @@ void main() {
         createdAt: DateTime.now(),
       ),
       unit: Unit(
-        unitId: UnitId(id.hashCode),
+        unitId: UnitId(id.hashCode.toString()),
         name: 'Unit_$id',
         hp: 100,
         atk: 10,
@@ -132,7 +132,7 @@ void main() {
         strategy: strategy,
         botRepository: repo,
         userId: UserId('simple_bot'),
-        unitId: UnitId(100),
+        unitId: UnitId('100'),
       );
 
       await presenceManager.joinBot(bot, createDummySession('simple_bot'));
@@ -175,7 +175,7 @@ void main() {
           strategy: strategy,
           botRepository: repo,
           userId: UserId('delete_own_bot'),
-          unitId: UnitId(200),
+          unitId: UnitId('200'),
         );
 
         await presenceManager.joinBot(
@@ -243,7 +243,7 @@ void main() {
           strategy: strategy,
           botRepository: repo,
           userId: UserId('delete_other_bot'),
-          unitId: UnitId(300),
+          unitId: UnitId('300'),
         );
 
         await presenceManager.joinBot(
@@ -298,7 +298,7 @@ void main() {
         strategy: strategy,
         botRepository: repo,
         userId: UserId('edit_own_bot'),
-        unitId: UnitId(400),
+        unitId: UnitId('400'),
       );
 
       await presenceManager.joinBot(bot, createDummySession('edit_own_bot'));
@@ -351,7 +351,7 @@ void main() {
         strategy: strategy,
         botRepository: repo,
         userId: UserId('single_msg_bot'),
-        unitId: UnitId(500),
+        unitId: UnitId('500'),
       );
 
       await presenceManager.joinBot(bot, createDummySession('single_msg_bot'));
@@ -396,7 +396,7 @@ void main() {
         strategy: strategy,
         botRepository: repo,
         userId: UserId('spam_bot'),
-        unitId: UnitId(600),
+        unitId: UnitId('600'),
       );
 
       await presenceManager.joinBot(bot, createDummySession('spam_bot'));
@@ -441,7 +441,7 @@ void main() {
           strategy: strategy,
           botRepository: repo,
           userId: UserId('lifecycle_bot'),
-          unitId: UnitId(700),
+          unitId: UnitId('700'),
         );
 
         await presenceManager.joinBot(bot, createDummySession('lifecycle_bot'));
@@ -527,14 +527,14 @@ void main() {
           strategy: strategy1,
           botRepository: repo1,
           userId: UserId('chat_bot_1'),
-          unitId: UnitId(800),
+          unitId: UnitId('800'),
         );
 
         final bot2 = ScenarioBot(
           strategy: strategy2,
           botRepository: repo2,
           userId: UserId('chat_bot_2'),
-          unitId: UnitId(801),
+          unitId: UnitId('801'),
         );
 
         // Join both bots
@@ -630,7 +630,7 @@ void main() {
         strategy: strategy,
         botRepository: repo,
         userId: UserId('history_bot'),
-        unitId: UnitId(900),
+        unitId: UnitId('900'),
       );
 
       await presenceManager.joinBot(bot, createDummySession('history_bot'));
@@ -713,14 +713,14 @@ void main() {
         strategy: strategy1,
         botRepository: repo1,
         userId: UserId('owner_bot'),
-        unitId: UnitId(1000),
+        unitId: UnitId('1000'),
       );
 
       final bot2 = ScenarioBot(
         strategy: strategy2,
         botRepository: repo2,
         userId: UserId('intruder_bot'),
-        unitId: UnitId(1001),
+        unitId: UnitId('1001'),
       );
 
       await presenceManager.joinBot(bot1, createDummySession('owner_bot'));

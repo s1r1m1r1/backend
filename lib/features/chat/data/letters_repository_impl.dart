@@ -24,7 +24,7 @@ class LettersRepositoryImpl implements LettersRepository {
         LetterTableCompanion.insert(
           chatRoomId: broadcastId,
           content: content,
-          senderId: senderId.id,
+          senderId: senderId,
         ),
       );
       if (entry?.id == null || entry?.chatRoomId == null) {

@@ -14,6 +14,7 @@ import 'delete_letter.cmd.dart';
 import 'disconnect.cmd.dart';
 import 'edit_letter.cmd.dart';
 import 'focus_combat_observer.cmd.dart';
+import 'frontend_version.cmd.dart';
 import 'game_action.cmd.dart';
 import 'get_unit_stats.cmd.dart';
 import 'join_arena.cmd.dart';
@@ -48,6 +49,7 @@ class WsCmdExecutor {
         PingRequest() => const PingCmd(),
         WithTokenRequest() => const WithTokenCmd(),
         DisconnectRequest() => const DisconnectCmd(),
+        FrontendVersionRequest() => const FrontendVersionCmd(),
       },
 
       // Menu commands

@@ -1,10 +1,14 @@
 import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
 
 import 'user_table.dart';
 
 @DataClassName('UnitEntry')
 class UnitTable extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  @override
+  Set<Column> get primaryKey => {id};
+
+  TextColumn get id => text().clientDefault(() => const Uuid().v7())();
   TextColumn get name => text().withLength(min: 3, max: 12)();
   IntColumn get atk => integer()(); // атака
   IntColumn get def => integer()(); // защита

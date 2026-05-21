@@ -16,7 +16,7 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
   final _lock = Lock();
   final CombatSupervisor _combatManager;
   int _nonceCount = 0;
-  String get _nextN => 'arena_${_nonceCount++}';
+  Noun _nextNoun() => Noun('arena_${_nonceCount++}');
 
   @override
   late BroadcastId broadcastId;
@@ -25,13 +25,15 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
 
   int _lastId = 0;
 
-  void createEdict(GameSocket socket, String n) {
+  void createEdict(GameSocket socket, Noun n) {
     _lock.synchronized(() async {
       final hasEdict = _edictGroups.any(
         (i) => i.members.any((i) => i.userId == socket.userId),
       );
       if (hasEdict) {
-        debugLog('createEdict Has edict\n\n');
+        debugLog(
+          '[Arena] createEdict — user ${socket.userId} already in edict',
+        );
         socket.sinkAdd(
           WsResponse.arenaError(
             n: n,
@@ -42,9 +44,9 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
       }
 
       final edictId = 'edict${_lastId++}';
-      final battleStartIn = DateTime.now().add(const Duration(seconds: 1));
+      final battleStartIn = DateTime.now().add(const Duration(seconds: 10));
       final newEdict = Edict(
-        id: edictId,
+        id: BroadcastId(edictId),
         createdAt: DateTime.now(),
         members: [(userId: socket.userId, unitName: socket.session.unit.name)],
         startIn: battleStartIn,
@@ -52,28 +54,34 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
         isFighting: false,
       );
       _edictGroups.add(newEdict);
+      debugLog(
+        '[Arena] createEdict — id=$edictId, user=${socket.userId}, battleIn=10s, totalEdicts=${_edictGroups.length}',
+      );
       _scheduleEdictBattle(edictId, battleStartIn);
       _broadcastEdicts();
     });
   }
 
-  // timer schedule
   void _scheduleEdictBattle(String edictId, DateTime battleStartIn) {
     final timeUntilBattle = battleStartIn.difference(DateTime.now());
-
-    // Schedule a one-off timer
+    debugLog(
+      '[Arena] _scheduleEdictBattle — id=$edictId, battleIn=${timeUntilBattle.inSeconds}s',
+    );
     final timer = Timer(timeUntilBattle, () {
       _lock.synchronized(() async {
         _edictTimer.remove(edictId);
         final edictIndex = _edictGroups.indexWhere((i) => i.id == edictId);
-
         if (edictIndex == -1) {
-          addError(Exception('stop edict not found  -1'), StackTrace.current);
+          debugLog(
+            '[Arena] _scheduleEdictBattle — edict $edictId not found (already removed)',
+          );
           return;
         }
-
         final edict = _edictGroups[edictIndex];
         final readyToStart = edict.members.length > 1;
+        debugLog(
+          '[Arena] _scheduleEdictBattle — id=$edictId, members=${edict.members.length}, ready=$readyToStart',
+        );
         if (readyToStart) {
           await _combatManager.createRoom(edict);
         }
@@ -84,17 +92,23 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
     _edictTimer[edictId] = timer;
   }
 
-  void subscribeChannel(GameSocket socket, String n) {
+  void subscribeChannel(GameSocket socket, Noun n) {
     final userId = socket.userId;
     final oldChannel = channels[userId];
     if (oldChannel != null) {
-      debugLog('oldChannel cancel');
+      debugLog('[Arena] subscribeChannel — replacing old channel for $userId');
       oldChannel.onSubscriptionCancel(broadcastId);
     }
     subscribe(socket);
     socket.shouldUnsubscribe[broadcastId] = () => unsubscribe(socket);
+    debugLog(
+      '[Arena] subscribeChannel — user $userId subscribed, sending ${_edictGroups.length} edicts',
+    );
     socket.sinkAdd(
-      WsResponse.location(n: _nextN, location: GameLocation.arena).toPacket(),
+      WsResponse.location(
+        n: _nextNoun(),
+        location: GameLocation.arena,
+      ).toPacket(),
     );
     socket.sinkAdd(
       WsResponse.activeEdicts(
@@ -104,7 +118,7 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
             (i) => EdictDto(
               id: i.id,
               members: i.members
-                  .map((m) => UserMemberDto(m.userId.id, m.unitName))
+                  .map((m) => UserMemberDto(m.userId, m.unitName))
                   .toList(),
               maxMembers: i.maxMembers,
               createdAt: i.createdAt,
@@ -112,12 +126,11 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
             ),
           ),
         ],
-        // .toList(),
       ).toPacket(),
     );
   }
 
-  void leaveArena(GameSocket socket, String n) {
+  void leaveArena(GameSocket socket, Noun n) {
     final userId = socket.userId;
     final channel = channels[userId];
     channel?.sinkAdd(
@@ -128,14 +141,14 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
     );
   }
 
-  Future<void> joinEdict(GameSocket socket, String edictId, String n) {
+  Future<void> joinEdict(GameSocket socket, String edictId, Noun n) {
     return _lock.synchronized(() async {
-      debugLog('joinEdict $edictId 1');
+      debugLog('[Arena] joinEdict — edictId=$edictId, user=${socket.userId}');
       final hasEdict = _edictGroups.any(
         (i) => i.members.any((i) => i.userId == socket.userId),
       );
       if (hasEdict) {
-        debugLog('joinEdict $edictId 2');
+        debugLog('[Arena] joinEdict — user ${socket.userId} already in edict');
         socket.sinkAdd(
           WsResponse.arenaError(
             n: n,
@@ -146,6 +159,7 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
       }
       final edictIndex = _edictGroups.indexWhere((i) => i.id == edictId);
       if (edictIndex == -1) {
+        debugLog('[Arena] joinEdict — edict $edictId not found');
         socket.sinkAdd(
           WsResponse.arenaError(
             n: n,
@@ -156,6 +170,9 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
       }
       final edict = _edictGroups[edictIndex];
       if (edict.members.length >= edict.maxMembers) {
+        debugLog(
+          '[Arena] joinEdict — edict $edictId is full (${edict.members.length}/${edict.maxMembers})',
+        );
         socket.sinkAdd(
           WsResponse.arenaError(n: n, error: WsArenaError.fullEdict).toPacket(),
         );
@@ -166,7 +183,9 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
         userId: socket.userId,
         unitName: socket.session.unit.name,
       ));
-
+      debugLog(
+        '[Arena] joinEdict — user ${socket.userId} joined edict $edictId (${edict.members.length}/${edict.maxMembers})',
+      );
       _broadcastEdicts();
     });
   }
@@ -188,15 +207,18 @@ class ArenaBroadcast extends Broadcast<WsResponse> {
   }
 
   void _broadcastEdicts() {
+    debugLog(
+      '[Arena] _broadcastEdicts — ${_edictGroups.length} edicts to ${channels.length} subscribers',
+    );
     broadcast(
       WsResponse.activeEdicts(
-        n: _nextN,
+        n: _nextNoun(),
         edicts: _edictGroups
             .map(
               (i) => EdictDto(
                 id: i.id,
                 members: i.members
-                    .map((m) => UserMemberDto(m.userId.id, m.unitName))
+                    .map((m) => UserMemberDto(m.userId, m.unitName))
                     .toList(),
                 maxMembers: i.maxMembers,
                 createdAt: i.createdAt,

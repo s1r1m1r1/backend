@@ -81,7 +81,7 @@ void main() {
         createdAt: DateTime.now(),
       ),
       unit: Unit(
-        unitId: UnitId(id.hashCode),
+        unitId: UnitId(id.hashCode.toString()),
         name: 'Unit_$id',
         hp: 100,
         atk: 50, // High ATK for fast win

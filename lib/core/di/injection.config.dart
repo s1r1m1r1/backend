@@ -10,7 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:backend/core/app_observer.dart' as _i604;
-import 'package:backend/core/rate_limiter.dart' as _i1042;
+import 'package:backend/core/rate_limiter.dart' as _i207;
 import 'package:backend/core/server_app_observer.dart' as _i835;
 import 'package:backend/core/system_health_service.dart' as _i809;
 import 'package:backend/db_client/dao/game_dao.dart' as _i401;
@@ -48,6 +48,7 @@ import 'package:backend/features/game/application/combat_supervisor.dart'
     as _i212;
 import 'package:backend/features/game/data/unit_repository_impl.dart' as _i814;
 import 'package:backend/features/game/domain/unit_repository.dart' as _i319;
+import 'package:backend/ws/bot_cmd_executor.dart' as _i899;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:mailing/application/mailing_service.dart' as _i834;
@@ -64,11 +65,16 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    await _i78.MailingPackageModule().init(gh);
     final dbClientModule = _$DbClientModule();
+    gh.lazySingleton<_i207.RateLimiter>(() => _i207.RateLimiter());
     gh.lazySingleton<_i35.OnlineRepository>(() => _i35.OnlineRepository());
     gh.lazySingleton<_i946.DbClient>(
       () => dbClientModule.memory(),
       registerFor: {_memory},
+    );
+    gh.lazySingleton<_i899.BotCmdExecutor>(
+      () => _i899.BotCmdExecutor(gh<_i207.RateLimiter>()),
     );
     gh.lazySingleton<_i604.AppObserver>(() => const _i835.ServerAppObserver());
     gh.lazySingleton<_i946.DbClient>(
@@ -122,7 +128,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i54.BotGenerator>(
       () => _i54.BotGenerator(gh<_i958.UserDao>(), gh<_i787.UnitDao>()),
     );
-    gh.lazySingleton<_i212.CombatSupervisor>(
+    gh.singleton<_i212.CombatSupervisor>(
       () => _i212.CombatSupervisor(
         gh<_i35.OnlineRepository>(),
         gh<_i454.SessionRepository>(),
@@ -140,6 +146,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i207.ArenaBroadcast>(
       () => _i207.ArenaBroadcast(gh<_i212.CombatSupervisor>()),
     );
+    gh.lazySingleton<_i809.SystemHealthService>(
+      () => _i809.SystemHealthService(
+        gh<_i35.OnlineRepository>(),
+        gh<_i212.CombatSupervisor>(),
+      ),
+    );
     gh.lazySingleton<_i781.BotRepository>(
       () => _i781.BotRepository(
         gh<_i158.PresenceManager>(),
@@ -148,16 +160,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i319.UnitRepository>(),
         gh<_i787.UnitDao>(),
         gh<_i689.LettersBroadManager>(),
+        gh<_i899.BotCmdExecutor>(),
       ),
-    );
-    gh.lazySingleton<_i809.SystemHealthService>(
-      () => _i809.SystemHealthService(
-        gh<_i35.OnlineRepository>(),
-        gh<_i212.CombatSupervisor>(),
-      ),
-    );
-    gh.lazySingleton<_i1042.RateLimiter>(
-      () => _i1042.RateLimiter()..startCleanupTimer(),
     );
     gh.singletonAsync<_i227.SystemOrchestrator>(() {
       final i = _i227.SystemOrchestrator(
@@ -170,7 +174,6 @@ extension GetItInjectableX on _i174.GetIt {
       );
       return i.createBots().then((_) => i);
     });
-    await _i78.MailingPackageModule().init(gh);
     return this;
   }
 }

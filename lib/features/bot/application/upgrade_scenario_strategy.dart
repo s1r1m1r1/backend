@@ -12,7 +12,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
 
   final bool isCreator;
   final Completer<void> upgraded = Completer<void>();
-  final Completer<int> winnerTeamId = Completer<int>();
+  final Completer<TeamId> winnerTeamId = Completer<TeamId>();
 
   String? _combatRoomId;
   int lastAtk = 10;
@@ -24,7 +24,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
   @override
   FutureOr<void> onInit(ScenarioBot bot) {
     debugLog('[Bot ${bot.userId}] onInit: joining arena');
-    bot.send(const .joinArena(n: 'upgrade_join_arena'));
+    bot.sendDelayed(const .joinArena(n: Noun('upgrade_join_arena')));
   }
 
   @override
@@ -42,7 +42,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
       if (!winnerTeamId.isCompleted)
         winnerTeamId.complete(message.winnerTeamId);
 
-      bot.send(const .joinArena(n: 'upgrade_rejoin'));
+      bot.sendDelayed(const .joinArena(n: Noun('upgrade_rejoin')));
       return;
     }
 
@@ -79,24 +79,29 @@ class UpgradeScenarioStrategy extends BotStrategy {
       case ActiveEdictsResponse(:final edicts):
         if (isCreator) {
           if (!edicts.any(
-            (e) => e.members.any((m) => m.userId == bot.userId.id),
+            (e) => e.members.any((m) => m.userId == bot.userId),
           )) {
-            bot.send(const .createNewEdict(n: 'upgrade_create'));
+            bot.sendDelayed(const .createNewEdict(n: Noun('upgrade_create')));
           }
         } else {
           if (edicts.isNotEmpty) {
             final target = edicts.first;
-            if (!target.members.any((m) => m.userId == bot.userId.id)) {
-              bot.send(.joinEdict(n: 'upgrade_join_edict', edictId: target.id));
+            if (!target.members.any((m) => m.userId == bot.userId)) {
+              bot.sendDelayed(
+                .joinEdict(
+                  n: const Noun('upgrade_join_edict'),
+                  edictId: target.id,
+                ),
+              );
             }
           }
         }
 
       case CombatStartedResponse():
         _combatRoomId = message.combatRoom;
-        bot.send(
+        bot.sendDelayed(
           WsRequest.joinBattleRoom(
-            n: 'upgrade_ready',
+            n: const Noun('upgrade_ready'),
             combatRoomId: _combatRoomId!,
           ),
         );
@@ -142,9 +147,9 @@ class UpgradeScenarioStrategy extends BotStrategy {
 
   void _checkUpgrades(ScenarioBot bot, UnitDto unit) {
     final addAtk = unit.statPoints;
-    bot.send(
+    bot.sendDelayed(
       .allocateStats(
-        n: 'upgrade_alloc',
+        n: const Noun('upgrade_alloc'),
         unitId: unit.id,
         addAtk: addAtk,
         addDef: 0,
@@ -154,8 +159,12 @@ class UpgradeScenarioStrategy extends BotStrategy {
     debugLog('[Bot ${bot.userId}] sent AllocateStats: +$addAtk ATK');
   }
 
-  void _handleTurn(ScenarioBot bot, int currentTurn, List<CombatantDto> membs) {
-    final myUnitId = bot.unitId.s;
+  void _handleTurn(
+    ScenarioBot bot,
+    UnitId currentTurn,
+    List<CombatantDto> membs,
+  ) {
+    final myUnitId = bot.unitId;
     if (currentTurn == myUnitId) {
       final enemies = membs
           .where((m) => m.unitId != myUnitId && m.unit.hp > 0)
@@ -166,9 +175,9 @@ class UpgradeScenarioStrategy extends BotStrategy {
       }
       final enemy = enemies.first;
       debugLog('[Bot ${bot.userId}] attacking ${enemy.unitId}');
-      bot.send(
+      bot.sendDelayed(
         WsRequest.gameAction(
-          n: 'upgrade_attack',
+          n: const Noun('upgrade_attack'),
           combatRoomId: _combatRoomId!,
           action: GameActionDto.attack(
             combatantId: myUnitId,

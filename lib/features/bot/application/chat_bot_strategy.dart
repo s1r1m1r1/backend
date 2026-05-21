@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:dto/dto.dart';
 
 import '../../../core/debug_log.dart';
-import '../../../core/utils/noun_gen.dart';
+import '../../../core/utils/next_noun.dart';
 import 'bot_strategy.dart';
 
 /// Base class for chat bot strategies with common functionality.
@@ -23,7 +23,7 @@ abstract class ChatBotStrategy extends BotStrategy {
 
   void _joinChat(ScenarioBot bot) {
     if (!_joined) {
-      bot.send(WsRequest.joinLetters(n: NouN.next().v));
+      bot.send(WsRequest.joinLetters(n: nextNoun()));
       _joined = true;
     }
   }
@@ -121,28 +121,24 @@ abstract class ChatBotStrategy extends BotStrategy {
 
   /// Send a new letter.
   void sendLetter(ScenarioBot bot, String content) {
-    bot.send(WsRequest.newLetter(n: NouN.next().v, content: content));
+    bot.send(WsRequest.newLetter(n: nextNoun(), content: content));
   }
 
   /// Edit a letter.
   void editLetter(ScenarioBot bot, int letterId, String content) {
     bot.send(
-      WsRequest.editLetter(
-        n: NouN.next().v,
-        letterId: letterId,
-        content: content,
-      ),
+      WsRequest.editLetter(n: nextNoun(), letterId: letterId, content: content),
     );
   }
 
   /// Delete a letter.
   void deleteLetter(ScenarioBot bot, int letterId) {
-    bot.send(WsRequest.deleteLetter(n: NouN.next().v, letterId: [letterId]));
+    bot.send(WsRequest.deleteLetter(n: nextNoun(), letterId: [letterId]));
   }
 
   /// Delete multiple letters.
   void deleteLetters(ScenarioBot bot, List<int> letterIds) {
-    bot.send(WsRequest.deleteLetter(n: NouN.next().v, letterId: letterIds));
+    bot.send(WsRequest.deleteLetter(n: nextNoun(), letterId: letterIds));
   }
 
   @override

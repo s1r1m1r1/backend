@@ -214,7 +214,7 @@ class MockSessionRepository extends _i1.Mock implements _i8.SessionRepository {
 /// See the documentation for Mockito's code generation for more information.
 class MockUnitRepository extends _i1.Mock implements _i9.UnitRepository {
   @override
-  _i6.Future<_i7.UnitStatsDto?> getUnitPublicInfo(_i4.UnitId? unitId) =>
+  _i6.Future<_i7.UnitStatsDto?> getUnitPublicInfo(_i7.UnitId? unitId) =>
       (super.noSuchMethod(
             Invocation.method(#getUnitPublicInfo, [unitId]),
             returnValue: _i6.Future<_i7.UnitStatsDto?>.value(),
@@ -259,7 +259,7 @@ class MockUnitRepository extends _i1.Mock implements _i9.UnitRepository {
   @override
   _i6.FutureOr<_i4.UnitDto?> getUnit({
     required _i7.UserId? userId,
-    required int? characterId,
+    required _i7.UnitId? characterId,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#getUnit, [], {
@@ -284,7 +284,7 @@ class MockUnitRepository extends _i1.Mock implements _i9.UnitRepository {
   @override
   _i6.Future<_i4.UnitDto> setSelectedUnit({
     required _i7.UserId? userid,
-    required int? unitId,
+    required _i7.UnitId? unitId,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#setSelectedUnit, [], {
@@ -324,7 +324,7 @@ class MockUnitRepository extends _i1.Mock implements _i9.UnitRepository {
   @override
   _i6.Future<bool> deleteUnit({
     required _i7.UserId? userId,
-    required int? characterId,
+    required _i7.UnitId? characterId,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#deleteUnit, [], {
@@ -338,7 +338,7 @@ class MockUnitRepository extends _i1.Mock implements _i9.UnitRepository {
 
   @override
   _i6.Future<void> updateStats({
-    required int? unitId,
+    required _i7.UnitId? unitId,
     int? winDelta = 0,
     int? lossDelta = 0,
     int? coinDelta = 0,
@@ -363,7 +363,7 @@ class MockUnitRepository extends _i1.Mock implements _i9.UnitRepository {
 
   @override
   _i6.Future<void> allocateStats(
-    int? unitId,
+    _i7.UnitId? unitId,
     int? addAtk,
     int? addDef,
     int? addVitality,

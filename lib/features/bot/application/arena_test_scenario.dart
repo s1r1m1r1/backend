@@ -18,7 +18,7 @@ class ArenaTestScenarioStrategy extends BotStrategy {
     debugLog(
       'Bot ${bot.userId} starting ArenaTestScenarioStrategy (creator: $isCreator)',
     );
-    bot.send(const WsRequest.joinArena(n: 'test_join'));
+    bot.sendDelayed(const WsRequest.joinArena(n: Noun('test_join')));
   }
 
   @override
@@ -35,22 +35,27 @@ class ArenaTestScenarioStrategy extends BotStrategy {
       case ActiveEdictsResponse(:final edicts):
         if (isCreator) {
           final alreadyMy = edicts.any(
-            (e) => e.members.any((m) => m.userId == bot.userId.id),
+            (e) => e.members.any((m) => m.userId == bot.userId),
           );
           if (!alreadyMy) {
             debugLog('Creator bot ${bot.userId} creating new edict');
-            bot.send(const .createNewEdict(n: 'test_create'));
+            bot.sendDelayed(const .createNewEdict(n: Noun('test_create')));
           }
         } else {
           // Партнер ищет созданный эдикт
           if (edicts.isNotEmpty) {
             final target = edicts.first;
             final isNotMember = !target.members.any(
-              (m) => m.userId == bot.userId.id,
+              (m) => m.userId == bot.userId,
             );
             if (isNotMember && target.members.length < target.maxMembers) {
               debugLog('Partner bot ${bot.userId} joining edict ${target.id}');
-              bot.send(.joinEdict(n: 'test_join_edict', edictId: target.id));
+              bot.sendDelayed(
+                .joinEdict(
+                  n: const Noun('test_join_edict'),
+                  edictId: target.id,
+                ),
+              );
             }
           }
         }
@@ -61,8 +66,11 @@ class ArenaTestScenarioStrategy extends BotStrategy {
         );
         if (!combatStarted.isCompleted) combatStarted.complete();
         // Подтверждаем готовность к бою
-        bot.send(
-          .joinBattleRoom(n: 'test_ready', combatRoomId: message.combatRoom),
+        bot.sendDelayed(
+          .joinBattleRoom(
+            n: const Noun('test_ready'),
+            combatRoomId: message.combatRoom,
+          ),
         );
 
       case StartBattleResponse():

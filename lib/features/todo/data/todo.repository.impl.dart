@@ -15,7 +15,7 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<TodoDto> createTodo(CreateTodoDto createTodoDto) async {
     debugLog('create todo');
-    final todo = await _datasource.createTodo(createTodoDto, user.userId.id);
+    final todo = await _datasource.createTodo(createTodoDto, user.userId);
     debugLog('create todo ready ${todo.toJson()}');
     return todo;
   }
@@ -23,21 +23,21 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<int> deleteTodo(int todoId) async {
     // final result = await getTodoById(todoId);
-    return _datasource.deleteTodoById(todoId: todoId, userId: user.userId.id);
+    return _datasource.deleteTodoById(todoId: todoId, userId: user.userId);
   }
 
   @override
   FutureOr<TodoDto> getTodoById(int todoId) async {
     final res = await _datasource.getTodoById(
       todoId: todoId,
-      userId: user.userId.id,
+      userId: user.userId,
     );
     return res;
   }
 
   @override
   Future<List<TodoDto>> getTodos() async {
-    final res = await _datasource.getAllTodo(user.userId.id);
+    final res = await _datasource.getAllTodo(user.userId);
     return res;
   }
 
@@ -49,7 +49,7 @@ class TodoRepositoryImpl implements TodoRepository {
     final r = await _datasource.updateTodo(
       todoId: todoId,
       todo: updateTodoDto,
-      userId: user.userId.id,
+      userId: user.userId,
     );
     return r;
   }

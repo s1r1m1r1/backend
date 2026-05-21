@@ -1,4 +1,4 @@
-import 'package:dto/dto.dart';
+import 'package:types/types.dart';
 
 typedef UserMember = ({UserId userId, String unitName});
 
@@ -11,7 +11,7 @@ class Edict {
     required this.startIn,
     required this.isFighting,
   });
-  final String id;
+  final BroadcastId id;
   final int maxMembers;
   final List<UserMember> members;
   final DateTime createdAt;

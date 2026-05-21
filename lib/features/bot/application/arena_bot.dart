@@ -6,7 +6,7 @@ import 'package:game_dto/game_dto.dart';
 
 import '../../../core/app_config.dart';
 import '../../../core/debug_log.dart';
-import '../../../core/utils/noun_gen.dart';
+import '../../../core/utils/next_noun.dart';
 import 'bot_strategy.dart';
 
 enum BotStatus { ready, joined, play, stopped, dead, failure }
@@ -26,11 +26,14 @@ class ArenaBotStrategy extends BotStrategy {
   BroadcastId? combatRoom;
 
   List<CombatantDto> combatants = [];
-  List<int> unitOrder = [];
+  List<UnitId> unitOrder = [];
   int ready = 0;
-  int currentTurn = -1;
+  UnitId currentTurn = UnitId.none;
 
-  /// Полный сброс состояния — бот возвращается в режим ожидания.
+  @override
+  Duration get actionDelay =>
+      Duration(milliseconds: AppConfig.botActionDelaySec * 1000);
+
   void _reset(ScenarioBot bot) {
     status = BotStatus.ready;
     joinedEdict = null;
@@ -38,14 +41,16 @@ class ArenaBotStrategy extends BotStrategy {
     combatants = [];
     unitOrder = [];
     ready = 0;
-    currentTurn = -1;
+    currentTurn = UnitId.none;
     debugLog('[ArenaBot ${bot.userId}] reset → ready');
   }
 
   @override
   void onInit(ScenarioBot bot) {
+    debugLog('[ArenaBot ${bot.userId}] onInit — joinedArena=$joinedArena');
     if (!joinedArena) {
-      bot.send(.joinArena(n: NouN.next().v));
+      debugLog('[ArenaBot ${bot.userId}] Sending joinArena');
+      bot.sendDelayed(.joinArena(n: nextNoun()));
       joinedArena = true;
     }
   }
@@ -58,64 +63,79 @@ class ArenaBotStrategy extends BotStrategy {
 
     if (message is! WsResponseBot) return;
 
-    final toClient = message;
-
-    switch (toClient) {
+    switch (message) {
       case BroadcastInfoResponse(:final broadcasts):
         setBroadcasts.addAll(broadcasts.map((i) => BroadcastId(i.id)));
+        debugLog(
+          '[ArenaBot ${bot.userId}] BroadcastInfo: ${broadcasts.length} broadcasts',
+        );
 
       case TerminatedBroadcastResponse(:final broad):
         setBroadcasts.remove(BroadcastId(broad));
         if (combatRoom?.id == broad || joinedEdict?.id == broad) {
+          debugLog(
+            '[ArenaBot ${bot.userId}] Terminated broadcast $broad — resetting',
+          );
           _reset(bot);
         }
 
       case TerminatedAllBroadcastResponse():
-        // Полный сброс (ResetEdictsCMD или ResetCombatsCMD)
+        debugLog('[ArenaBot ${bot.userId}] TerminatedAllBroadcast — resetting');
         setBroadcasts.clear();
         joinedArena = false;
         _reset(bot);
-        bot.send(.joinArena(n: NouN.next().v));
+        bot.sendDelayed(.joinArena(n: nextNoun()));
         joinedArena = true;
 
       case ArenaErrorResponse():
-        break;
+        debugLog('[ArenaBot ${bot.userId}] ArenaError: ${message.error}');
 
       case ActiveEdictsResponse(:final edicts):
         this.edicts = edicts;
-        // Если уже в бою или уже присоединились — не трогаем эдикты
+        debugLog(
+          '[ArenaBot ${bot.userId}] ActiveEdicts: ${edicts.length} edicts, status=$status',
+        );
         if (status == BotStatus.play || status == BotStatus.joined) {
           joinedEdict = edicts.firstWhereOrNull(
-            (i) => i.members.any((m) => m.userId == bot.userId.id),
+            (i) => i.members.any((m) => m.userId == bot.userId),
+          );
+          debugLog(
+            '[ArenaBot ${bot.userId}] Already in edict: ${joinedEdict?.id}',
           );
           return;
         }
         joinedEdict = edicts.firstWhereOrNull(
-          (i) => i.members.any((m) => m.userId == bot.userId.id),
+          (i) => i.members.any((m) => m.userId == bot.userId),
         );
         if (joinedEdict != null) {
           status = .joined;
+          debugLog('[ArenaBot ${bot.userId}] Joined edict: ${joinedEdict!.id}');
           return;
         }
-        // Ищем первый доступный эдикт и вступаем
         if (edicts.isNotEmpty) {
           final available = edicts.firstWhereOrNull(
             (e) => e.maxMembers > e.members.length,
           );
           if (available != null) {
-            bot.send(.joinEdict(n: NouN.next().v, edictId: available.id));
+            debugLog('[ArenaBot ${bot.userId}] Joining edict: ${available.id}');
+            bot.sendDelayed(.joinEdict(n: nextNoun(), edictId: available.id));
+          } else {
+            debugLog('[ArenaBot ${bot.userId}] No available edicts');
           }
         }
 
       case JoinedEdictResponse(:final edict):
         joinedEdict = edict;
         status = .joined;
+        debugLog('[ArenaBot ${bot.userId}] JoinedEdictResponse: ${edict.id}');
 
-      // TransitionResponse: подтверждаем переход в Combat через joinBattleRoom
       case CombatStartedResponse(:final combatRoom):
         this.combatRoom = BroadcastId(combatRoom);
         status = .play;
-        bot.send(.joinBattleRoom(n: NouN.next().v, combatRoomId: combatRoom));
+        debugLog('[ArenaBot ${bot.userId}] CombatStarted: $combatRoom');
+        bot.sendDelayed(
+          .joinBattleRoom(n: nextNoun(), combatRoomId: combatRoom),
+        );
 
       case StartBattleResponse(
         :final broadcastId,
@@ -129,30 +149,23 @@ class ArenaBotStrategy extends BotStrategy {
           return;
         }
         combatants = List<CombatantDto>.from(membs);
-        this.unitOrder = List<int>.from(unitOrder);
-        this.currentTurn = currentTurn;
+        this.unitOrder = unitOrder.map((id) => UnitId(id.toString())).toList();
+        this.currentTurn = UnitId(currentTurn.toString());
         this.ready = ready;
-
-        // Refresh unitOrder based on alive combatants
         this.unitOrder = combatants
             .where((c) => c.unit.hp > 0)
             .map((c) => c.unitId)
             .toList();
-
-        // Check if bot is dead right after start
         final selfCombatant = combatants.firstWhereOrNull(
-          (c) => c.unitId == (bot.unitId as int),
+          (c) => c.unitId == bot.unitId,
         );
         if (selfCombatant != null && selfCombatant.unit.hp <= 0) {
           status = .dead;
-          this.unitOrder.remove(bot.unitId as int);
-          debugLog(
-            '[ArenaBot ${bot.userId}] Bot is dead on start, skipping actions.',
-          );
+          this.unitOrder.remove(bot.unitId);
+          debugLog('[ArenaBot ${bot.userId}] Bot is dead on start');
           return;
         }
-
-        if (currentTurn == (bot.unitId as int)) {
+        if (this.currentTurn == bot.unitId) {
           _performAttack(bot, broadcastId);
         }
 
@@ -165,25 +178,22 @@ class ArenaBotStrategy extends BotStrategy {
           debugLog('[ArenaBot ${bot.userId}] CombatStateResponse WRONG ROOM');
           return;
         }
-        this.currentTurn = currentTurn;
+        this.currentTurn = UnitId(currentTurn.toString());
         combatants = List<CombatantDto>.from(membs);
-        // Refresh unitOrder based on alive combatants
         unitOrder = combatants
             .where((c) => c.unit.hp > 0)
             .map((c) => c.unitId)
             .toList();
-
-        // Check bot health before acting
         final selfCombatant = combatants.firstWhereOrNull(
-          (c) => c.unitId == (bot.unitId as int),
+          (c) => c.unitId == bot.unitId,
         );
         if (selfCombatant != null && selfCombatant.unit.hp <= 0) {
           status = BotStatus.dead;
-          unitOrder.remove(bot.unitId as int);
+          unitOrder.remove(bot.unitId);
           debugLog('[ArenaBot ${bot.userId}] Bot is dead, skipping turn.');
           return;
         }
-        if (currentTurn == (bot.unitId as int)) {
+        if (this.currentTurn == bot.unitId) {
           _performAttack(bot, broadcastId);
         }
 
@@ -196,52 +206,45 @@ class ArenaBotStrategy extends BotStrategy {
                 (c) => c.unitId == targetId,
               );
               if (target != null) {
-                // Update target HP in bot's local combatants list
                 final updatedUnit = target.unit.copyWith(hp: targetHp);
                 final idx = combatants.indexOf(target);
                 combatants[idx] = target.copyWith(unit: updatedUnit);
               }
             case TurnEventDto(:final currentTurn, :final unitOrder):
-              this.currentTurn = currentTurn;
-              this.unitOrder = List<int>.from(unitOrder);
+              this.currentTurn = UnitId(currentTurn.toString());
+              this.unitOrder = unitOrder
+                  .map((id) => UnitId(id.toString()))
+                  .toList();
             case RoundEventDto():
-              // Local round tracking not strictly needed for attack logic
               break;
             case DeathEventDto(:final unitId):
               unitOrder.remove(unitId);
           }
         }
-
-        // Check if bot is dead after events
         final selfCombatant = combatants.firstWhereOrNull(
-          (c) => c.unitId == (bot.unitId as int),
+          (c) => c.unitId == bot.unitId,
         );
         if (selfCombatant != null && selfCombatant.unit.hp <= 0) {
           status = BotStatus.dead;
-          unitOrder.remove(bot.unitId as int);
+          unitOrder.remove(bot.unitId);
           return;
         }
-
-        if (currentTurn == (bot.unitId as int)) {
+        if (currentTurn == bot.unitId) {
           _performAttack(bot, broadcastId);
         }
 
       case CombatErrorResponse(:final broadcastId):
         if (broadcastId == combatRoom?.id) {
-          debugLog(
-            '[ArenaBot ${bot.userId}] CombatError — resetting & rejoining Arena',
-          );
+          debugLog('[ArenaBot ${bot.userId}] CombatError — resetting');
           _reset(bot);
-          bot.send(WsRequest.joinArena(n: NouN.next().v));
+          bot.sendDelayed(.joinArena(n: nextNoun()));
         }
 
       case CombatWinResponse(:final broadcastId):
         if (broadcastId == combatRoom?.id) {
-          debugLog(
-            '[ArenaBot ${bot.userId}] CombatWin — resetting & rejoining Arena',
-          );
+          debugLog('[ArenaBot ${bot.userId}] CombatWin — resetting');
           _reset(bot);
-          bot.send(WsRequest.joinArena(n: NouN.next().v));
+          bot.sendDelayed(.joinArena(n: nextNoun()));
         }
 
       case CombatRoomsResponse():
@@ -254,56 +257,46 @@ class ArenaBotStrategy extends BotStrategy {
       case UnitsUpdateResponse(:final dto):
         _onUnitsUpdate(bot, dto);
         break;
+
       case CombatClosedResponse(:final broadcastId):
         if (broadcastId == combatRoom?.id) {
-          debugLog(
-            '[ArenaBot ${bot.userId}] CombatClosed — resetting & rejoining Arena',
-          );
+          debugLog('[ArenaBot ${bot.userId}] CombatClosed — resetting');
           _reset(bot);
-          bot.send(WsRequest.joinArena(n: NouN.next().v));
+          bot.sendDelayed(WsRequest.joinArena(n: nextNoun()));
         }
     }
   }
 
   void _performAttack(ScenarioBot bot, String broadcastId) {
-    debugLog(
-      '[ArenaBot ${bot.userId}] _performAttack called for room: $broadcastId',
-    );
+    debugLog('[ArenaBot ${bot.userId}] _performAttack for room: $broadcastId');
     if (combatants.isEmpty) {
-      debugLog('[ArenaBot ${bot.userId}] _performAttack failed: no combatants');
+      debugLog('[ArenaBot ${bot.userId}] _performAttack: no combatants');
       return;
     }
-
     final selfCombatant = combatants.firstWhereOrNull(
       (c) => c.unitId == bot.unitId,
     );
     if (selfCombatant != null && selfCombatant.unit.hp <= 0) {
-      debugLog('[ArenaBot ${bot.userId}] _performAttack failed: I am dead!');
+      debugLog('[ArenaBot ${bot.userId}] _performAttack: bot is dead');
       status = BotStatus.dead;
       return;
     }
-
-    // Атакуем только живых противников
     final alive = combatants
         .where((c) => c.unit.hp > 0 && c.unitId != bot.unitId)
         .toList();
     if (alive.isEmpty) {
-      debugLog(
-        '[ArenaBot ${bot.userId}] _performAttack failed: no alive targets',
-      );
+      debugLog('[ArenaBot ${bot.userId}] _performAttack: no alive targets');
       return;
     }
-
     final target = alive[rnd.nextInt(alive.length)];
-    debugLog('[ArenaBot ${bot.userId}] Target selected: ${target.userId}');
+    debugLog('[ArenaBot ${bot.userId}] Target: ${target.userId}');
     Future.delayed(AppConfig.botAttackTimeout, () {
-      debugLog('[ArenaBot ${bot.userId}] Sending GameActionTs to $broadcastId');
       bot.send(
         WsRequest.gameAction(
           combatRoomId: broadcastId,
-          n: NouN.next().v,
+          n: nextNoun(),
           action: GameActionDto.attack(
-            combatantId: bot.unitId as int,
+            combatantId: bot.unitId,
             enemyCombatantId: target.unitId,
           ),
         ),
@@ -312,7 +305,6 @@ class ArenaBotStrategy extends BotStrategy {
   }
 
   void _onUnitsUpdate(ScenarioBot bot, ListUnitDto units) {
-    // Проверяем наличие очков для улучшения
     final currentUnit = units.list.firstWhereOrNull(
       (u) => u.id == units.selectedId,
     );
@@ -323,17 +315,13 @@ class ArenaBotStrategy extends BotStrategy {
 
   void _checkUpgrades(ScenarioBot bot, UnitDto unit) {
     if (unit.statPoints <= 0) return;
-
     debugLog(
       '[ArenaBot ${bot.userId}] Upgrading unit ${unit.id} with ${unit.statPoints} points',
     );
-
     var remaining = unit.statPoints;
     var addAtk = 0;
     var addDef = 0;
     var addVit = 0;
-
-    // Сбалансированное распределение: 40% ATK, 30% DEF, 30% VIT
     while (remaining > 0) {
       final r = rnd.nextDouble();
       if (r < 0.4) {
@@ -345,10 +333,9 @@ class ArenaBotStrategy extends BotStrategy {
       }
       remaining--;
     }
-
-    bot.send(
+    bot.sendDelayed(
       WsRequest.allocateStats(
-        n: NouN.next().v,
+        n: nextNoun(),
         unitId: unit.id,
         addAtk: addAtk,
         addDef: addDef,

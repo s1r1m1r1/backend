@@ -15,7 +15,7 @@ Future<void> init(InternetAddress ip, int port) async {
   Logger.root.onRecord.listen(onRecord);
 
   final env = Platform.environment['ENV'] ?? 'dev';
-  configureDependencies(environment: kDebugMode ? 'memory' : env);
+  await configureDependencies(environment: kDebugMode ? 'memory' : env);
 
   // Wait for all async singletons (including SystemOrchestrator bots creation)
   await getIt.allReady();

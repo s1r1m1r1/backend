@@ -73,7 +73,7 @@ void main() {
         createdAt: DateTime.now(),
       ),
       unit: Unit(
-        unitId: UnitId(id.hashCode),
+        unitId: UnitId(id.hashCode.toString()),
         name: 'Unit_$id',
         hp: 100,
         atk: 10,
@@ -107,7 +107,7 @@ void main() {
           strategy: strategy1,
           botRepository: repo,
           userId: UserId('bot_1'),
-          unitId: UnitId(1),
+          unitId: UnitId('1'),
         );
 
         final strategy2 = ArenaTestScenarioStrategy(isCreator: false);
@@ -115,7 +115,7 @@ void main() {
           strategy: strategy2,
           botRepository: repo,
           userId: UserId('bot_2'),
-          unitId: UnitId(2),
+          unitId: UnitId('2'),
         );
 
         await presenceManager.joinBot(bot1, createDummySession('bot_1'));
@@ -165,7 +165,7 @@ void main() {
         strategy: ArenaTestScenarioStrategy(isCreator: true),
         botRepository: repo,
         userId: UserId('reset_bot'),
-        unitId: UnitId(3),
+        unitId: UnitId('3'),
       );
       await presenceManager.joinBot(bot, createDummySession('reset_bot'));
 
@@ -176,7 +176,7 @@ void main() {
         strategy: resetStrategy,
         botRepository: repo,
         userId: UserId('admin'),
-        unitId: UnitId(0),
+        unitId: UnitId('0'),
       );
       await presenceManager.joinBot(adminBot, createDummySession('admin'));
 
@@ -207,7 +207,7 @@ void main() {
         strategy: resetStrategy,
         botRepository: repo,
         userId: UserId('admin_combat'),
-        unitId: UnitId(0),
+        unitId: UnitId('0'),
       );
       await presenceManager.joinBot(
         adminBot,

@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- UserId get userId; String get email; Role get role; DateTime get createdAt; bool get emailVerified; String? get confirmationToken; String get password;
+ UserId get userId; Email get email; Role get role; DateTime get createdAt; bool get emailVerified; String? get confirmationToken; String get password;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,7 +45,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- UserId userId, String email, Role role, DateTime createdAt, bool emailVerified, String? confirmationToken, String password
+ UserId userId, Email email, Role role, DateTime createdAt, bool emailVerified, String? confirmationToken, String password
 });
 
 
@@ -66,7 +66,7 @@ class _$UserCopyWithImpl<$Res>
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as UserId,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as Email,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as Role,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,emailVerified: null == emailVerified ? _self.emailVerified : emailVerified // ignore: cast_nullable_to_non_nullable
 as bool,confirmationToken: freezed == confirmationToken ? _self.confirmationToken : confirmationToken // ignore: cast_nullable_to_non_nullable
@@ -87,7 +87,7 @@ class _User extends User {
   
 
 @override final  UserId userId;
-@override final  String email;
+@override final  Email email;
 @override final  Role role;
 @override final  DateTime createdAt;
 @override@JsonKey() final  bool emailVerified;
@@ -124,7 +124,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- UserId userId, String email, Role role, DateTime createdAt, bool emailVerified, String? confirmationToken, String password
+ UserId userId, Email email, Role role, DateTime createdAt, bool emailVerified, String? confirmationToken, String password
 });
 
 
@@ -145,7 +145,7 @@ class __$UserCopyWithImpl<$Res>
   return _then(_User(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as UserId,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as Email,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as Role,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,emailVerified: null == emailVerified ? _self.emailVerified : emailVerified // ignore: cast_nullable_to_non_nullable
 as bool,confirmationToken: freezed == confirmationToken ? _self.confirmationToken : confirmationToken // ignore: cast_nullable_to_non_nullable

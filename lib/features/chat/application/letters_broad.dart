@@ -37,7 +37,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
   final _lock = Lock();
   final _letterCache = <LetterDto>[];
   int _nonceCount = 0;
-  String get _nextN => 'letter_${_nonceCount++}';
+  Noun _nextNoun() => Noun('letter_${_nonceCount++}');
 
   /// Per-user rate limiter: userId → list of timestamps (ms since epoch).
   final _rateLimiter = <String, List<int>>{};
@@ -83,7 +83,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
     }
   }
 
-  void newLetter(GameSocket socket, String content, String n) {
+  void newLetter(GameSocket socket, String content, Noun n) {
     _lock.synchronized(() async {
       try {
         // Rate limit check
@@ -143,7 +143,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
     }, timeout: _defaultTimeout);
   }
 
-  void editLetter(GameSocket socket, int letterId, String content, String n) {
+  void editLetter(GameSocket socket, int letterId, String content, Noun n) {
     _lock.synchronized(() async {
       try {
         // Rate limit check
@@ -179,7 +179,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
           return;
         }
         final letter = _letterCache[indexLetter];
-        if (letter.senderId != socket.session.user.userId.id) {
+        if (letter.senderId != socket.session.user.userId) {
           debugLog('letter access denied');
           _sendLetterError(socket, n, WsLetterError.accessDenied, [
             letterId,
@@ -212,7 +212,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
     }, timeout: _defaultTimeout);
   }
 
-  void removeLetter(GameSocket socket, int letterId, String n) {
+  void removeLetter(GameSocket socket, int letterId, Noun n) {
     _lock.synchronized(() async {
       try {
         // Rate limit check
@@ -278,7 +278,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
     }, timeout: _defaultTimeout);
   }
 
-  void removeLetters(GameSocket socket, List<int> letterIds, String n) {
+  void removeLetters(GameSocket socket, List<int> letterIds, Noun n) {
     _lock.synchronized(() async {
       try {
         // Rate limit check
@@ -390,7 +390,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
   /// This is a "cold path" — errors should not arrive if everything works correctly.
   void _sendLetterError(
     GameSocket socket,
-    String n,
+    Noun n,
     WsLetterError error,
     List<int> letterIds,
     String reason,
@@ -409,7 +409,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
 
   // --- Helper Methods ---
 
-  WsResponse _lettersDTO(String n) {
+  WsResponse _lettersDTO(Noun n) {
     return WsResponse.letterHistory(
       n: n,
       roomId: broadcastId,
@@ -417,7 +417,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
     );
   }
 
-  FutureOr<void> subscribeChannel(GameSocket socket, String n) async {
+  FutureOr<void> subscribeChannel(GameSocket socket, Noun n) async {
     await _lock.synchronized(() async {
       try {
         subscribe(socket);
@@ -432,7 +432,7 @@ class _LettersBroad extends Broadcast<LetterResponse> {
         socket.sinkAdd(_lettersDTO(n).toPacket());
         socket.sinkAdd(
           WsResponse.broadcastInfo(
-            n: _nextN,
+            n: _nextNoun(),
             broadcasts: socket.joinedBroadsInfo().toList(),
           ).toPacket(),
         );

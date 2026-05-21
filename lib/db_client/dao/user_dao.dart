@@ -18,7 +18,7 @@ class UserDao extends DatabaseAccessor<DbClient> with _$UserDaoMixin {
   User _toUser(UserEntry entry) {
     return User(
       userId: UserId(entry.id),
-      email: entry.email,
+      email: Email(entry.email),
       password: entry.password,
       createdAt: entry.createdAt,
       role: entry.role,

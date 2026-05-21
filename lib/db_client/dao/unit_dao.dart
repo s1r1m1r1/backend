@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
-import 'package:dto/dto.dart';
+import 'package:dto/dto.dart' show UnitStatsDto;
 import 'package:game_dto/game_dto.dart';
+import 'package:types/types.dart';
 
-import '../../core/api_exceptions.dart';
 import '../db_client.dart';
 import '../tables/selected_unit_table.dart';
 import '../tables/unit_table.dart';
@@ -19,31 +19,13 @@ class UnitDao extends DatabaseAccessor<DbClient> with _$UnitDaoMixin {
   // Mapping methods
   //------------------------------------------------------------------------------- --
 
-  UnitDto _toDto(UnitEntry entry) {
-    return UnitDto(
-      id: entry.id,
-      name: entry.name,
-      hp: entry.vitality,
-      atk: entry.atk,
-      def: entry.def,
-      level: entry.level,
-      statPoints: entry.statPoints,
-      // stats: UnitStatsDto(
-      //   wins: entry.wins,
-      //   losses: entry.losses,
-      //   coins: entry.coins,
-      //   exp: entry.exp,
-      // ),
-    );
-  }
-
   //------------------------------------------------------------------------------- --
   // CRUD operations returning DTOs
   //------------------------------------------------------------------------------- --
 
-  Future<UnitDto> insertUnit(UnitTableCompanion companion) async {
+  Future<UnitEntry> insertUnit(UnitTableCompanion companion) async {
     final entry = await into(unitTable).insertReturning(companion);
-    return _toDto(entry);
+    return entry;
   }
 
   Future<int> deleteAllBotUnits(List<String> botUserIds) async {
@@ -53,73 +35,58 @@ class UnitDao extends DatabaseAccessor<DbClient> with _$UnitDaoMixin {
     return query.go();
   }
 
-  Future<UnitEntry?> _getUnitEntry(int unitId) {
+  Future<UnitEntry?> getUnitEntry(String unitId) {
     final query = unitTable.select();
     query.where((t) => t.id.equals(unitId));
     return query.getSingleOrNull();
   }
 
-  Future<UnitDto?> getUnitDto({
-    required int unitId,
-    required String userId,
-  }) async {
-    final entry = await _getUnitEntry(unitId);
-    if (entry == null || entry.userId != userId) {
-      return null;
-    }
-    return _toDto(entry);
-  }
-
-  Future<List<UnitDto>> getListUnitDto({required String userId}) async {
+  Future<List<UnitEntry>> getListUnitEntries({required String userId}) async {
     final query = unitTable.select();
     query.where((t) => t.userId.equals(userId));
     final entries = await query.get();
-    return entries.map(_toDto).toList();
+    return entries;
   }
 
-  Future<UnitDto?> updateUnit(UnitTableCompanion companion) async {
+  Future<UnitEntry?> updateUnit(UnitTableCompanion companion) async {
     final isOk = await update(unitTable).replace(companion);
     if (!isOk) return null;
 
-    final entry = await _getUnitEntry(companion.id.value);
-    if (entry == null) return null;
-
-    return _toDto(entry);
+    final entry = await getUnitEntry(companion.id.value);
+    return entry;
   }
 
-  Future<int> deleteUnit(int characterId) async {
+  Future<int> deleteUnit(String characterId) async {
     final query = delete(unitTable);
     query.where((t) => t.id.equals(characterId));
     return query.go();
   }
 
-  Future<UnitDto> setSelectedUnit(SelectedUnitTableCompanion companion) async {
+  Future<UnitEntry?> setSelectedUnit(
+    SelectedUnitTableCompanion companion,
+  ) async {
     final selectedEntry = await selectedUnitTable.insertReturning(
       companion,
       mode: InsertMode.insertOrReplace,
     );
 
-    final unitEntry = await _getUnitEntry(selectedEntry.unitId);
-    if (unitEntry == null) throw const ApiException.notFound();
-
-    return _toDto(unitEntry);
+    final unitEntry = await getUnitEntry(selectedEntry.unitId);
+    return unitEntry;
   }
 
-  Future<UnitDto?> getSelectedUnitDto(String userId) async {
+  Future<UnitEntry?> getSelectedUnitEntry(String userId) async {
     final query = selectedUnitTable.select();
     query.where((t) => t.userId.equals(userId));
     final selectedEntry = await query.getSingleOrNull();
 
     if (selectedEntry == null) return null;
 
-    final unitEntry = await _getUnitEntry(selectedEntry.unitId);
-    if (unitEntry == null) return null;
-
-    return _toDto(unitEntry);
+    final unitEntry = await getUnitEntry(selectedEntry.unitId);
+    return unitEntry;
   }
 
   Future<void> updateStats({
-    required int unitId,
+    required UnitId unitId,
     int winDelta = 0,
     int lossDelta = 0,
     int coinDelta = 0,
@@ -152,7 +119,7 @@ class UnitDao extends DatabaseAccessor<DbClient> with _$UnitDaoMixin {
   }
 
   Future<void> setStats({
-    required int unitId,
+    required UnitId unitId,
     int? wins,
     int? losses,
     int? coins,
@@ -189,7 +156,7 @@ class UnitDao extends DatabaseAccessor<DbClient> with _$UnitDaoMixin {
   }
 
   Future<void> allocateStats(
-    int unitId,
+    String unitId,
     int addAtk,
     int addDef,
     int addVitality,
@@ -218,7 +185,7 @@ class UnitDao extends DatabaseAccessor<DbClient> with _$UnitDaoMixin {
     ]);
   }
 
-  Future<UnitStatsDto?> getUnitPublicInfo(int unitId) async {
+  Future<UnitStatsDto?> getUnitPublicInfo(String unitId) async {
     final query = unitTable.select();
     query.where((t) => t.id.equals(unitId));
     final entry = await query.getSingleOrNull();

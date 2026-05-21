@@ -13,7 +13,7 @@ class Combatant {
     required this.stats,
   }) : mutableUnit = Unit.fromDto(baseUnit);
   final UnitId unitId;
-  int teamId;
+  TeamId teamId;
   final UserId userId;
   bool isBot;
   //------------------
@@ -25,9 +25,9 @@ class Combatant {
 
   CombatantDto toDto({bool includeBase = true}) {
     return CombatantDto(
-      unitId: unitId as int,
+      unitId: unitId,
       teamId: teamId,
-      userId: userId as String,
+      userId: userId,
       isBot: isBot,
       baseUnit: includeBase ? baseUnit : null,
       unit: mutableUnit.toDto(),

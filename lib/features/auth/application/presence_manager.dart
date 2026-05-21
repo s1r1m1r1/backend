@@ -7,6 +7,7 @@ import 'package:synchronized/synchronized.dart';
 
 import '../../../core/broadcast.dart';
 import '../../../core/debug_log.dart';
+import '../../../core/utils/next_noun.dart';
 import '../../game/domain/unit.dart';
 import '../../game/domain/unit_repository.dart';
 import '../domain/session.dart';
@@ -17,14 +18,14 @@ import 'session_socket.dart';
 const _timeoutDuration = Duration(seconds: 3);
 
 abstract class PresenceManager {
-  FutureOr<void> join(UserChannel channel, String token, String n);
-  void infoJoinedBroads(UserChannel channel, String n);
-  void removeUser(Sink channel, String n);
-  void syncOnlineUsers(Sink channel, String n);
+  FutureOr<void> join(UserChannel channel, Token token, Noun n);
+  void infoJoinedBroads(UserChannel channel, Noun n);
+  void removeUser(Sink channel, Noun n);
+  void syncOnlineUsers(Sink channel, Noun n);
   Future<void> joinBot(SinkBot bot, GameSession session);
   GameSocket? getGameSocket(UserId userId);
   Future<void> syncUnits(UserId userId);
-  Future<void> sendMenu(UserId userId, String n);
+  Future<void> sendMenu(UserId userId, Noun n);
   void removeAllBots();
   // BotRepository get botRepository;
   BroadcastId get broadcastId;
@@ -48,13 +49,13 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
   // BotRepository get botRepository => _botRepository;
   final _lock = Lock();
   int _nonce = 0;
-  String get _nextN => 'online_${_nonce++}';
+  Noun _nextNoun() => Noun('online_${_nonce++}');
 
   @override
   late BroadcastId broadcastId;
 
   @override
-  FutureOr<void> join(UserChannel channel, String token, String n) async {
+  FutureOr<void> join(UserChannel channel, Token token, Noun n) async {
     try {
       await _join(channel, token, n).timeout(
         _timeoutDuration,
@@ -77,7 +78,7 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
     }
   }
 
-  Future<void> _join(UserChannel userChannel, String token, String n) async {
+  Future<void> _join(UserChannel userChannel, String token, Noun n) async {
     debugLog('PresenceManager: _join start n=$n');
     // 1. Data Loading Phase (Unlocked, prevents bottlenecking other auth attempts)
     final session = await _sessionRepository.getSession(token: token);
@@ -119,7 +120,7 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
   Future<void> _registerPresenceLocked(
     UserChannel userChannel,
     GameSession gameSession,
-    String n,
+    Noun n,
   ) async {
     final socket = _onlineRep.getSessionUSERID(gameSession.user.userId);
     if (socket != null) {
@@ -153,11 +154,11 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
     final units = await _unitRepository.getListUnit(
       userId: gameSession.user.userId,
     );
-    final selectedId = gameSession.unit.unitId.s;
+    final selectedId = gameSession.unit.unitId;
 
     newSessionChannel.sinkAdd(
       WsResponse.menu(
-        n: _nextN,
+        n: nextNoun(),
         user: gameSession.user.toDto(),
         units: ListUnitDto(selectedId: selectedId, list: units),
       ).toPacket(),
@@ -174,7 +175,7 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
     );
     newSessionChannel.sinkAdd(
       WsResponse.broadcastInfo(
-        n: _nextN,
+        n: _nextNoun(),
         broadcasts: newSessionChannel.joinedBroadsInfo(),
       ).toPacket(),
     );
@@ -183,7 +184,7 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
   }
 
   @override
-  void infoJoinedBroads(UserChannel channel, String n) {
+  void infoJoinedBroads(UserChannel channel, Noun n) {
     try {
       debugLog('ActiveUsersBloc infoJoinedBroads');
       final userId = channel.userId;
@@ -205,12 +206,12 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
   }
 
   @override
-  void removeUser(Sink channel, String n) {
+  void removeUser(Sink channel, Noun n) {
     debugLog('ActiveUsersBloc removeUser');
     _lock.synchronized(() async {
       try {
         final userId = channel.userId;
-        if (userId.id == 'none') {
+        if (userId == UserId.none) {
           addError(Exception('userId is none'), StackTrace.current);
           return;
         }
@@ -231,7 +232,7 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
   }
 
   @override
-  void syncOnlineUsers(Sink channel, String n) {
+  void syncOnlineUsers(Sink channel, Noun n) {
     final toClient = _getOnlineUsers(n);
     channel.sinkAdd(toClient.toPacket());
   }
@@ -239,7 +240,7 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
   void joinOnlineUsers(UserChannel channel) {
     try {
       // проверить channel , должен быть зарегистрирован
-      final toClient = _getOnlineUsers(_nextN);
+      final toClient = _getOnlineUsers(_nextNoun());
       channel.sinkAdd(toClient.toPacket());
       // _broadcastOnlineUsers();
     } catch (e, s) {
@@ -248,16 +249,16 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
   }
 
   void _broadcastOnlineUsers() {
-    final toClient = _getOnlineUsers(_nextN);
+    final toClient = _getOnlineUsers(_nextNoun());
     broadcast(toClient);
   }
 
-  WsResponse _getOnlineUsers(String n) {
+  WsResponse _getOnlineUsers(Noun n) {
     final List<GameSocket> list = _onlineRep.getList();
     final members = list
         .map(
           (i) => OnlineMemberDto(
-            i.session.unit.unitId.s,
+            i.session.unit.unitId,
             i.session.unit.name,
             i.isBot,
             wins: i.session.unit.wins,
@@ -285,14 +286,14 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
 
     socket.sinkAdd(
       WsResponse.unitsUpdate(
-        n: _nextN,
-        dto: ListUnitDto(selectedId: selected?.id ?? 0, list: units),
+        n: _nextNoun(),
+        dto: ListUnitDto(selectedId: selected?.id ?? UnitId.none, list: units),
       ).toPacket(),
     );
   }
 
   @override
-  Future<void> sendMenu(UserId userId, String n) async {
+  Future<void> sendMenu(UserId userId, Noun n) async {
     final socket = _onlineRep.getSessionUSERID(userId);
     if (socket == null) return;
 
@@ -303,26 +304,36 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
       WsResponse.menu(
         n: n,
         user: socket.session.user.toDto(),
-        units: ListUnitDto(selectedId: selected?.id ?? 0, list: units),
+        units: ListUnitDto(
+          selectedId: selected?.id ?? UnitId.none,
+          list: units,
+        ),
       ).toPacket(),
     );
   }
 
   @override
   Future<void> joinBot(SinkBot bot, GameSession session) async {
-    debugLog('PresenceManager: joinBot userId=${session.user.userId}');
-    _onlineRep.startFromBot(bot, session);
-    final channel = _onlineRep.getSessionUSERID(session.user.userId);
-    if (channel == null) {
-      debugLog(
-        'PresenceManager: joinBot failed to create channel for ${session.user.userId}',
-      );
-      return;
+    final userId = session.user.userId;
+    debugLog('[BotJoin] START — userId=$userId, unitId=${session.unit.unitId}');
+    try {
+      _onlineRep.startFromBot(bot, session);
+      final channel = _onlineRep.getSessionUSERID(userId);
+      if (channel == null) {
+        debugLog('[BotJoin] ERROR — channel is null for userId=$userId');
+        return;
+      }
+      debugLog('[BotJoin] Channel created for userId=$userId');
+      subscribe(channel);
+      channel.shouldUnsubscribe[broadcastId] = () => unsubscribe(channel);
+      debugLog('[BotJoin] Calling bot.init() for userId=$userId');
+      await bot.init();
+      debugLog('[BotJoin] bot.init() completed for userId=$userId');
+      _broadcastOnlineUsers();
+      debugLog('[BotJoin] DONE — userId=$userId is online');
+    } catch (e, st) {
+      debugLog('[BotJoin] ERROR — userId=$userId: $e\n$st');
     }
-    subscribe(channel);
-    channel.shouldUnsubscribe[broadcastId] = () => unsubscribe(channel);
-    await bot.init();
-    _broadcastOnlineUsers();
   }
 
   @override

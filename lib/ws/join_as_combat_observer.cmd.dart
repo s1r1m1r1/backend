@@ -5,11 +5,11 @@ import '../features/game/application/combat_supervisor.dart';
 import 'ws_cmd.dart';
 
 class JoinAsCombatObserverCmd
-    extends AuthenticatedWsCmd<JoinAsCombatObserverRequest> {
+    extends DeveloperWsCmd<JoinAsCombatObserverRequest> {
   const JoinAsCombatObserverCmd();
 
   @override
-  void executeAuthenticated(
+  void executeDeveloper(
     RequestContext context,
     UserChannel channel,
     GameSocket session,

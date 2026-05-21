@@ -6,7 +6,7 @@ import 'injection.config.dart';
 final getIt = GetIt.instance;
 
 @InjectableInit(
-  externalPackageModulesAfter: [ExternalModule(MailingPackageModule)],
+  externalPackageModulesBefore: [ExternalModule(MailingPackageModule)],
 )
-void configureDependencies({String? environment}) =>
+Future<void> configureDependencies({String? environment}) =>
     getIt.init(environment: environment);

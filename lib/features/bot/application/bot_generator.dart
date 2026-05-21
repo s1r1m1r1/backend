@@ -61,25 +61,23 @@ class BotGenerator {
     remainingPoints -= defPoints;
     final vitPoints = remainingPoints;
 
-    debugLog(
-      'BotGenerator: Generating unit: $name for userId: ${user.userId.id}',
-    );
+    debugLog('BotGenerator: Generating unit: $name for userId: ${user.userId}');
     final unitCompanion = UnitTableCompanion.insert(
       name: name,
       atk: 10 + atkPoints,
       def: 5 + defPoints,
       vitality: 50 + (vitPoints * 5),
-      userId: user.userId.id,
+      userId: user.userId,
     );
 
     final unit = await unitDao.insertUnit(unitCompanion);
 
     // Select the unit for the bot
     debugLog(
-      'BotGenerator: Selecting unit: ${unit.id} for userId: ${user.userId.id}',
+      'BotGenerator: Selecting unit: ${unit.id} for userId: ${user.userId}',
     );
     await unitDao.setSelectedUnit(
-      .insert(unitId: unit.id, userId: user.userId.id),
+      .insert(unitId: unit.id, userId: user.userId),
     );
   }
 }

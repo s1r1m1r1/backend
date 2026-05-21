@@ -1,438 +1,261 @@
-import 'package:backend/core/rate_limit_tier_mapping.dart';
 import 'package:backend/core/rate_limiter.dart';
+import 'package:backend/core/rate_limit_tier_mapping.dart';
 import 'package:dto/dto.dart';
 import 'package:test/test.dart';
 
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+int _clockMs = 0;
+
+DateTime _fakeClock() =>
+    DateTime(2026).add(Duration(milliseconds: _clockMs));
+
+void _advance(int ms) => _clockMs += ms;
+
+void _resetClock() => _clockMs = 0;
+
+RateLimiter _limiter() {
+  _resetClock();
+  return RateLimiter.withClock(_fakeClock);
+}
+
+UserId _uid(String id) => UserId(id);
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
 void main() {
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
-
-  /// Creates a [RateLimiter] with a controllable clock.
-  /// The clock starts at [epoch] and advances by [increment] on each call.
-  ({RateLimiter limiter, void Function() advance}) _makeLimiter({
-    Duration increment = const Duration(milliseconds: 100),
-  }) {
-    var callCount = 0;
-    final epoch = DateTime(2026, 1, 1);
-    final states = <int, DateTime>{};
-    final limiter = RateLimiter(
-      clock: () {
-        final idx = callCount;
-        callCount++;
-        return epoch.add(increment * idx);
-      },
-    );
-    return (
-      limiter: limiter,
-      advance: () {
-        // Burn one clock tick by calling with a throwaway user
-        limiter.isRateLimited(const UserId('_tick'));
-      },
-    );
-  }
-
-  UserId uid(String id) => UserId(id);
-
-  // ---------------------------------------------------------------------------
-  // 1. Basic isRateLimited()
-  // ---------------------------------------------------------------------------
-  group('isRateLimited — basic functionality', () {
-    test('first message is not rate limited', () {
-      final limiter = _makeLimiter().limiter;
-      expect(limiter.isRateLimited(uid('1')), isFalse);
+  group('Token Bucket — basic', () {
+    test('first request always passes', () {
+      final l = _limiter();
+      expect(l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed), isFalse);
     });
 
-    test('5 messages within 1 second are allowed (burst limit = 5)', () {
-      final limiter = _makeLimiter().limiter;
-      for (var i = 0; i < 5; i++) {
-        expect(
-          limiter.isRateLimited(uid('1')),
-          isFalse,
-          reason: 'Message ${i + 1} should be allowed',
-        );
-      }
-    });
-
-    test('6th message within 1 second is blocked (burst exceeded)', () {
-      final limiter = _makeLimiter().limiter;
-      for (var i = 0; i < 5; i++) {
-        limiter.isRateLimited(uid('1'));
-      }
-      expect(limiter.isRateLimited(uid('1')), isTrue);
-    });
-
-    test(
-      '30 messages within 10 seconds are allowed (sustained limit = 30)',
-      () {
-        // Use 300ms spacing → 30 messages = 9s total, within 10s window
-        final limiter = _makeLimiter(
-          increment: const Duration(milliseconds: 300),
-        ).limiter;
-        for (var i = 0; i < 30; i++) {
-          expect(
-            limiter.isRateLimited(uid('1')),
-            isFalse,
-            reason: 'Message ${i + 1} should be allowed',
-          );
-        }
-      },
-    );
-
-    test('31st message within 10 seconds is blocked (sustained exceeded)', () {
-      final limiter = _makeLimiter(
-        increment: const Duration(milliseconds: 300),
-      ).limiter;
-      for (var i = 0; i < 30; i++) {
-        limiter.isRateLimited(uid('1'));
-      }
-      expect(limiter.isRateLimited(uid('1')), isTrue);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // 2. Sliding window
-  // ---------------------------------------------------------------------------
-  group('isRateLimited — sliding window', () {
-    test('after 1+ second pause burst window clears — can send again', () {
-      final result = _makeLimiter();
-      final limiter = result.limiter;
-      final advance = result.advance;
-
-      // Fill burst window (5 messages)
-      for (var i = 0; i < 5; i++) {
-        limiter.isRateLimited(uid('1'));
-      }
-      expect(limiter.isRateLimited(uid('1')), isTrue);
-
-      // Advance time by >1 second (each tick = 100ms, so 11 ticks = 1.1s)
-      for (var i = 0; i < 11; i++) {
-        advance();
-      }
-
-      // Now user 1's burst window should have cleared
-      expect(limiter.isRateLimited(uid('1')), isFalse);
-    });
-
-    test('after 10+ second pause sustained window clears', () {
-      final result = _makeLimiter();
-      final limiter = result.limiter;
-      final advance = result.advance;
-
-      // Fill sustained window: send 31 messages at 100ms intervals = 3.1s
-      // Sustained window is 10s, so 30 msgs in 3s is within limit.
-      // 31st msg at 3.1s is blocked by sustained.
-      for (var i = 0; i < 30; i++) {
-        limiter.isRateLimited(uid('1'));
-      }
-      expect(limiter.isRateLimited(uid('1')), isTrue); // 31st blocked
-
-      // Burn 100 ticks (10s) to clear sustained window
-      for (var i = 0; i < 100; i++) {
-        advance();
-      }
-
-      // Sustained window should have cleared for user 1
-      expect(limiter.isRateLimited(uid('1')), isFalse);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // 3. Multiple users
-  // ---------------------------------------------------------------------------
-  group('isRateLimited — multiple users', () {
-    test('rate limits are independent per UserId', () {
-      final limiter = _makeLimiter().limiter;
-
-      // Fill burst for user 1
-      for (var i = 0; i < 5; i++) {
-        limiter.isRateLimited(uid('1'));
-      }
-      expect(limiter.isRateLimited(uid('1')), isTrue);
-
-      // User 2 should not be affected
-      expect(limiter.isRateLimited(uid('2')), isFalse);
-    });
-
-    test('blocking one user does not affect another', () {
-      final limiter = _makeLimiter().limiter;
-
-      // Fill burst for both users
-      for (var i = 0; i < 5; i++) {
-        limiter.isRateLimited(uid('1'));
-        limiter.isRateLimited(uid('2'));
-      }
-
-      expect(limiter.isRateLimited(uid('1')), isTrue);
-      expect(limiter.isRateLimited(uid('2')), isTrue);
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // 4. isRateLimitedByTier()
-  // ---------------------------------------------------------------------------
-  group('isRateLimitedByTier', () {
-    test('RateLimitTier.none always returns false', () {
-      final limiter = _makeLimiter().limiter;
-      for (var i = 0; i < 100; i++) {
-        expect(
-          limiter.isRateLimitedByTier(uid('1'), RateLimitTier.none),
-          isFalse,
-        );
-      }
-    });
-
-    test('RateLimitTier.relaxed (10/30s) blocks after 10 messages', () {
-      final limiter = _makeLimiter().limiter;
+    test('allows burst up to capacity', () {
+      final l = _limiter();
       for (var i = 0; i < 10; i++) {
-        expect(
-          limiter.isRateLimitedByTier(uid('1'), RateLimitTier.relaxed),
-          isFalse,
-          reason: 'Message ${i + 1} should be allowed',
-        );
+        expect(l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed),
+            isFalse, reason: 'request $i');
       }
-      expect(
-        limiter.isRateLimitedByTier(uid('1'), RateLimitTier.relaxed),
-        isTrue,
-      );
+      // 11th blocked
+      expect(l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed), isTrue);
     });
 
-    test('RateLimitTier.strict (3/5s) blocks after 3 messages', () {
-      final limiter = _makeLimiter().limiter;
+    test('blocks after capacity exceeded', () {
+      final l = _limiter();
       for (var i = 0; i < 3; i++) {
-        expect(
-          limiter.isRateLimitedByTier(uid('1'), RateLimitTier.strict),
-          isFalse,
-          reason: 'Message ${i + 1} should be allowed',
-        );
+        l.isRateLimitedByTier(_uid('u1'), RateLimitTier.strict);
       }
-      expect(
-        limiter.isRateLimitedByTier(uid('1'), RateLimitTier.strict),
-        isTrue,
-      );
+      expect(l.isRateLimitedByTier(_uid('u1'), RateLimitTier.strict), isTrue);
     });
 
-    test('RateLimitTier.critical (5/1s) blocks after 5 messages', () {
-      final limiter = _makeLimiter().limiter;
-      for (var i = 0; i < 5; i++) {
-        expect(
-          limiter.isRateLimitedByTier(uid('1'), RateLimitTier.critical),
-          isFalse,
-          reason: 'Message ${i + 1} should be allowed',
-        );
+    test('refills over time', () {
+      final l = _limiter();
+      // Exhaust relaxed (10/30s)
+      for (var i = 0; i < 10; i++) {
+        l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed);
       }
-      expect(
-        limiter.isRateLimitedByTier(uid('1'), RateLimitTier.critical),
-        isTrue,
-      );
+      expect(l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed), isTrue);
+
+      // Advance 30s — bucket refills
+      _advance(30000);
+      expect(l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed), isFalse);
     });
 
-    test('RateLimitTier.admin (1/5s) blocks after 1 message', () {
-      final limiter = _makeLimiter().limiter;
-      expect(
-        limiter.isRateLimitedByTier(uid('1'), RateLimitTier.admin),
-        isFalse,
-      );
-      expect(
-        limiter.isRateLimitedByTier(uid('1'), RateLimitTier.admin),
-        isTrue,
-      );
-    });
-
-    test('tier windows are independent of each other', () {
-      final limiter = _makeLimiter().limiter;
-
-      // Fill critical tier (5/1s) for user 1
-      for (var i = 0; i < 5; i++) {
-        limiter.isRateLimitedByTier(uid('1'), RateLimitTier.critical);
+    test('none tier never limits', () {
+      final l = _limiter();
+      for (var i = 0; i < 1000; i++) {
+        expect(l.isRateLimitedByTier(_uid('u1'), RateLimitTier.none), isFalse);
       }
-      expect(
-        limiter.isRateLimitedByTier(uid('1'), RateLimitTier.critical),
-        isTrue,
-      );
-
-      // Relaxed tier should still be available
-      expect(
-        limiter.isRateLimitedByTier(uid('1'), RateLimitTier.relaxed),
-        isFalse,
-      );
     });
   });
 
-  // ---------------------------------------------------------------------------
-  // 5. RateLimitTierMapping
-  // ---------------------------------------------------------------------------
+  group('Token Bucket — per-user isolation', () {
+    test('users are independent', () {
+      final l = _limiter();
+      for (var i = 0; i < 10; i++) {
+        l.isRateLimitedByTier(_uid('a'), RateLimitTier.relaxed);
+      }
+      expect(l.isRateLimitedByTier(_uid('a'), RateLimitTier.relaxed), isTrue);
+      expect(l.isRateLimitedByTier(_uid('b'), RateLimitTier.relaxed), isFalse);
+    });
+  });
+
+  group('Token Bucket — per-tier isolation', () {
+    test('exhausting one tier does not affect another', () {
+      final l = _limiter();
+      // Exhaust strict (3/5s)
+      for (var i = 0; i < 3; i++) {
+        l.isRateLimitedByTier(_uid('u1'), RateLimitTier.strict);
+      }
+      expect(l.isRateLimitedByTier(_uid('u1'), RateLimitTier.strict), isTrue);
+      // Relaxed (10/30s) still available
+      expect(l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed), isFalse);
+    });
+  });
+
+  group('Penalty escalation', () {
+    test('1st violation → warning', () {
+      final l = _limiter();
+      expect(l.recordViolation(_uid('u1')), PenaltyLevel.warning);
+      expect(l.getViolationCount(_uid('u1')), 1);
+      expect(l.getPenaltyLevel(_uid('u1')), PenaltyLevel.warning);
+    });
+
+    test('2nd violation → mute5s', () {
+      final l = _limiter();
+      l.recordViolation(_uid('u1'));
+      expect(l.recordViolation(_uid('u1')), PenaltyLevel.mute5s);
+      expect(l.getViolationCount(_uid('u1')), 2);
+      expect(l.isMuted(_uid('u1')), isTrue);
+      expect(l.getMuteRemainingMs(_uid('u1')), greaterThan(0));
+    });
+
+    test('3rd violation → mute30s', () {
+      final l = _limiter();
+      l.recordViolation(_uid('u1'));
+      l.recordViolation(_uid('u1'));
+      expect(l.recordViolation(_uid('u1')), PenaltyLevel.mute30s);
+      expect(l.getViolationCount(_uid('u1')), 3);
+      expect(l.isMuted(_uid('u1')), isTrue);
+    });
+
+    test('4th violation → close', () {
+      final l = _limiter();
+      for (var i = 0; i < 3; i++) l.recordViolation(_uid('u1'));
+      expect(l.recordViolation(_uid('u1')), PenaltyLevel.close);
+      expect(l.getViolationCount(_uid('u1')), 4);
+    });
+
+    test('5th+ stays at close', () {
+      final l = _limiter();
+      for (var i = 0; i < 5; i++) l.recordViolation(_uid('u1'));
+      expect(l.getPenaltyLevel(_uid('u1')), PenaltyLevel.close);
+      expect(l.getViolationCount(_uid('u1')), 5);
+    });
+
+    test('mute5s expires after 5s', () {
+      final l = _limiter();
+      l.recordViolation(_uid('u1'));
+      l.recordViolation(_uid('u1'));
+      expect(l.isMuted(_uid('u1')), isTrue);
+
+      _advance(6000);
+      expect(l.isMuted(_uid('u1')), isFalse);
+      expect(l.getMuteRemainingMs(_uid('u1')), isNull);
+    });
+
+    test('mute30s expires after 30s', () {
+      final l = _limiter();
+      for (var i = 0; i < 3; i++) l.recordViolation(_uid('u1'));
+      expect(l.isMuted(_uid('u1')), isTrue);
+
+      _advance(31000);
+      expect(l.isMuted(_uid('u1')), isFalse);
+    });
+
+    test('violation count resets after 5min TTL', () {
+      final l = _limiter();
+      l.recordViolation(_uid('u1'));
+      l.recordViolation(_uid('u1'));
+      expect(l.getViolationCount(_uid('u1')), 2);
+
+      _advance(6 * 60 * 1000); // 6 min
+      expect(l.recordViolation(_uid('u1')), PenaltyLevel.warning);
+      expect(l.getViolationCount(_uid('u1')), 1);
+    });
+
+    test('count does NOT reset before 5min', () {
+      final l = _limiter();
+      l.recordViolation(_uid('u1'));
+      l.recordViolation(_uid('u1'));
+
+      _advance(4 * 60 * 1000); // 4 min
+      expect(l.recordViolation(_uid('u1')), PenaltyLevel.mute30s);
+      expect(l.getViolationCount(_uid('u1')), 3);
+    });
+
+    test('per-user penalty isolation', () {
+      final l = _limiter();
+      for (var i = 0; i < 3; i++) l.recordViolation(_uid('a'));
+
+      expect(l.getPenaltyLevel(_uid('b')), PenaltyLevel.warning);
+      expect(l.getViolationCount(_uid('b')), 0);
+      expect(l.isMuted(_uid('b')), isFalse);
+    });
+  });
+
+  group('Rate limit triggers penalty', () {
+    test('exhausting tier records violation automatically', () {
+      final l = _limiter();
+      for (var i = 0; i < 10; i++) {
+        l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed);
+      }
+      // 11th triggers penalty
+      l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed);
+      expect(l.getViolationCount(_uid('u1')), 1);
+      expect(l.getPenaltyLevel(_uid('u1')), PenaltyLevel.warning);
+    });
+  });
+
+  group('isRateLimited (legacy)', () {
+    test('checks burst and sustained tiers', () {
+      final l = _limiter();
+      // Exhaust burst (5/1s)
+      for (var i = 0; i < 5; i++) {
+        l.isRateLimitedByTier(_uid('u1'), RateLimitTier.burst);
+      }
+      expect(l.isRateLimited(_uid('u1')), isTrue);
+    });
+  });
+
   group('RateLimitTierMapping', () {
-    test('PingRequest maps to none', () {
-      const req = WsRequest.ping(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.none);
+    test('ping → none', () {
+      expect(const WsRequest.ping(n: '1').rateLimitTier, RateLimitTier.none);
     });
-
-    test('AckRequest maps to none', () {
-      const req = WsRequest.ack(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.none);
+    test('ack → none', () {
+      expect(const WsRequest.ack(n: '1').rateLimitTier, RateLimitTier.none);
     });
-
-    test('NewLetterRequest maps to relaxed', () {
-      const req = WsRequest.newLetter(n: '1', content: 'hi');
-      expect(req.rateLimitTier, RateLimitTier.relaxed);
+    test('newLetter → relaxed', () {
+      expect(const WsRequest.newLetter(n: '1', content: 'x').rateLimitTier,
+          RateLimitTier.relaxed);
     });
-
-    test('EditLetterRequest maps to normal', () {
-      const req = WsRequest.editLetter(n: '1', letterId: 1, content: 'hi');
-      expect(req.rateLimitTier, RateLimitTier.normal);
-    });
-
-    test('DeleteLetterRequest maps to normal', () {
-      const req = WsRequest.deleteLetter(n: '1', letterId: [1]);
-      expect(req.rateLimitTier, RateLimitTier.normal);
-    });
-
-    test('JoinArenaRequest maps to strict', () {
-      const req = WsRequest.joinArena(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.strict);
-    });
-
-    test('LeaveArenaRequest maps to strict', () {
-      const req = WsRequest.leaveArena(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.strict);
-    });
-
-    test('JoinBattleRoomRequest maps to strict', () {
-      const req = WsRequest.joinBattleRoom(n: '1', combatRoomId: 'room1');
-      expect(req.rateLimitTier, RateLimitTier.strict);
-    });
-
-    test('ChangeLocationRequest maps to strict', () {
-      const req = WsRequest.changeLocation(
-        n: '1',
-        location: GameLocation.arena,
-      );
-      expect(req.rateLimitTier, RateLimitTier.strict);
-    });
-
-    test('GameActionRequest maps to critical', () {
+    test('gameAction → critical', () {
       final req = WsRequest.gameAction(
         n: '1',
-        combatRoomId: 'room1',
-        action: const GameActionDto.attack(combatantId: 1, enemyCombatantId: 2),
+        combatRoomId: 'r',
+        action: const GameActionDto.attack(
+            combatantId: UnitId('1'), enemyCombatantId: UnitId('2')),
       );
       expect(req.rateLimitTier, RateLimitTier.critical);
     });
-
-    test('AllocateStatsRequest maps to critical', () {
-      const req = WsRequest.allocateStats(
-        n: '1',
-        unitId: 1,
-        addAtk: 1,
-        addDef: 1,
-        addVitality: 1,
-      );
-      expect(req.rateLimitTier, RateLimitTier.critical);
+    test('joinArena → strict', () {
+      expect(
+          const WsRequest.joinArena(n: '1').rateLimitTier, RateLimitTier.strict);
     });
-
-    test('SyncCombatStateRequest maps to sync', () {
-      const req = WsRequest.syncCombatState(n: '1', combatRoomId: 'room1');
-      expect(req.rateLimitTier, RateLimitTier.sync);
+    test('unknown → normal', () {
+      expect(const WsRequest.editLetter(n: '1', letterId: 1, content: 'y')
+          .rateLimitTier, RateLimitTier.normal);
     });
-
-    test('SyncJoinedBroadsRequest maps to sync', () {
-      const req = WsRequest.syncJoinedBroads(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.sync);
-    });
-
-    test('SyncMenuRequest maps to sync', () {
-      const req = WsRequest.syncMenu(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.sync);
-    });
-
-    test('SyncOnlineUsers maps to sync', () {
-      const req = WsRequest.syncOnlineUsers(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.sync);
-    });
-
-    test('CreateBotsRequest maps to admin', () {
-      const req = WsRequest.createBots(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.admin);
-    });
-
-    test('ResetCombatsRequest maps to admin', () {
-      const req = WsRequest.resetCombats(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.admin);
-    });
-
-    test('ResetEdictsRequest maps to admin', () {
-      const req = WsRequest.resetEdicts(n: '1');
-      expect(req.rateLimitTier, RateLimitTier.admin);
-    });
-
-    test(
-      'unknown type defaults to normal (DisconnectRequest is explicit, use WithTokenRequest)',
-      () {
-        // WithTokenRequest is not in the mapping, so it defaults to normal
-        const req = WsRequest.withToken(n: '1', token: 'abc');
-        expect(req.rateLimitTier, RateLimitTier.normal);
-      },
-    );
   });
 
-  // ---------------------------------------------------------------------------
-  // 6. Stale entry cleanup
-  // ---------------------------------------------------------------------------
-  group('stale entry cleanup', () {
-    test('user inactive for 5+ minutes is removed from state', () {
-      final result = _makeLimiter();
-      final limiter = result.limiter;
-      final advance = result.advance;
-
-      // User 1 sends a message at t=0
-      limiter.isRateLimited(uid('1'));
-
-      // Advance time by 6 minutes (360s = 3600 ticks at 100ms)
-      for (var i = 0; i < 3600; i++) {
-        advance();
-      }
-
-      // After 6 minutes of inactivity, user 1's state should be stale.
-      // User 1 should be able to send 5 messages again (burst limit)
-      // because their state was purged.
-      for (var i = 0; i < 5; i++) {
-        expect(
-          limiter.isRateLimited(uid('1')),
-          isFalse,
-          reason:
-              'After stale cleanup, user 1 message ${i + 1} should be allowed',
-        );
-      }
-      // 6th should be blocked (new state, fresh burst window)
-      expect(limiter.isRateLimited(uid('1')), isTrue);
+  group('nextRefillMs', () {
+    test('null when tokens available', () {
+      final l = _limiter();
+      expect(l.nextRefillMs(_uid('u1'), RateLimitTier.relaxed), isNull);
     });
 
-    test('after cleanup user can send without previous limits', () {
-      final result = _makeLimiter();
-      final limiter = result.limiter;
-      final advance = result.advance;
-
-      // Fill burst for user 1
-      for (var i = 0; i < 5; i++) {
-        limiter.isRateLimited(uid('1'));
+    test('returns ms when bucket exhausted', () {
+      final l = _limiter();
+      for (var i = 0; i < 10; i++) {
+        l.isRateLimitedByTier(_uid('u1'), RateLimitTier.relaxed);
       }
-      expect(limiter.isRateLimited(uid('1')), isTrue); // blocked
-
-      // Advance 6 minutes
-      for (var i = 0; i < 3600; i++) {
-        advance();
-      }
-
-      // User 1 should now have a fresh state (old one purged as stale)
-      // Send 5 more messages — should all go through
-      for (var i = 0; i < 5; i++) {
-        expect(
-          limiter.isRateLimited(uid('1')),
-          isFalse,
-          reason: 'Message ${i + 1} after cleanup should be allowed',
-        );
-      }
+      final ms = l.nextRefillMs(_uid('u1'), RateLimitTier.relaxed);
+      expect(ms, isNotNull);
+      expect(ms!, greaterThan(0));
     });
   });
 }

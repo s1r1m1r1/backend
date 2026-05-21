@@ -85,7 +85,7 @@ void main() {
         createdAt: DateTime.now(),
       ),
       unit: Unit(
-        unitId: UnitId(999),
+        unitId: UnitId('999'),
         name: 'DebugUnit',
         hp: 100,
         atk: 10,
@@ -100,7 +100,7 @@ void main() {
       receivedMessages,
       completer,
       UserId(testUserId),
-      UnitId(999),
+      UnitId('999'),
       repo,
     );
 

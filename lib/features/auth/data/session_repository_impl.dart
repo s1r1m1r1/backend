@@ -46,14 +46,14 @@ class SessionRepositoryImpl implements SessionRepository {
     final session = await _db.sessionDao.getSessionWithUser(
       token: token,
       refreshToken: refreshToken,
-      userId: userId?.id,
+      userId: userId,
     );
     return session;
   }
 
   @override
   Future<void> deleteSession(UserId userId) async {
-    await _db.sessionDao.softDeleteSessionByUserId(userId.id);
+    await _db.sessionDao.softDeleteSessionByUserId(userId);
   }
 
   @override
