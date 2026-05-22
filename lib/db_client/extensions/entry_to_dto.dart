@@ -58,7 +58,7 @@ extension TodoEntryToDto on TodoEntry {
 // =============================================================================
 extension SessionEntryToDto on SessionEntry {
   SessionDto toDto() => SessionDto(
-    user: UserDto(userId: UserId(userId), email: Email.none, role: Role.user),
+    user: UserDto(userId: UserId(userId), email: null, role: Role.user),
     unit: null,
   );
 }

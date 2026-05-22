@@ -12,7 +12,7 @@ class RemoveBotsCmd extends DeveloperWsCmd<RemoveBotsRequest> {
   @override
   FutureOr<void> executeDeveloper(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     RemoveBotsRequest message,
   ) async {

@@ -10,7 +10,7 @@ class JoinEdictCmd extends AuthenticatedWsCmd<JoinEdictRequest> {
   @override
   void executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     JoinEdictRequest message,
   ) {

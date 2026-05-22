@@ -26,23 +26,27 @@ abstract class AuthenticatedWsCmd<T extends WsRequest> extends WsCmd<T> {
     UserChannel channel,
     T message,
   ) async {
-    final session = context.read<OnlineRepository>().getSessionSINK(
-      channel.userId,
-    );
+    final userId = channel.userId;
+    // 1. Сначала пытаемся получить сессию, если userId существует
+    final session = userId != null
+        ? context.read<OnlineRepository>().getSessionSINK(userId)
+        : null;
+    // 2. Если userId нет ИЛИ сессия не найдена — закрываем канал и выходим
     if (session == null) {
       await channel.close(
         WebSocketCloseCode.sessionNotFound.code,
         WebSocketCloseCode.sessionNotFound.message,
       );
-      return;
+      return; // Важно: останавливаем дальнейшее выполнение метода!
     }
+    final unitId = session.unitId;
     session.lastActiveTime = DateTime.now();
 
     // Per-tier rate limiting via centralized RateLimiter.
     final rateLimiter = context.read<RateLimiter>();
     final tier = message.rateLimitTier;
-    if (rateLimiter.isRateLimitedByTier(channel.userId, tier)) {
-      final penalty = rateLimiter.recordViolation(channel.userId);
+    if (rateLimiter.isRateLimitedByTier(userId!, tier)) {
+      final penalty = rateLimiter.recordViolation(userId);
       final errorResponse = WsResponse.rateLimitError(
         n: Noun('rate_limit_${penalty.name}'),
         error: RateLimitErrorResponse(
@@ -50,21 +54,26 @@ abstract class AuthenticatedWsCmd<T extends WsRequest> extends WsCmd<T> {
           message: 'Превышен лимит запросов. Пожалуйста, подождите.',
           retryAfterMs: 1000,
           penaltyLevel: penalty.value,
-          currentViolationCount: rateLimiter.getViolationCount(channel.userId),
+          currentViolationCount: rateLimiter.getViolationCount(userId),
           commandType: message.runtimeType.toString(),
-          muteRemainingMs: rateLimiter.getMuteRemainingMs(channel.userId),
+          muteRemainingMs: rateLimiter.getMuteRemainingMs(userId),
         ),
       );
       channel.sinkAdd(errorResponse.toPacket());
       return;
     }
 
-    return executeAuthenticated(context, channel, session, message);
+    return executeAuthenticated(
+      context,
+      RegisteredUserChannel(channel, userId, unitId),
+      session,
+      message,
+    );
   }
 
   FutureOr<void> executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     T message,
   );
@@ -77,7 +86,7 @@ abstract class DeveloperWsCmd<T extends WsRequest>
   @override
   FutureOr<void> executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     T message,
   ) async {
@@ -93,7 +102,7 @@ abstract class DeveloperWsCmd<T extends WsRequest>
 
   FutureOr<void> executeDeveloper(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     T message,
   );

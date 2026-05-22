@@ -10,7 +10,7 @@ class DeleteLetterCmd extends AuthenticatedWsCmd<DeleteLetterRequest> {
   @override
   void executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     DeleteLetterRequest message,
   ) {

@@ -10,7 +10,7 @@ class JoinLettersCmd extends AuthenticatedWsCmd<JoinLettersRequest> {
   @override
   void executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     JoinLettersRequest message,
   ) {

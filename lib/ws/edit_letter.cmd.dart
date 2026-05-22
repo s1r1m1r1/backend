@@ -10,7 +10,7 @@ class EditLetterCmd extends AuthenticatedWsCmd<EditLetterRequest> {
   @override
   void executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     EditLetterRequest message,
   ) {

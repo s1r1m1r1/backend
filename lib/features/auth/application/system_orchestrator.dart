@@ -1,12 +1,11 @@
 import 'dart:async';
 
-import 'package:dto/dto.dart';
 import 'package:injectable/injectable.dart';
 import 'package:synchronized/synchronized.dart';
 
 import '../../../core/debug_log.dart';
-import '../../bot/application/arena_bot.dart';
 import '../../bot/application/bot_generator.dart';
+import '../../bot/application/bot_strategy.dart';
 import '../../bot/application/disconnect_bot.dart';
 import '../../bot/application/ws_bot_repository.dart';
 import '../../game/domain/unit.dart';
@@ -83,8 +82,11 @@ class SystemOrchestrator {
             debugLog('[BotCreate] SKIP bot ${b.email} — no unit selected');
             continue;
           }
-          final gameSession = GameSession.fromSession(session, Unit.fromDto(unit));
-          final sinkBot = ArenaBot(
+          final gameSession = GameSession.fromSession(
+            session,
+            Unit.fromDto(unit),
+          );
+          final sinkBot = RegisteredScenarioBot.arena(
             botRepository: botRepository,
             userId: gameSession.user.userId,
             unitId: gameSession.unit.unitId,
@@ -128,7 +130,7 @@ class SystemOrchestrator {
     _lock.synchronized(() async {
       try {
         final userId = userChannel.userId;
-        if (userId == UserId.none) return;
+        if (userId == null) return;
         final session = onlineBroadcast.getGameSocket(userId);
         if (session == null) return;
         final replacedByUser =

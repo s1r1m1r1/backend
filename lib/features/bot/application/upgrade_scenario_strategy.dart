@@ -165,6 +165,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
     List<CombatantDto> membs,
   ) {
     final myUnitId = bot.unitId;
+    if (bot.unitId == null) return;
     if (currentTurn == myUnitId) {
       final enemies = membs
           .where((m) => m.unitId != myUnitId && m.unit.hp > 0)
@@ -180,7 +181,7 @@ class UpgradeScenarioStrategy extends BotStrategy {
           n: const Noun('upgrade_attack'),
           combatRoomId: _combatRoomId!,
           action: GameActionDto.attack(
-            combatantId: myUnitId,
+            combatantId: myUnitId!,
             enemyCombatantId: enemy.unitId,
           ),
         ),

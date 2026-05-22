@@ -10,8 +10,8 @@ import 'package:dto/dto.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final handler = webSocketHandler((webSocketChannel, protocol) {
-    // start with not authenticated userId -1
-    final channel = UserChannel(webSocketChannel, UserId.none, UnitId.none);
+    // start with not authenticated - userId and unitId are null
+    final channel = UserChannel(webSocketChannel);
     webSocketChannel.stream.listen(
       (message) async {
         if (message is! String) {

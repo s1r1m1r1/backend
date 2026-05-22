@@ -11,7 +11,7 @@ class SyncMenuCmd extends AuthenticatedWsCmd<SyncMenuRequest> {
   @override
   FutureOr<void> executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     SyncMenuRequest message,
   ) async {

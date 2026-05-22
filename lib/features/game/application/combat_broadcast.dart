@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_brace_in_string_interps
+// ignore_for_file: unnecessary_brace_in_string_interpolations
 
 import 'dart:async';
 
@@ -82,7 +82,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
       _startTurnTimer();
       _broadcastEvent([
         CombatEventDto.turn(
-          currentTurn: combat.currentCombatant,
+          currentTurn: combat.currentCombatant!,
           unitOrder: combat.unitOrder,
           turnEndAt: _currentTurnEndAt,
         ),
@@ -111,7 +111,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
         return;
       }
 
-      final combatant = combatants[index];
+      final Combatant combatant = combatants[index];
       combatant.ready = true;
       final readyCount = combatants.fold(0, (p, c) => p + (c.ready ? 1 : 0));
       final allReady = readyCount == combatants.length;
@@ -137,7 +137,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
                   membs: combatants.map((i) => i.toDto()).toList(),
                   unitOrder: combat.unitOrder,
                   ready: readyCount,
-                  currentTurn: combat.currentCombatant,
+                  currentTurn: combat.currentCombatant!,
                   turnEndAt: _currentTurnEndAt,
                   id: -1, // Initial state before any events
                 )
@@ -152,7 +152,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
               membs: combatants.map((i) => i.toDto()).toList(),
               unitOrder: combat.unitOrder,
               ready: readyCount,
-              currentTurn: combat.currentCombatant,
+              currentTurn: combat.currentCombatant!,
               id: -1,
             ).toPacket(),
           );
@@ -164,7 +164,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
             n: n,
             broadcastId: broadcastId as String,
             round: combat.round,
-            currentTurn: combat.currentCombatant,
+            currentTurn: combat.currentCombatant!,
             membs: combatants.map((i) => i.toDto(includeBase: true)).toList(),
             unitOrder: combat.unitOrder,
             turnEndAt: _currentTurnEndAt,
@@ -182,7 +182,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
           n: n,
           broadcastId: broadcastId as String,
           round: combat.round,
-          currentTurn: combat.currentCombatant,
+          currentTurn: combat.currentCombatant!,
           membs: combatants.map((i) => i.toDto(includeBase: true)).toList(),
           unitOrder: combat.unitOrder,
           turnEndAt: _currentTurnEndAt,
@@ -288,7 +288,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
           }
 
           log(
-            '[COMBAT][${broadcastId}] Round ${combat.round} | Turn ${combatant.unitId}\n'
+            '[COMBAT][$broadcastId] Round ${combat.round} | Turn ${combatant.unitId}\n'
             '  - ${combatant.mutableUnit.name} attacks ${enemyCombatant.mutableUnit.name}\n'
             '  - Damage: $damage | Enemy HP: ${enemyCombatant.mutableUnit.hp}',
           );
@@ -437,7 +437,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
 
           events.add(
             CombatEventDto.turn(
-              currentTurn: combat.currentCombatant,
+              currentTurn: combat.currentCombatant!,
               unitOrder: combat.unitOrder,
               turnEndAt: _currentTurnEndAt,
             ),
@@ -516,8 +516,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
     for (var i = 0; i < combatants.length; i++) {
       final combatant = combatants[i];
       combatant.teamId = TeamId(combatant.unitId.value);
-      final socket = await _socketOrBot(UserId(combatant.userId));
-
+      final socket = await _socketOrBot(combatant.userId);
       if (socket == null) {
         error = WsCombatError.missedSocket;
         continue;
@@ -549,7 +548,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
     }
 
     for (final combatant in combatants) {
-      final socket = await _socketOrBot(UserId(combatant.userId));
+      final socket = await _socketOrBot(combatant.userId);
       if (socket == null) continue;
 
       socket.sinkAdd(
@@ -632,7 +631,7 @@ class CombatBroadcast extends Broadcast<CombatResponse> {
     socket.sinkAdd(
       WsResponse.unitsUpdate(
         n: _nextNoun(),
-        dto: ListUnitDto(selectedId: selected?.id ?? UnitId.none, list: units),
+        dto: ListUnitDto(selectedId: selected?.id, list: units),
       ).toPacket(),
     );
   }

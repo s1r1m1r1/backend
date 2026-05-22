@@ -1,10 +1,13 @@
 import 'dart:async';
 
-import 'package:dart_frog_web_socket/dart_frog_web_socket.dart';
 import 'package:dto/dto.dart';
 
-import '../../bot/application/ws_bot_repository.dart';
 import '../domain/session.dart';
+import 'bot_sink.dart';
+import 'user_channel.dart';
+
+export 'bot_sink.dart';
+export 'user_channel.dart';
 
 typedef LateCallback = FutureOr<void> Function();
 
@@ -18,7 +21,8 @@ abstract class ISocket<S extends WsResponse> {
 
 abstract class IGameSocket<S extends WsResponse> extends ISocket<S> {
   UserId get userId;
-  void replaceSink(UserChannel? sink);
+  UnitId get unitId;
+  void replaceSink(RegisteredUserChannel sink);
   void setBot(SinkBot? bot);
 
   @override
@@ -34,10 +38,16 @@ abstract class IGameSocket<S extends WsResponse> extends ISocket<S> {
 class GameSocket extends IGameSocket {
   GameSocket._(this.session, this._userSink, this._bot, this.botMode);
   factory GameSocket.fromBot(GameSession session, SinkBot bot) =>
-      ._(session, null, bot, true);
+      GameSocket._(session, null, bot, true);
 
-  factory GameSocket.fromChannel(GameSession session, UserChannel channel) =>
-      ._(session, channel, null, false);
+  factory GameSocket.fromChannel(GameSession session, UserChannel channel) {
+    return GameSocket._(
+      session,
+      RegisteredUserChannel(channel, session.user.userId, session.unit.unitId),
+      null,
+      false,
+    );
+  }
 
   final GameSession session;
 
@@ -46,8 +56,11 @@ class GameSocket extends IGameSocket {
   @override
   UserId get userId => session.user.userId;
 
-  UserChannel? _userSink;
-  UserChannel? get userSink => _userSink;
+  @override
+  UnitId get unitId => session.unit.unitId;
+
+  RegisteredUserChannel? _userSink;
+  RegisteredUserChannel? get userSink => _userSink;
 
   String? get activeRoomId {
     final broads = joinedBroadsInfo();
@@ -151,11 +164,13 @@ class GameSocket extends IGameSocket {
   }
 
   @override
-  void replaceSink(UserChannel? sink) {
+  void replaceSink(RegisteredUserChannel? sink) {
     botMode = false;
     _bot?.dispose();
     // передать userId в sink
-    sink?.userId = userId;
+    if (sink != null) {
+      sink.userId = userId;
+    }
     // сбросить ботов , и userId
     _userSink?.dispose();
     // заменить sink
@@ -224,146 +239,4 @@ class GameSocket extends IGameSocket {
       return BroadcastMemberDto(id: id);
     }).toList();
   }
-}
-//-------------------------------------------------------------
-
-abstract class Sink<T extends WsResponse> {
-  UserId get userId;
-  set userId(UserId id);
-
-  set unitId(UnitId id);
-  UnitId get unitId;
-
-  void sinkAdd(EncodedPacket<T> encoded);
-  void dispose();
-}
-
-class UserChannel extends Sink<WsResponse> {
-  UserChannel(this._channel, this._userId, this._unitId);
-  final WebSocketChannel _channel;
-
-  WebSocketChannel get channel => _channel;
-
-  late UnitId _unitId;
-  @override
-  UnitId get unitId => _unitId;
-  @override
-  set unitId(UnitId id) => _unitId = id;
-
-  @override
-  void sinkAdd(EncodedPacket<WsResponse> encoded) {
-    _channel.sink.add(encoded.rawJson);
-  }
-
-  Future<void> close(int? code, String? reason) =>
-      _channel.sink.close(code, reason);
-
-  @override
-  bool operator ==(Object other) =>
-      other is UserChannel && other._channel == _channel;
-
-  @override
-  int get hashCode => _channel.hashCode;
-
-  @override
-  void dispose() {}
-
-  UserId _userId;
-  @override
-  UserId get userId => _userId;
-  @override
-  set userId(UserId id) => _userId = id;
-
-  /// Short-window timestamps (1 second) — burst protection.
-  @Deprecated('Use centralized RateLimiter service instead')
-  final List<DateTime> _burstTimestamps = [];
-
-  /// Long-window timestamps (10 seconds) — sustained flood protection.
-  @Deprecated('Use centralized RateLimiter service instead')
-  final List<DateTime> _sustainedTimestamps = [];
-
-  /// Maximum messages per 1-second window (burst limit).
-  @Deprecated('Use centralized RateLimiter service instead')
-  static const _burstLimit = 5;
-
-  /// Burst window duration.
-  @Deprecated('Use centralized RateLimiter service instead')
-  static const _burstWindow = Duration(seconds: 1);
-
-  /// Maximum messages per 10-second window (sustained limit).
-  @Deprecated('Use centralized RateLimiter service instead')
-  static const _sustainedLimit = 30;
-
-  /// Sustained window duration.
-  @Deprecated('Use centralized RateLimiter service instead')
-  static const _sustainedWindow = Duration(seconds: 10);
-
-  /// Returns `true` if the user has exceeded either the burst or sustained rate limit.
-  ///
-  /// Two sliding windows are checked:
-  /// - **Burst**: max [_burstLimit] messages per [_burstWindow] — prevents sudden spikes.
-  /// - **Sustained**: max [_sustainedLimit] messages per [_sustainedWindow] — prevents continuous flood.
-  ///
-  /// Timestamps outside each window are purged before checking.
-  @Deprecated('Use centralized RateLimiter service instead')
-  bool isRateLimited() {
-    final now = DateTime.now();
-
-    // Purge old timestamps outside the sustained window (covers both windows).
-    final cutoffSustained = now.subtract(_sustainedWindow);
-    _sustainedTimestamps.removeWhere((t) => t.isBefore(cutoffSustained));
-
-    final cutoffBurst = now.subtract(_burstWindow);
-    _burstTimestamps.removeWhere((t) => t.isBefore(cutoffBurst));
-
-    // Check burst limit (short window).
-    if (_burstTimestamps.length >= _burstLimit) {
-      return true;
-    }
-
-    // Check sustained limit (long window).
-    if (_sustainedTimestamps.length >= _sustainedLimit) {
-      return true;
-    }
-
-    // Record the message in both windows.
-    _burstTimestamps.add(now);
-    _sustainedTimestamps.add(now);
-    return false;
-  }
-}
-
-abstract class SinkBot<T extends WsResponse, W extends WsRequest>
-    extends Sink<WsResponse> {
-  SinkBot({
-    required this._botRepository,
-    required this._userId,
-    required this._unitId,
-  }) {
-    botCallback = (WsRequest toServer) => _botRepository.add(this, toServer);
-  }
-  final BotRepository _botRepository;
-
-  UserId _userId;
-
-  UnitId _unitId;
-
-  @override
-  UserId get userId => _userId;
-  @override
-  set userId(UserId id) => _userId = id;
-
-  @override
-  UnitId get unitId => _unitId;
-  @override
-  set unitId(UnitId unitId) => _unitId = unitId;
-
-  @override
-  void sinkAdd(EncodedPacket<WsResponse> encoded);
-
-  @override
-  void dispose();
-
-  void Function(WsRequest)? botCallback;
-  FutureOr<void> init();
 }

@@ -129,7 +129,12 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
         debugLog(
           'replace channel in session ${socket.userSink?.userId} ${userChannel.userId}',
         );
-        socket.replaceSink(userChannel);
+        final reg = RegisteredUserChannel(
+          userChannel,
+          socket.userId,
+          socket.unitId,
+        );
+        socket.replaceSink(reg);
         if (prev != null) {
           await prev.sink.close(
             WebSocketCloseCode.sessionConflict.code,
@@ -188,7 +193,7 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
     try {
       debugLog('ActiveUsersBloc infoJoinedBroads');
       final userId = channel.userId;
-      if (userId == UserId.none) return;
+      if (userId == null) return;
 
       debugLog('ActiveUsersBloc infoJoinedBroads 2');
       final sessionChannel = _onlineRep.getSessionUSERID(userId);
@@ -211,8 +216,8 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
     _lock.synchronized(() async {
       try {
         final userId = channel.userId;
-        if (userId == UserId.none) {
-          addError(Exception('userId is none'), StackTrace.current);
+        if (userId == null) {
+          addError(Exception('userId is null'), StackTrace.current);
           return;
         }
 
@@ -287,7 +292,7 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
     socket.sinkAdd(
       WsResponse.unitsUpdate(
         n: _nextNoun(),
-        dto: ListUnitDto(selectedId: selected?.id ?? UnitId.none, list: units),
+        dto: ListUnitDto(selectedId: selected?.id, list: units),
       ).toPacket(),
     );
   }
@@ -304,10 +309,7 @@ class PresenceManagerImpl extends BroadcastThrottle<WsResponse>
       WsResponse.menu(
         n: n,
         user: socket.session.user.toDto(),
-        units: ListUnitDto(
-          selectedId: selected?.id ?? UnitId.none,
-          list: units,
-        ),
+        units: ListUnitDto(selectedId: selected?.id, list: units),
       ).toPacket(),
     );
   }

@@ -73,8 +73,8 @@ class RateLimiter {
   RateLimiter() : _now = DateTime.now;
   RateLimiter.withClock(this._now);
 
-  final Map<UserId, Map<int, _Bucket>> _buckets = {};
-  final Map<UserId, _PenaltyState> _penalties = {};
+  final Map<ActorId, Map<int, _Bucket>> _buckets = {};
+  final Map<ActorId, _PenaltyState> _penalties = {};
   final DateTime Function() _now;
 
   // —— Public API ——
@@ -83,7 +83,7 @@ class RateLimiter {
   /// [tokenCost] defaults to 1.0, but can be higher for heavy requests.
   /// Returns true if rate limited (blocked).
   bool isRateLimitedByTier(
-    UserId userId,
+    ActorId actorId,
     RateLimitTier tier, {
     double tokenCost = 1.0,
   }) {
@@ -92,11 +92,11 @@ class RateLimiter {
     final now = _now();
 
     // Check mute first
-    final penalty = _penalties[userId];
+    final penalty = _penalties[actorId];
     if (penalty != null && penalty.isMuted(now)) return true;
 
     // Token bucket
-    final userBuckets = _buckets.putIfAbsent(userId, () => {});
+    final userBuckets = _buckets.putIfAbsent(actorId, () => {});
     final bucket = userBuckets.putIfAbsent(
       tier.index,
       () => _Bucket(tokens: tier.capacity, lastRefill: now),
@@ -109,7 +109,7 @@ class RateLimiter {
     }
 
     // No token — record penalty
-    _penalties.putIfAbsent(userId, () => _PenaltyState()).record(now);
+    _penalties.putIfAbsent(actorId, () => _PenaltyState()).record(now);
     return true;
   }
 
@@ -123,8 +123,8 @@ class RateLimiter {
       _penalties.putIfAbsent(userId, () => _PenaltyState()).record(_now());
 
   /// Current penalty level for user
-  PenaltyLevel getPenaltyLevel(UserId userId) =>
-      _penalties[userId]?.level ?? PenaltyLevel.warning;
+  PenaltyLevel getPenaltyLevel(ActorId actorId) =>
+      _penalties[actorId]?.level ?? PenaltyLevel.warning;
 
   /// Current violation count
   int getViolationCount(UserId userId) => _penalties[userId]?.count ?? 0;

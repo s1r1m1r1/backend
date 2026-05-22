@@ -10,7 +10,7 @@ class CreateNewEdictCmd extends AuthenticatedWsCmd<CreateNewEdictRequest> {
   @override
   void executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     CreateNewEdictRequest message,
   ) {

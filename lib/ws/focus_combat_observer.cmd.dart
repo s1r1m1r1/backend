@@ -11,7 +11,7 @@ class FocusCombatObserverCmd
   @override
   void executeDeveloper(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     FocusCombatObserverRequest message,
   ) {

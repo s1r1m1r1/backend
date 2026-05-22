@@ -11,7 +11,7 @@ class JoinBattleRoomCmd extends AuthenticatedWsCmd<JoinBattleRoomRequest> {
   @override
   Future<void> executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     JoinBattleRoomRequest message,
   ) async {

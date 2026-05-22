@@ -10,7 +10,7 @@ class NewLetterCmd extends AuthenticatedWsCmd<NewLetterRequest> {
   @override
   void executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     NewLetterRequest message,
   ) {

@@ -28,7 +28,7 @@ class ArenaBotStrategy extends BotStrategy {
   List<CombatantDto> combatants = [];
   List<UnitId> unitOrder = [];
   int ready = 0;
-  UnitId currentTurn = UnitId.none;
+  UnitId? currentTurn;
 
   @override
   Duration get actionDelay =>
@@ -41,7 +41,7 @@ class ArenaBotStrategy extends BotStrategy {
     combatants = [];
     unitOrder = [];
     ready = 0;
-    currentTurn = UnitId.none;
+    currentTurn = null;
     debugLog('[ArenaBot ${bot.userId}] reset → ready');
   }
 
@@ -296,7 +296,7 @@ class ArenaBotStrategy extends BotStrategy {
           combatRoomId: broadcastId,
           n: nextNoun(),
           action: GameActionDto.attack(
-            combatantId: bot.unitId,
+            combatantId: bot.unitId!,
             enemyCombatantId: target.unitId,
           ),
         ),

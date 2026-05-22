@@ -11,7 +11,7 @@ class GetUnitStatsCmd extends AuthenticatedWsCmd<GetUnitStatsRequest> {
   @override
   FutureOr<void> executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     GetUnitStatsRequest message,
   ) async {

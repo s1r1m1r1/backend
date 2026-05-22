@@ -39,7 +39,7 @@ class BotRepository {
     if (toServer is! BotRequest) return;
 
     // Check rate limiting via BotCmdExecutor
-    if (_botCmdExecutor.isCommandBlocked(botSink.userId, toServer)) {
+    if (_botCmdExecutor.isCommandBlocked(botSink.botId, toServer)) {
       debugLog(
         '[BotRepository] Command blocked by rate limiter: $toServer for userId=${botSink.userId}',
       );
@@ -47,8 +47,11 @@ class BotRepository {
     }
 
     try {
-      debugLog('[BotRepository] add: $toServer for userId=${botSink.userId}');
-      final gameSocket = _onlineBroadcast.getGameSocket(botSink.userId);
+      debugLog('[BotRepository] add: $toServer for userId=${botSink.botId}');
+      final userId = botSink.userId;
+      final gameSocket = userId == null
+          ? null
+          : _onlineBroadcast.getGameSocket(userId);
       debugLog(
         '[BotRepository] gameSocket=${gameSocket != null ? "found" : "NULL"}',
       );
@@ -154,8 +157,10 @@ class BotRepository {
             toServer.addVitality,
           );
         case ChangeUnitStatsRequest():
+          final unitId = toServer.unitId;
+          if (unitId == null) return;
           await _unitDao.setStats(
-            unitId: toServer.unitId ?? botSink.unitId,
+            unitId: unitId,
             wins: toServer.wins,
             losses: toServer.losses,
             coins: toServer.coins,
@@ -172,14 +177,14 @@ class BotRepository {
   }
 
   /// Check if a bot is disabled due to rate limit violations.
-  bool isBotDisabled(UserId userId) => _botCmdExecutor.isBotDisabled(userId);
+  bool isBotDisabled(BotId botId) => _botCmdExecutor.isBotDisabled(botId);
 
   /// Re-enable a disabled bot (for testing or manual recovery).
-  void enableBot(UserId userId) => _botCmdExecutor.enableBot(userId);
+  void enableBot(BotId botId) => _botCmdExecutor.enableBot(botId);
 
   /// Get penalty level for a bot.
-  PenaltyLevel getBotPenaltyLevel(UserId userId) =>
-      _botCmdExecutor.getPenaltyLevel(userId);
+  PenaltyLevel getBotPenaltyLevel(BotId botId) =>
+      _botCmdExecutor.getPenaltyLevel(botId);
 
   /// Get remaining mute time for a bot in milliseconds.
   int? getBotMuteRemainingMs(UserId userId) =>

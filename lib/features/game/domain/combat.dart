@@ -9,19 +9,19 @@ enum TurnStatus { none, available, completed }
 class Combat {
   Combat({
     required this.round,
-    required this.currentCombatant,
+    this.currentCombatant,
     required this.unitOrder,
     required this.combatants,
   });
   factory Combat.initial() => Combat(
     round: const Round(0),
-    currentCombatant: UnitId.none,
+    currentCombatant: null,
     unitOrder: [],
     combatants: [],
   );
   CombatStatus status = CombatStatus.initial;
   Round round;
-  UnitId currentCombatant;
+  UnitId? currentCombatant;
   List<UnitId> unitOrder;
   List<Combatant> combatants;
 
@@ -31,7 +31,7 @@ class Combat {
       return;
     }
     unitOrder.removeAt(0);
-    currentCombatant = unitOrder.first;
+    currentCombatant = unitOrder.isNotEmpty ? unitOrder.first : null;
   }
 
   void initTurn() {
@@ -40,7 +40,7 @@ class Combat {
           .where((e) => e.mutableUnit.hp > 0)
           .map((e) => e.unitId)
           .toList();
-      currentCombatant = unitOrder.isNotEmpty ? unitOrder.first : UnitId.none;
+      currentCombatant = unitOrder.isNotEmpty ? unitOrder.first : null;
       status = CombatStatus.ready;
     }
   }
@@ -51,6 +51,6 @@ class Combat {
         .where((e) => e.mutableUnit.hp > 0)
         .map((e) => e.unitId)
         .toList();
-    currentCombatant = unitOrder.isNotEmpty ? unitOrder.first : UnitId.none;
+    currentCombatant = unitOrder.isNotEmpty ? unitOrder.first : null;
   }
 }

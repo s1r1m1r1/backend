@@ -10,7 +10,7 @@ class ResetCombatsCmd extends DeveloperWsCmd<ResetCombatsRequest> {
   @override
   void executeDeveloper(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     ResetCombatsRequest message,
   ) {

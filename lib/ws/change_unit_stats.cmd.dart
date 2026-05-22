@@ -13,7 +13,7 @@ class ChangeUnitStatsCmd extends DeveloperWsCmd<ChangeUnitStatsRequest> {
   @override
   FutureOr<void> executeDeveloper(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     ChangeUnitStatsRequest message,
   ) async {

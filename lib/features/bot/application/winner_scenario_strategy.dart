@@ -67,7 +67,7 @@ class WinnerScenarioStrategy extends BotStrategy {
       case ActiveEdictsResponse(:final edicts):
         if (isCreator) {
           if (!edicts.any(
-            (e) => e.members.any((m) => m.userId == (bot.userId as String)),
+            (e) => e.members.any((m) => m.userId == bot.userId),
           )) {
             bot.sendDelayed(
               const WsRequest.createNewEdict(n: Noun('winner_create')),
@@ -76,9 +76,7 @@ class WinnerScenarioStrategy extends BotStrategy {
         } else {
           if (edicts.isNotEmpty) {
             final target = edicts.first;
-            if (!target.members.any(
-              (m) => m.userId == (bot.userId as String),
-            )) {
+            if (!target.members.any((m) => m.userId == bot.userId)) {
               bot.sendDelayed(
                 WsRequest.joinEdict(
                   n: const Noun('winner_join_edict'),
@@ -179,6 +177,7 @@ class WinnerScenarioStrategy extends BotStrategy {
     debugLog(
       '[WinnerBot] Bot ${bot.userId} _handleTurn: turn=$currentTurn myId=$myUnitId',
     );
+    if (myUnitId == null) return;
     if (currentTurn == myUnitId) {
       final enemies = membs
           .where((m) => m.unitId != myUnitId && m.unit.hp > 0)

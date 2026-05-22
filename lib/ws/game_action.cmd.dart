@@ -11,7 +11,7 @@ class GameActionCmd extends AuthenticatedWsCmd<GameActionRequest> {
   @override
   Future<void> executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     GameActionRequest message,
   ) async {

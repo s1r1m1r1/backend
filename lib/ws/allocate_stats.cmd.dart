@@ -22,6 +22,8 @@ class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
     final unitRep = context.read<UnitRepository>();
 
     const logPrefix = '[WS][AllocateStats]';
+    final userId = channel.userId;
+    if (userId == null) throw StateError('userId not found');
 
     // Validate request
     if (message.addAtk < 0 || message.addDef < 0 || message.addVitality < 0) {
@@ -34,7 +36,7 @@ class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
 
     // Check if the unit belongs to the user
     final unit = await unitRep.getUnit(
-      userId: channel.userId,
+      userId: userId,
       characterId: message.unitId,
     );
 
@@ -60,7 +62,7 @@ class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
 
     // Fetch updated unit
     final updatedUnit = await unitRep.getUnit(
-      userId: channel.userId,
+      userId: userId,
       characterId: message.unitId,
     );
 
@@ -68,7 +70,7 @@ class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
 
     // Fetch session from context to update the current unit if it matches
     final onlineRep = context.read<OnlineRepository>();
-    final sessionChannel = onlineRep.getSessionUSERID(channel.userId);
+    final sessionChannel = onlineRep.getSessionUSERID(userId);
 
     if (sessionChannel != null &&
         sessionChannel.session.unit.unitId == message.unitId) {
@@ -80,7 +82,7 @@ class AllocateStatsCmd implements WsCmd<AllocateStatsRequest> {
     }
 
     // Broadcast updated units to client
-    final allUnits = await unitRep.getListUnit(userId: channel.userId);
+    final allUnits = await unitRep.getListUnit(userId: userId);
     channel.sinkAdd(
       WsResponse.unitsUpdate(
         n: message.n,

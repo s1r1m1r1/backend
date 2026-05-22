@@ -10,7 +10,7 @@ class ResetEdictsCmd extends DeveloperWsCmd<ResetEdictsRequest> {
   @override
   void executeDeveloper(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     ResetEdictsRequest message,
   ) {

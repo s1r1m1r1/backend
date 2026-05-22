@@ -11,7 +11,7 @@ class JoinAsCombatObserverCmd
   @override
   void executeDeveloper(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     JoinAsCombatObserverRequest message,
   ) {

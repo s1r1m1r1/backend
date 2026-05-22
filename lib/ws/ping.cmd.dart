@@ -14,9 +14,10 @@ class PingCmd extends WsCmd<PingRequest> {
     UserChannel channel,
     PingRequest message,
   ) {
+    if (channel.unitId == null) return null;
     // Optionally update lastActiveTime if session exists
     final session = context.read<OnlineRepository>().getSessionSINK(
-      channel.userId,
+      channel.userId!,
     );
     session?.lastActiveTime = DateTime.now();
 

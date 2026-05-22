@@ -11,7 +11,7 @@ class SyncCombatStateCmd extends AuthenticatedWsCmd<SyncCombatStateRequest> {
   @override
   Future<void> executeAuthenticated(
     RequestContext context,
-    UserChannel channel,
+    RegisteredUserChannel channel,
     GameSocket session,
     SyncCombatStateRequest message,
   ) async {

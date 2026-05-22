@@ -16,10 +16,10 @@ class BotCmdExecutor {
   final RateLimiter _rateLimiter;
 
   /// Tracks bots that have been disabled due to repeated rate limit violations.
-  final _disabledBots = <UserId>{};
+  final _disabledBots = <BotId>{};
 
   /// Tracks consecutive rate limit violations per bot.
-  final _violationCounts = <UserId, int>{};
+  final _violationCounts = <BotId, int>{};
 
   /// Threshold for disabling a bot (5 consecutive violations).
   static const _disableThreshold = 5;
@@ -28,9 +28,9 @@ class BotCmdExecutor {
   ///
   /// Returns `true` if the command should be BLOCKED (rate limited).
   /// Returns `false` if the command is allowed to proceed.
-  bool isCommandBlocked(UserId userId, WsRequest message) {
+  bool isCommandBlocked(BotId botId, WsRequest message) {
     // Check if bot is already disabled
-    if (_disabledBots.contains(userId)) {
+    if (_disabledBots.contains(botId)) {
       return true;
     }
 
@@ -39,7 +39,7 @@ class BotCmdExecutor {
 
     // Skip check for unlimited tiers
     if (tier.isUnlimited) {
-      _resetViolations(userId);
+      _resetViolations(botId);
       return false;
     }
 
@@ -48,52 +48,52 @@ class BotCmdExecutor {
 
     // Check rate limit with appropriate token cost
     final isLimited = _rateLimiter.isRateLimitedByTier(
-      userId,
+      botId,
       tier,
       tokenCost: tokenCost,
     );
 
     if (isLimited) {
-      _recordViolation(userId);
+      _recordViolation(botId);
       return true; // Block the command
     } else {
-      _resetViolations(userId);
+      _resetViolations(botId);
       return false; // Allow the command
     }
   }
 
-  void _recordViolation(UserId userId) {
-    final count = (_violationCounts[userId] ?? 0) + 1;
-    _violationCounts[userId] = count;
+  void _recordViolation(BotId botId) {
+    final count = (_violationCounts[botId] ?? 0) + 1;
+    _violationCounts[botId] = count;
 
     // Note: RateLimiter already records violation in isRateLimitedByTier()
     // We only track consecutive violations for auto-disabling bots
 
     if (count >= _disableThreshold) {
-      _disabledBots.add(userId);
-      _violationCounts.remove(userId);
+      _disabledBots.add(botId);
+      _violationCounts.remove(botId);
     }
   }
 
-  void _resetViolations(UserId userId) {
+  void _resetViolations(BotId userId) {
     _violationCounts.remove(userId);
   }
 
   /// Check if a bot is disabled.
-  bool isBotDisabled(UserId userId) => _disabledBots.contains(userId);
+  bool isBotDisabled(BotId botId) => _disabledBots.contains(botId);
 
   /// Re-enable a disabled bot (for testing or manual recovery).
-  void enableBot(UserId userId) {
-    _disabledBots.remove(userId);
-    _violationCounts.remove(userId);
+  void enableBot(BotId botId) {
+    _disabledBots.remove(botId);
+    _violationCounts.remove(botId);
   }
 
   /// Get violation count for a bot.
-  int getViolationCount(UserId userId) => _violationCounts[userId] ?? 0;
+  int getViolationCount(BotId botId) => _violationCounts[botId] ?? 0;
 
   /// Get penalty level for a bot from RateLimiter.
-  PenaltyLevel getPenaltyLevel(UserId userId) {
-    return _rateLimiter.getPenaltyLevel(userId);
+  PenaltyLevel getPenaltyLevel(BotId botId) {
+    return _rateLimiter.getPenaltyLevel(botId);
   }
 
   /// Get remaining mute time in milliseconds, if any.
